@@ -1,0 +1,23 @@
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky !important;
+  z-index: 9999;
+  :global {
+    .ant-menu {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+  }
+}
+
+.navbar_sticky {
+  padding: 0 48px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #fff;
+}
