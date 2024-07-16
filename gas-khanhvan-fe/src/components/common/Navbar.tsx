@@ -1,10 +1,9 @@
 import {AppstoreOutlined, MenuUnfoldOutlined, SettingOutlined} from '@ant-design/icons'
 import type {MenuProps} from 'antd'
 import {Menu} from 'antd'
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 
 import styles from '../../styles/common/Navbar.module.scss'
-import Container from './Container'
 
 type MenuItem = Required<MenuProps>['items'][number]
 

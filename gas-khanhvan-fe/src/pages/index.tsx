@@ -1,6 +1,6 @@
 import Navbar from '@/components/common/Navbar'
 import HeadTag from '../components/home/HeadTag'
-import React, {useState} from 'react'
+import React from 'react'
 import PromotionCarousel from '@/components/common/PromotionCarousel'
 
 import styles from '../styles/home/Home.module.scss'
