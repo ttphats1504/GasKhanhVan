@@ -26,6 +26,10 @@ a {
   text-decoration: none;
 }
 
+ul li {
+  list-style: none;
+}
+
 .ant-menu-dark.ant-menu-horizontal {
   flex: 1;
 }
