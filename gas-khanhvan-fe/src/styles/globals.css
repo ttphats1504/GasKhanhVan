@@ -1,8 +1,10 @@
 :root {
-  --font-mono: ui-monospace, Menlo, Monaco, 'Cascadia Mono', 'Segoe UI Mono', 'Roboto Mono',
-    'Oxygen Mono', 'Ubuntu Monospace', 'Source Code Pro', 'Fira Mono', 'Droid Sans Mono',
-    'Courier New', monospace;
+  --font-mono: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji' !important;
   --foreground-rgb: 0, 0, 0;
+  --primary-blue-800: #007aff;
+  --primary-blue-600: #10a8eb;
 }
 
 * {
@@ -19,6 +21,7 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
+  background-color: #f7f7f7;
 }
 
 a {
@@ -27,7 +30,7 @@ a {
 }
 
 ul li {
-  list-style: none;
+  list-style: nones;
 }
 
 .ant-menu-dark.ant-menu-horizontal {

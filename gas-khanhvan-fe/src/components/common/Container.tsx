@@ -5,7 +5,7 @@ type ContainerProps = {
 }
 
 const Container = ({children}: ContainerProps) => {
-  return <div style={{padding: '0 48px'}}>{children}</div>
+  return <div style={{padding: '0 5%'}}>{children}</div>
 }
 
 export default Container

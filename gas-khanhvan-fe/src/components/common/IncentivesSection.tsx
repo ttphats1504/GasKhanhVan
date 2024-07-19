@@ -4,7 +4,7 @@ import styles from '../../styles/common/Incentives.module.scss'
 
 const Incentives = () => {
   return (
-    <>
+    <div className={styles.background}>
       <Container>
         <div className={styles.wrap}>
           <Flex gap='middle' vertical align='center' justify='center' className={styles.item}>
@@ -25,7 +25,7 @@ const Incentives = () => {
           </Flex>
         </div>
       </Container>
-    </>
+    </div>
   )
 }
 

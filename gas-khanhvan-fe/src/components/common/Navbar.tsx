@@ -1,9 +1,10 @@
 import {AppstoreOutlined, MenuUnfoldOutlined, SettingOutlined} from '@ant-design/icons'
 import type {MenuProps} from 'antd'
-import {Menu} from 'antd'
+import {Input, Menu} from 'antd'
 import {useState} from 'react'
 
 import styles from '../../styles/common/Navbar.module.scss'
+const {Search} = Input
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -65,7 +66,7 @@ const items: MenuItem[] = [
   {
     key: 'alipay',
     label: (
-      <a href='https://ant.design' target='_blank' rel='noopener noreferrer'>
+      <a href='#' target='_blank' rel='noopener noreferrer'>
         Navigation Four - Link
       </a>
     ),
@@ -91,7 +92,9 @@ const Navbar = () => {
           items={items}
           triggerSubMenuAction='hover'
         />
-        <div>Search Section</div>
+        <div>
+          <Search className={styles.search_box} placeholder='Tìm kiếm' />
+        </div>
       </div>
     </div>
   )

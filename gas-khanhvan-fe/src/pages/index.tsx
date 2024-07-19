@@ -6,6 +6,7 @@ import Incentives from '@/components/common/IncentivesSection'
 import Footer from '@/components/common/Footer'
 
 import styles from '../styles/home/Home.module.scss'
+import ProductSection from '@/components/home/ProductSection'
 
 export default function Home() {
   return (
@@ -13,7 +14,12 @@ export default function Home() {
       <HeadTag />
       <Navbar />
       <PromotionCarousel />
-      <Incentives />
+      <main>
+        <div className={styles.top_bg}>
+          <Incentives />
+          <ProductSection />
+        </div>
+      </main>
       <Footer />
     </div>
   )

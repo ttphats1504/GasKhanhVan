@@ -2,3 +2,11 @@
   height: 100vh;
   overflow-y: scroll;
 }
+
+.top_bg {
+  background: url('/assets/backgrounds/bg_top.svg') no-repeat 0 bottom;
+  background-size: cover;
+  height: 100%;
+  padding: 0 0 25%;
+  padding-top: 20px;
+}
