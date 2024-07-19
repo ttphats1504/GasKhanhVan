@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://gas-khanh-van.vercel.app/
+
+# Sitemaps
+Sitemap: https://gas-khanh-van.vercel.app/sitemap.xml
