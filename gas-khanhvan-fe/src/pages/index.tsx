@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Cửa Hàng Gas Khánh Vân - Gas Quận 7</title>
+        <title>Cửa Hàng Gas Gas Quận 7 - Gas Khánh Vân</title>
         <meta
           name="google-site-verification"
           content="1576YrYuw5N2zO2oH75ShLXhWDn9rbJAd8DSNBcQYIs"
