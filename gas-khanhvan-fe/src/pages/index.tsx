@@ -39,7 +39,7 @@ export default function Home() {
               "@context": "https://schema.org",
               "@type": "WebSite",
               url: "https://gas-khanh-van.vercel.app/",
-              name: "My Awesome Site",
+              name: "Cửa Hàng Gas Gas Quận 7 - Gas Khánh Vân",
               potentialAction: {
                 "@type": "SearchAction",
                 target:
