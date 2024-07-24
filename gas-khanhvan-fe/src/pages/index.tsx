@@ -33,6 +33,22 @@ export default function Home() {
           property='og:image'
           content='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV6JUe_TejYzBFTSUEVdiHsHzVqWOLE1fGXg&s'
         />
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              url: 'https://gas-khanh-van.vercel.app/',
+              name: 'Cửa Hàng Gas Gas Quận 7 - Gas Khánh Vân',
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: 'https://gas-khanh-van.vercel.app/search?q={search_term_string}',
+                'query-input': 'required name=search_term_string',
+              },
+            }),
+          }}
+        />
       </Head>
       <div className={styles.container}>
         <HeadTag />

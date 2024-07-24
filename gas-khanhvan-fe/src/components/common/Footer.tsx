@@ -1,9 +1,9 @@
-import {Col, Flex, Row} from 'antd'
-import {Typography} from 'antd'
+import { Col, Flex, Row } from "antd";
+import { Typography } from "antd";
 
-import styles from '../../styles/common/Footer.module.scss'
+import styles from "../../styles/common/Footer.module.scss";
 
-const {Title} = Typography
+const { Title } = Typography;
 
 const Footer = () => {
   return (
@@ -58,9 +58,11 @@ const Footer = () => {
           </Col>
         </Row>
       </footer>
-      <div className={styles.footer_mark}>© 2024 Khánh Vân Gas. All Rights Reserved.</div>
+      <div className={styles.footer_mark}>
+        © 2024 Gas Khánh Vân - Cửa hàng Gas Quận 7. All Rights Reserved.
+      </div>
     </>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;
