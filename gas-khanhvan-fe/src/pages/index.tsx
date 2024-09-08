@@ -1,13 +1,12 @@
-import Navbar from "@/components/common/Navbar";
-import HeadTag from "../components/home/HeadTag";
 import React from "react";
-import PromotionCarousel from "@/components/common/PromotionCarousel";
+import Head from "next/head";
 import Incentives from "@/components/common/IncentivesSection";
-import Footer from "@/components/common/Footer";
+import PromotionCarousel from "@/components/common/PromotionCarousel";
+import ProductSection from "@/components/home/ProductSection";
+import MainLayout from "@/layouts/MainLayout";
+import { Footer } from "antd/es/layout/layout";
 
 import styles from "../styles/home/Home.module.scss";
-import ProductSection from "@/components/home/ProductSection";
-import Head from "next/head";
 
 export default function Home() {
   return (
@@ -50,18 +49,16 @@ export default function Home() {
           }}
         />
       </Head>
-      <div className={styles.container}>
-        <HeadTag />
-        <Navbar />
+      <MainLayout>
         <PromotionCarousel />
-        <main>
+        <div>
           <div className={styles.top_bg}>
             <Incentives />
             <ProductSection />
           </div>
-        </main>
+        </div>
         <Footer />
-      </div>
+      </MainLayout>
     </>
   );
 }
