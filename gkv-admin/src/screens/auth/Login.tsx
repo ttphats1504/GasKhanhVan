@@ -13,7 +13,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
 // import SocialLogin from "./components/SocialLogin";
-// import handleAPI from "../../apis/handleAPI";
+import handleAPI from "../../apis/handleAPI";
 // import { addAuth } from "../../redux/reducers/authReducer";
 // import { appInfo, localDataNames } from "../../constants/appInfos";
 
@@ -27,9 +27,11 @@ const Login = () => {
   // const dispatch = useDispatch();
 
   const handleLogin = async (values: { email: string; password: string }) => {
+    console.log(values);
     setIsLoading(true);
     try {
-      // const res: any = await handleAPI("/auth/login", values, "post");
+      const res: any = await handleAPI("/auth/register", values, "post");
+      console.log(res);
       // message.success(res.message);
       // res.data && dispatch(addAuth(res.data));
       // if (isRemember) {
@@ -67,7 +69,7 @@ const Login = () => {
 
         <Form
           layout="vertical"
-          //   form={form}
+          form={form}
           onFinish={handleLogin}
           disabled={isLoading}
           size="large"

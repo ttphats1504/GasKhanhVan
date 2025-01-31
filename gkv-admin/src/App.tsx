@@ -8,9 +8,7 @@ function App() {
   return (
     <ConfigProvider
       theme={{
-        token: {
-          colorTextHeading: "#1570EF",
-        },
+        token: {},
         components: {},
       }}
     >
