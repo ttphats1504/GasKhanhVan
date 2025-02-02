@@ -10,11 +10,23 @@ import {
   Col,
   Modal,
   Form,
+  Upload,
 } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { UploadFile } from "antd/es/upload/interface";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css"; // Import Quill styles
+
+import handleAPI from "../apis/handleAPI";
+import EditCylinderModal from "./EditCylinderModal";
 
 interface Cylinder {
-  id: number;
+  _id: string;
   name: string;
   type: string;
   price: number;
@@ -24,86 +36,149 @@ interface Cylinder {
   createdAt: string;
 }
 
+const fetchCylinderDatas = async () => {
+  const api = "/api/cylinders";
+  try {
+    const res = await handleAPI(api, "get");
+    return res;
+  } catch (error) {
+    console.error("Error fetching cylinders:", error);
+    return [];
+  }
+};
+
+const fetchCylinderById = async (id: string) => {
+  try {
+    const res = await handleAPI(`/api/cylinders/${id}`, "get");
+    console.log("fetchCylinderById: ", res);
+    return res;
+  } catch (error) {
+    console.error("Error fetching cylinders:", error);
+    return null;
+  }
+};
+
 const GasCylinderTable: React.FC = () => {
   const [cylinders, setCylinders] = useState<Cylinder[]>([]);
+  const [cylinderDetails, setCylinderDetails] = useState<Cylinder | null>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isModalAddVisible, setIsModalAddVisible] = useState<boolean>(false);
+  const [isModalEditVisible, setIsModalEditVisible] = useState<boolean>(false);
   const [form] = Form.useForm();
+  const [file, setFile] = useState<UploadFile | null>(null);
+  const [description, setDescription] = useState<string>("");
 
-  // Fetch data from the backend (mock data for now)
+  // Fetch data from the backend
   useEffect(() => {
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setCylinders([
-        {
-          id: 1,
-          name: "Oxygen Cylinder",
-          type: "Medical",
-          price: 50,
-          stock: 100,
-          image: "https://via.placeholder.com/150",
-          description: "High-quality oxygen cylinder for medical use.",
-          createdAt: "2023-10-01",
-        },
-        {
-          id: 2,
-          name: "Nitrogen Cylinder",
-          type: "Industrial",
-          price: 80,
-          stock: 50,
-          image: "https://via.placeholder.com/150",
-          description: "Industrial-grade nitrogen cylinder.",
-          createdAt: "2023-10-02",
-        },
-      ]);
+    const fetchData = async () => {
+      setLoading(true);
+
+      const res: any = await fetchCylinderDatas(); // Call the function
+
+      if (res && res.length > 0) {
+        setCylinders(res);
+      }
+
       setLoading(false);
-    }, 1000);
+    };
+
+    fetchData(); // Call the async function inside useEffect
   }, []);
 
   // Handle delete action
-  const handleDelete = (id: number) => {
-    setCylinders(cylinders.filter((cylinder) => cylinder.id !== id));
-    message.success("Cylinder deleted successfully!");
+  const handleDelete = async (id: string) => {
+    try {
+      await handleAPI(`/api/cylinders/${id}`, "delete");
+
+      // Update UI by removing deleted item
+      setCylinders((prevCylinders) =>
+        prevCylinders.filter((cylinder) => cylinder._id !== id)
+      );
+
+      message.success("Cylinder deleted successfully!");
+    } catch (error) {
+      message.error("Error deleting cylinder");
+    }
   };
 
   // Handle edit action
-  const handleEdit = (id: number) => {
-    const cylinderToEdit = cylinders.find((cylinder) => cylinder.id === id);
-    message.info(`Editing cylinder: ${cylinderToEdit?.name}`);
-    // Add your edit logic here (e.g., open a modal with a form)
+  const handleEdit = async (id: string) => {
+    setIsModalEditVisible(true);
+    setLoading(true);
+
+    try {
+      const res: any = await fetchCylinderById(id);
+
+      if (res) {
+        setCylinderDetails(res);
+      } else {
+        message.error("Cylinder not found!");
+      }
+    } catch (error) {
+      message.error("Error fetching cylinder details");
+      console.error("Error fetching cylinder:", error);
+    }
+
+    setLoading(false);
   };
 
   // Show modal for adding a new cylinder
-  const showModal = () => {
-    setIsModalVisible(true);
+  const showModalAdd = () => {
+    setIsModalAddVisible(true);
   };
 
   // Handle modal cancel
   const handleCancel = () => {
-    setIsModalVisible(false);
+    setIsModalAddVisible(false);
+    setIsModalEditVisible(false);
     form.resetFields();
   };
 
   // Handle form submission
-  const handleSubmit = (values: Omit<Cylinder, "id" | "createdAt">) => {
-    const newCylinder = {
-      id: cylinders.length + 1, // Generate a new ID (replace with backend logic)
-      ...values,
-      createdAt: new Date().toISOString().split("T")[0], // Add creation date
-    };
-    setCylinders([...cylinders, newCylinder]);
-    message.success("Cylinder added successfully!");
-    setIsModalVisible(false);
-    form.resetFields();
+  const handleSubmit = async (values: Omit<Cylinder, "id" | "createdAt">) => {
+    if (!file) {
+      message.error("Please upload an image!");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("type", values.type);
+    formData.append("price", values.price.toString());
+    formData.append("stock", values.stock.toString());
+    formData.append("description", values.description);
+    // Cast file to Blob safely
+    const fileBlob = file as unknown as Blob;
+    // Append file as Blob
+    formData.append("image", fileBlob);
+
+    try {
+      const response: any = await handleAPI(
+        "/api/cylinders",
+        "post",
+        formData,
+        {
+          "Content-Type": "multipart/form-data",
+        }
+      );
+
+      if (response) {
+        message.success("Cylinder added successfully!");
+        setCylinders([...cylinders, response]); // Update table
+        setIsModalAddVisible(false);
+        form.resetFields();
+        setFile(null);
+      }
+    } catch (error) {
+      message.error("Error adding cylinder");
+    }
   };
 
   // Table columns
   const columns = [
     {
       title: "ID",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "_id",
+      key: "_id",
     },
     {
       title: "Name",
@@ -131,7 +206,7 @@ const GasCylinderTable: React.FC = () => {
       key: "image",
       render: (image: string) => (
         <img
-          src={image}
+          src={`${process.env.REACT_APP_BASE_URL}/${image}`}
           alt="cylinder"
           style={{ width: "50px", height: "50px" }}
         />
@@ -141,11 +216,20 @@ const GasCylinderTable: React.FC = () => {
       title: "Description",
       dataIndex: "description",
       key: "description",
+      render: (text: string) => (
+        <div dangerouslySetInnerHTML={{ __html: text }} />
+      ),
     },
     {
       title: "Created At",
       dataIndex: "createdAt",
       key: "createdAt",
+      render: (date: string) => {
+        const formattedDate = new Date(date).toLocaleString("vi-VN", {
+          hour12: false, // 24-hour format
+        });
+        return formattedDate;
+      },
     },
     {
       title: "Action",
@@ -155,13 +239,13 @@ const GasCylinderTable: React.FC = () => {
           <Button
             type="link"
             icon={<EditOutlined />}
-            onClick={() => handleEdit(record.id)}
+            onClick={() => handleEdit(record._id)}
           >
             Edit
           </Button>
           <Popconfirm
             title="Are you sure you want to delete this cylinder?"
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={() => handleDelete(record._id)}
             okText="Yes"
             cancelText="No"
           >
@@ -174,11 +258,15 @@ const GasCylinderTable: React.FC = () => {
     },
   ];
 
+  const handleFileChange = ({ file }: any) => {
+    setFile(file);
+  };
+  console.log("asdasd: ", cylinderDetails?.name);
   return (
     <Card
       title="Manage Gas Cylinders"
       extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
+        <Button type="primary" icon={<PlusOutlined />} onClick={showModalAdd}>
           Add New Cylinder
         </Button>
       }
@@ -205,7 +293,7 @@ const GasCylinderTable: React.FC = () => {
       {/* Add New Cylinder Modal */}
       <Modal
         title="Add New Cylinder"
-        visible={isModalVisible}
+        open={isModalAddVisible}
         onCancel={handleCancel}
         footer={null}
       >
@@ -247,23 +335,31 @@ const GasCylinderTable: React.FC = () => {
             <Input type="number" placeholder="Enter stock quantity" />
           </Form.Item>
           <Form.Item
-            label="Image URL"
+            label="Upload Image"
             name="image"
-            rules={[{ required: true, message: "Please enter the image URL!" }]}
+            rules={[{ required: true, message: "Please upload an image!" }]}
           >
-            <Input placeholder="Enter image URL" />
+            <Upload.Dragger
+              name="image"
+              beforeUpload={(file) => {
+                handleFileChange({ file });
+                return false; // Prevent automatic upload
+              }}
+              maxCount={1}
+              onRemove={() => setFile(null)}
+            >
+              <p className="ant-upload-drag-icon">
+                <UploadOutlined />
+              </p>
+              <p>Click or drag file to upload</p>
+            </Upload.Dragger>
           </Form.Item>
-          <Form.Item
-            label="Description"
-            name="description"
-            rules={[
-              {
-                required: true,
-                message: "Please enter the cylinder description!",
-              },
-            ]}
-          >
-            <Input.TextArea placeholder="Enter cylinder description" />
+          <Form.Item label="Description" name="description">
+            <ReactQuill
+              value={description}
+              onChange={setDescription}
+              placeholder="Enter cylinder description"
+            />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
@@ -272,6 +368,13 @@ const GasCylinderTable: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
+      {/* Edit Cylinder Modal */}
+      <EditCylinderModal
+        isModalEditVisible={isModalEditVisible}
+        handleCancel={handleCancel}
+        handleSubmit={handleSubmit}
+        cylinderDetails={cylinderDetails}
+      />
     </Card>
   );
 };

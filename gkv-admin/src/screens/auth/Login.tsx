@@ -30,7 +30,7 @@ const Login = () => {
     console.log(values);
     setIsLoading(true);
     try {
-      const res: any = await handleAPI("/auth/register", values, "post");
+      const res: any = await handleAPI("/auth/register", "post", values);
       console.log(res);
       // message.success(res.message);
       // res.data && dispatch(addAuth(res.data));

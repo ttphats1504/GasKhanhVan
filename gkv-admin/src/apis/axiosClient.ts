@@ -2,7 +2,7 @@ import axios from "axios";
 import { config } from "process";
 import queryString from "query-string";
 
-const baseURL = `http://localhost:3002`;
+const baseURL = process.env.REACT_APP_BASE_URL || `http://localhost:3002`;
 
 const axiosClient = axios.create({
     baseURL,
@@ -16,7 +16,9 @@ axiosClient.interceptors.request.use(async (config: any) => {
         ...config.headers,
     };
 
-    config.data;
+    config.data = {
+		
+	};
 
     return config;
 });

@@ -4,11 +4,11 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UploadOutlined,
-  UserOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
 import { Breadcrumb, Button, Layout, Menu, theme } from "antd";
-import GasCylinderTable from "../components/GasCylinderTable";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import GasCylinderManage from "../screens/cylinder/GasCylinderManage";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -29,7 +29,11 @@ const MainRouter = () => {
             {
               key: "1",
               icon: <FireOutlined />,
-              label: "Gas Cylinder",
+              label: (
+                <a href="/gas-cylinder" rel="noopener noreferrer">
+                  Gas Cylinder
+                </a>
+              ),
             },
             {
               key: "2",
@@ -66,10 +70,15 @@ const MainRouter = () => {
             borderRadius: borderRadiusLG,
           }}
         >
-          <GasCylinderTable />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<GasCylinderManage />} />
+              <Route path="/gas-cylinder" element={<GasCylinderManage />} />
+            </Routes>
+          </BrowserRouter>
         </Content>
         <Footer style={{ textAlign: "center" }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
+          GasKhanhVan Manage ©{new Date().getFullYear()} Created by ttphats
         </Footer>
       </Layout>
     </Layout>
