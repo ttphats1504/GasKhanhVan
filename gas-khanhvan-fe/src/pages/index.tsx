@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import React from "react";
-import Head from "next/head";
-import Incentives from "@/components/common/IncentivesSection";
-import PromotionCarousel from "@/components/common/PromotionCarousel";
-import ProductSection from "@/components/home/ProductSection";
-import MainLayout from "@/layouts/MainLayout";
-import { Footer } from "antd/es/layout/layout";
-
-import styles from "../styles/home/Home.module.scss";
-=======
 import Navbar from '@/components/common/Navbar'
 import HeadTag from '../components/home/HeadTag'
 import React from 'react'
@@ -20,7 +9,7 @@ import styles from '../styles/home/Home.module.scss'
 import ProductSection from '@/components/home/ProductSection'
 import Head from 'next/head'
 import SaleBanner from '@/components/common/SaleBanner'
->>>>>>> 5d0506589bd3ec7b62f8a451642f58171e029f82
+import MainLayout from '@/layouts/MainLayout'
 
 export default function Home() {
   return (

@@ -5,6 +5,7 @@ import Container from '../common/Container'
 
 import styles from '../../styles/home/ProductSection.module.scss'
 import ProductCard from '../common/ProductCard'
+import cylinders from '../../../data/cylinders'
 
 const {Title} = Typography
 
@@ -23,25 +24,12 @@ export default function ProductSection() {
         </Title>
         <div className={styles.line_break}></div>
       </Flex>
-      <Row className={styles.card_wrap} gutter={24}>
-        <Col span={4}>
-          <ProductCard />
-        </Col>
-        <Col span={4}>
-          <ProductCard />
-        </Col>
-        <Col span={4}>
-          <ProductCard />
-        </Col>
-        <Col span={4}>
-          <ProductCard />
-        </Col>
-        <Col span={4}>
-          <ProductCard />
-        </Col>
-        <Col span={4}>
-          <ProductCard />
-        </Col>
+      <Row className={styles.card_wrap} gutter={[24, 24]}>
+        {cylinders.map((cylinder) => (
+          <Col key={cylinder.id} xs={24} sm={8} md={4}>
+            <ProductCard cylinder={cylinder} />
+          </Col>
+        ))}
       </Row>
     </Container>
   )
