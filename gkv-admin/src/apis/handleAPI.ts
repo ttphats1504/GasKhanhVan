@@ -1,4 +1,4 @@
-import axiosClient from './axiosClient';
+import axiosClient from './axiosClient'
 
 const handleAPI = async (
   url: string,
@@ -8,16 +8,16 @@ const handleAPI = async (
 ) => {
   try {
     const response = await axiosClient(url, {
-		method, // HTTP method (GET, POST, etc.)
-		...(method === 'get' ? { params: data } : { data }), // Handles GET vs other requests
-		headers, // Custom headers (optional)
-	  });
+      method, // HTTP method (GET, POST, etc.)
+      ...(method === 'get' ? {params: data} : {data}), // Handles GET vs other requests
+      headers, // Custom headers (optional)
+    })
 
-    return response;
+    return response
   } catch (error: any) {
-    console.error('API Error:', error.response?.data || error.message);
-    throw error.response?.data || error.message;
+    console.error('API Error:', error.response?.data || error.message)
+    throw error.response?.data || error.message
   }
-};
+}
 
-export default handleAPI;
+export default handleAPI

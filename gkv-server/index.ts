@@ -1,41 +1,73 @@
-
-
-import express from 'express';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+import express from 'express'
+import dotenv from 'dotenv'
+import mongoose from 'mongoose'
 import userRouter from './src/routers/user'
-import cylinderRoutes from './src/routers/cylinderRoutes';
-import cors from 'cors';
+import productRoutes from './src/routers/productRoutes'
+import categoryRoutes from './src/routers/categoryRoutes'
+import cors from 'cors'
+import {mysqlDB} from './src/database/mysql'
+import Product from './src/models/ProductModel'
+import Category from './src/models/CategoryModel'
 
-dotenv.config();
+dotenv.config()
 
-const PORT = process.env.PORT || 3001;
-const dbURL = `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@cluster0.dh8fo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-const app = express();
+const PORT = process.env.PORT || 3001
 
-app.use(express.json());
-app.use(cors());
-app.use('/uploads', express.static('uploads'));
+// mongoose connection pool
+const dbURL = `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@cluster0.dh8fo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+const app = express()
+const bodyParser = require('body-parser')
 
-const connectDB = async () => {
-    try {
-        await mongoose.connect(dbURL);
+app.use(cors())
+app.use(express.json())
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+)
+app.use(bodyParser.json())
+app.use('/uploads', express.static('uploads'))
 
-        console.log(`Connect to db successfully!!!`);
-    } catch (error) {
-        console.log(`Can not connect to db ${error}`)
-    }
+const connectMongoDB = async () => {
+  try {
+    await mongoose.connect(dbURL)
+
+    console.log(`Connect to db successfully!!!`)
+  } catch (error) {
+    console.log(`Can not connect to db ${error}`)
+  }
 }
 
-app.use('/auth', userRouter);
-app.use('/api/cylinders', cylinderRoutes);
+const connectMySQL = async () => {
+  try {
+    const connection = await mysqlDB.getConnection()
+    await connection.query('SELECT 1') // simple query to test the connection
+    connection.release()
 
-connectDB()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server is starting at http://localhost:${PORT}`);
-        });
-    })
-    .catch((error) => {
-        console.log(error)
-    })
+    console.log('Connected to MySQL successfully!!!')
+  } catch (error) {
+    console.error(`Cannot connect to MySQL: ${error}`)
+    process.exit(1)
+  }
+}
+
+app.use('/auth', userRouter)
+app.use('/api/products', productRoutes)
+app.use('/api/categories', categoryRoutes)
+
+const startServer = async () => {
+  await Product.sync({alter: true}) // syncs model with table structure
+  await Category.sync({alter: true}) // syncs model with table structure
+  await connectMongoDB()
+  await connectMySQL()
+
+  app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`)
+  })
+}
+
+startServer().catch((err) => {
+  console.error('Failed to start server:', err)
+})
+
+export default app

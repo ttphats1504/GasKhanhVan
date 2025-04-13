@@ -1,8 +1,10 @@
-import React from "react";
-import { ConfigProvider } from "antd";
-import logo from "./logo.svg";
-import "./App.css";
-import Routers from "./routers/Routers";
+import React from 'react'
+import {ConfigProvider} from 'antd'
+import logo from './logo.svg'
+import './App.css'
+import {BrowserRouter} from 'react-router-dom'
+import Routers from './routers/Routers'
+import 'react-quill/dist/quill.snow.css'
 
 function App() {
   return (
@@ -12,9 +14,11 @@ function App() {
         components: {},
       }}
     >
-      <Routers />
+      <BrowserRouter>
+        <Routers />
+      </BrowserRouter>
     </ConfigProvider>
-  );
+  )
 }
 
-export default App;
+export default App
