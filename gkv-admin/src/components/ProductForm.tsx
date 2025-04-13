@@ -91,14 +91,14 @@ const ProductForm: React.FC<ProductFormProps> = ({visible, onClose, onSuccess, p
           })
 
       if (response) {
-        message.success(`Cylinder ${isEditing ? 'updated' : 'added'} successfully!`)
+        message.success(`Product ${isEditing ? 'updated' : 'added'} successfully!`)
         onSuccess(response) // Update the table
         onClose()
         form.resetFields()
         setFile(null)
       }
     } catch (error) {
-      message.error(`Error ${isEditing ? 'updating' : 'adding'} cylinder`)
+      message.error(`Error ${isEditing ? 'updating' : 'adding'} product`)
     }
   }
 
@@ -168,7 +168,7 @@ const ProductForm: React.FC<ProductFormProps> = ({visible, onClose, onSuccess, p
           <ReactQuill
             value={description}
             onChange={setDescription}
-            placeholder='Enter cylinder description'
+            placeholder='Enter product description'
           />
         </Form.Item>
 
