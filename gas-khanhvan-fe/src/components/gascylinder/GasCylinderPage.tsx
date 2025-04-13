@@ -3,11 +3,46 @@ import {Carousel, Col, Flex, Image, Layout, Row, Typography} from 'antd'
 import styles from '@/styles/gascylinder/GasCylinderPage.module.scss'
 import FilterSideBar from '../common/FilterSidebar'
 import ProductCard from '../common/ProductCard'
-import cylinders from '../../../data/cylinders'
+import handleAPI from '@/apis/handleAPI'
+import Product from '../../../../gkv-admin/src/models/Product'
+import {useEffect, useState} from 'react'
 
 const {Title} = Typography
 
+const fetchProductDatas = async () => {
+  const api = '/api/products'
+  try {
+    const res = await handleAPI(api, 'get')
+    return res
+  } catch (error) {
+    console.error('Error fetching Products:', error)
+    return []
+  }
+}
+
 const GasCylinderPage = () => {
+  const [cylinders, setCylinders] = useState<Product[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
+
+  // Fetch data from the backend
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true)
+
+      const res: any = await fetchProductDatas() // Call the function
+
+      if (res && res.length > 0) {
+        setCylinders(res)
+      }
+
+      setLoading(false)
+    }
+
+    fetchData() // Call the async function inside useEffect
+  }, [])
+
+  if (loading) return <>Loading...</>
+
   return (
     <div className={styles.wrapper}>
       <Carousel autoplay className={styles.carousel}>

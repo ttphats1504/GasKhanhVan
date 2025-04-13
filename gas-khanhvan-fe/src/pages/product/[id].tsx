@@ -15,26 +15,73 @@ import {
   Divider,
 } from 'antd'
 import {ShoppingCartOutlined} from '@ant-design/icons'
-import cylinders, {Cylinder} from '../../../data/cylinders'
 import MainLayout from '@/layouts/MainLayout'
 import ProductCard from '@/components/common/ProductCard'
+import handleAPI from '@/apis/handleAPI'
+import Product from '@/models/Product'
 
 const {Title, Text, Paragraph} = Typography
 const {TabPane} = Tabs
 
+const fetchProductById = async (id: string | string[]) => {
+  const api = `/api/products/${id}`
+  try {
+    const res = await handleAPI(api, 'get')
+    return res
+  } catch (error) {
+    console.error('Error fetching Product by Id:', error)
+    return []
+  }
+}
+
+const fetchProductDatas = async () => {
+  const api = '/api/products'
+  try {
+    const res = await handleAPI(api, 'get')
+    return res
+  } catch (error) {
+    console.error('Error fetching Products:', error)
+    return []
+  }
+}
+
 const ProductDetail: React.FC = () => {
   const router = useRouter()
   const {id} = router.query
-
-  const [cylinder, setCylinder] = useState<Cylinder | null>(null)
+  const [cylinders, setCylinders] = useState<Product[]>([])
+  const [cylinder, setCylinder] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // Fetch data from the backend
   useEffect(() => {
-    if (id) {
-      const product = cylinders.find((c) => c.id === id)
-      setCylinder(product || null)
+    const fetchDatas = async () => {
+      setLoading(true)
+
+      const res: any = await fetchProductDatas() // Call the function
+
+      if (res && res.length > 0) {
+        setCylinders(res)
+      }
+
       setLoading(false)
     }
+
+    fetchDatas() // Call the async function inside useEffect
+  }, [])
+
+  // Fetch data from the backend
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log(id)
+      if (id) {
+        setLoading(true)
+        const res: any = await fetchProductById(id) // Call the function
+        setCylinder(res)
+        setLoading(false)
+      }
+    }
+
+    fetchData() // Call the async function inside useEffect
   }, [id])
 
   if (loading) return <Spin size='large' style={{display: 'block', margin: '50px auto'}} />
@@ -42,7 +89,7 @@ const ProductDetail: React.FC = () => {
 
   // Fetch related products (e.g., same category or type)
   //   const relatedProducts = cylinders.filter((c) => c.type === cylinder.type && c.id !== cylinder.id)
-  const relatedProducts = cylinders.filter((c) => parseInt(c.id) < 5)
+  const relatedProducts: Product[] = cylinders.filter((c) => parseInt(c.id) < 5)
 
   return (
     <MainLayout>
@@ -65,7 +112,7 @@ const ProductDetail: React.FC = () => {
           >
             <Title level={2}>{cylinder.name}</Title>
             <Text type='secondary' style={{fontSize: '16px'}}>
-              Type: {cylinder.type}
+              Type: {cylinder.typeId}
             </Text>
 
             {/* Price */}
@@ -117,7 +164,7 @@ const ProductDetail: React.FC = () => {
             <TabPane tab='Specifications' key='2'>
               <ul>
                 <li>
-                  <strong>Type:</strong> {cylinder.type}
+                  <strong>Type:</strong> {cylinder.typeId}
                 </li>
                 <li>
                   <strong>Price:</strong> $

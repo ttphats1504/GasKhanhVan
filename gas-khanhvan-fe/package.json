@@ -12,9 +12,11 @@
   },
   "dependencies": {
     "antd": "^5.19.1",
+    "axios": "^1.8.4",
     "next": "14.2.4",
     "next-seo": "^6.5.0",
     "next-sitemap": "^4.2.3",
+    "query-string": "^9.1.1",
     "react": "^18",
     "react-dom": "^18",
     "remixicon": "^4.3.0",
