@@ -14,11 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCylinder = exports.updateCylinder = exports.getCylinderById = exports.getAllCylinders = exports.addCylinder = void 0;
 const CylinderModel_1 = __importDefault(require("../models/CylinderModel"));
+const cloudinary_1 = __importDefault(require("../config/cloudinary"));
+const fs_1 = __importDefault(require("fs"));
 // Add a new cylinder with image
 const addCylinder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('Raw body:', req.body);
         const { name, type, price, stock, description } = req.body;
+        const file = req === null || req === void 0 ? void 0 : req.file;
         const image = req.file ? req.file.path : ''; // Path to the uploaded image
         const newCylinder = new CylinderModel_1.default({
             name,
@@ -29,6 +31,20 @@ const addCylinder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             description, // Rich text description
         });
         yield newCylinder.save();
+        // Step 2: Upload Image to Cloudinary
+        let imageUrl = '';
+        if (file) {
+            const result = yield cloudinary_1.default.uploader.upload(file.path, {
+                folder: 'cylinders', // Save images inside a "cylinders" folder
+                use_filename: true,
+            });
+            imageUrl = result.secure_url; // Get public Cloudinary URL
+            // Step 3: Update Cylinder with Image URL
+            newCylinder.image = imageUrl;
+            yield newCylinder.save();
+            // Delete local file after upload
+            fs_1.default.unlinkSync(file.path);
+        }
         res.status(201).json(newCylinder);
     }
     catch (err) {
@@ -65,12 +81,44 @@ const getCylinderById = (req, res) => __awaiter(void 0, void 0, void 0, function
 exports.getCylinderById = getCylinderById;
 // Update a cylinder
 const updateCylinder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
+        console.log('🔍 Request Params:', req.params);
+        console.log('📝 Request Body:', req.body);
         const { id } = req.params;
-        const updatedCylinder = yield CylinderModel_1.default.findByIdAndUpdate(id, req.body, { new: true });
-        res.status(200).json(updatedCylinder);
+        const file = req.file; // Get uploaded file (if any)
+        // Find the existing cylinder
+        const existingCylinder = yield CylinderModel_1.default.findById(id);
+        if (existingCylinder) {
+            let imageUrl = existingCylinder.image; // Keep old image if no new one is uploaded
+            if (file) {
+                console.log('📸 New Image File:', file.originalname);
+                // ✅ Upload new image to Cloudinary
+                const uploadResult = yield cloudinary_1.default.uploader.upload(file.path, {
+                    folder: 'cylinders', // Store in "cylinders" folder
+                    use_filename: true,
+                });
+                imageUrl = uploadResult.secure_url; // Get Cloudinary URL
+                // ✅ Delete old image from Cloudinary (if exists)
+                if (existingCylinder.image) {
+                    const oldImagePublicId = (_a = existingCylinder.image.split('/').pop()) === null || _a === void 0 ? void 0 : _a.split('.')[0]; // Extract public ID
+                    if (oldImagePublicId) {
+                        yield cloudinary_1.default.uploader.destroy(`cylinders/${oldImagePublicId}`);
+                    }
+                }
+                // ✅ Delete local file
+                fs_1.default.unlinkSync(file.path);
+            }
+            // ✅ Update cylinder in the database
+            const updatedCylinder = yield CylinderModel_1.default.findByIdAndUpdate(id, Object.assign(Object.assign({}, req.body), { image: imageUrl }), // Update all fields + new image URL
+            { new: true, runValidators: true } // Return updated document
+            );
+            console.log('✅ Updated Cylinder:', updatedCylinder);
+            res.status(200).json(updatedCylinder);
+        }
     }
     catch (err) {
+        console.error('❌ Error updating cylinder:', err);
         res.status(500).json({ error: err.message });
     }
 });

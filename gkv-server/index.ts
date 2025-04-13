@@ -41,7 +41,6 @@ const connectMongoDB = async () => {
 const connectMySQL = async () => {
   try {
     const connection = await mysqlDB.getConnection()
-    await connection.query('SELECT 1') // simple query to test the connection
     connection.release()
 
     console.log('Connected to MySQL successfully!!!')
