@@ -58,7 +58,7 @@ export default function ProductSection() {
         <div className={styles.line_break}></div>
       </Flex>
       <Row className={styles.card_wrap} gutter={[24, 24]}>
-        {cylinders.map((cylinder) => (
+        {cylinders.map((cylinder: any) => (
           <Col key={cylinder.id} xs={24} sm={8} md={4}>
             <ProductCard cylinder={cylinder} />
           </Col>
