@@ -6,7 +6,7 @@ import fs from 'fs'
 // Create
 export const addCategory = async (req: Request, res: Response) => {
   try {
-    const {name} = req.body
+    const {name, slug} = req.body
     const file = req.file
     let imageUrl = ''
 
@@ -22,6 +22,7 @@ export const addCategory = async (req: Request, res: Response) => {
     const newCategory = await Category.create({
       name,
       image: imageUrl,
+      slug: slug,
     })
 
     res.status(201).json(newCategory)

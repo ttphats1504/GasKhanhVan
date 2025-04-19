@@ -76,13 +76,18 @@ const CategoryList: React.FC = () => {
       key: 'name',
     },
     {
-      title: 'Image',
-      dataIndex: 'image',
-      key: 'image',
-      render: (image: string) => (
-        <img src={image || ''} alt='product' style={{width: '50px', height: '50px'}} />
-      ),
+      title: 'Slug',
+      dataIndex: 'slug',
+      key: 'slug',
     },
+    // {
+    //   title: 'Image',
+    //   dataIndex: 'image',
+    //   key: 'image',
+    //   render: (image: string) => (
+    //     <img src={image || ''} alt='product' style={{width: '50px', height: '50px'}} />
+    //   ),
+    // },
     {
       title: 'Action',
       key: 'action',

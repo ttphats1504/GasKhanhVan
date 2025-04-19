@@ -1,17 +1,17 @@
-import GasCylinderPage from "@/components/gascylinder/GasCylinderPage";
-import RoutingPath from "@/configs/routing";
-import CategoryLayout from "@/layouts/CategoryLayout";
-import { useRouter } from "next/router";
+import GasCylinderPage from '@/components/gascylinder/GasCylinderPage'
+import RoutingPath from '@/configs/routing'
+import CategoryLayout from '@/layouts/CategoryLayout'
+import {useRouter} from 'next/router'
 
 export default function CategoryPagePage() {
-  const router = useRouter();
+  const router = useRouter()
   if (!router.query.slug) {
-    return <></>;
+    return <></>
   }
 
   return (
     <CategoryLayout>
-      {router.query.slug == RoutingPath.BINH_GAS && <GasCylinderPage />}
+      <GasCylinderPage />
     </CategoryLayout>
-  );
+  )
 }

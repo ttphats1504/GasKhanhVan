@@ -120,7 +120,7 @@ const GasCylinderPage = () => {
             <Flex vertical>
               <Title level={3}>Gas</Title>
               <Row gutter={[16, 16]}>
-                {cylinders.map((cylinder) => (
+                {cylinders.map((cylinder: any) => (
                   <Col key={cylinder.id} xs={24} sm={12} md={8} lg={6}>
                     <ProductCard cylinder={cylinder} />
                   </Col>

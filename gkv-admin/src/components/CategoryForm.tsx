@@ -26,19 +26,20 @@ const CategoryForm: React.FC<CategoryFormProps> = ({visible, onClose, onSuccess,
   }, [category, form])
 
   // Handle file change
-  const handleFileChange = ({file}: any) => {
-    setFile(file)
-  }
+  // const handleFileChange = ({file}: any) => {
+  //   setFile(file)
+  // }
 
   // Handle form submission
   const handleSubmit = async (values: Omit<Category, 'id'>) => {
-    if (!file && !isEditing) {
-      message.error('Please upload an image!')
-      return
-    }
+    // if (!file && !isEditing) {
+    //   message.error('Please upload an image!')
+    //   return
+    // }
 
     const formData = new FormData()
     formData.append('name', values.name)
+    formData.append('slug', values.slug)
     // Cast file to Blob safely
     const fileBlob = file as unknown as Blob
     // Append file as Blob
@@ -83,10 +84,13 @@ const CategoryForm: React.FC<CategoryFormProps> = ({visible, onClose, onSuccess,
           <Input placeholder='Enter category name' />
         </Form.Item>
         <Form.Item
-          label='Upload Image'
-          name='image'
-          rules={[{required: true, message: 'Please upload an image!'}]}
+          label='Slug'
+          name='slug'
+          rules={[{required: true, message: 'Please enter the slug!'}]}
         >
+          <Input placeholder='Enter slug' />
+        </Form.Item>
+        {/* <Form.Item label='Upload Image' name='image'>
           <Upload.Dragger
             name='image'
             beforeUpload={(file) => {
@@ -101,7 +105,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({visible, onClose, onSuccess,
             </p>
             <p>Click or drag file to upload</p>
           </Upload.Dragger>
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item>
           {isEditing ? (
             <Button type='primary' htmlType='submit'>

@@ -7,6 +7,11 @@
   --primary-blue-600: #10a8eb;
   --text-color-white: #ffffff;
   --background-color-white: #ffffff;
+  --primary-yellow-800: #fabc3f;
+  --primary-yellow-700: #ffc60b;
+  --primary-yellow-600: #fce700;
+  --primary-orange-800: #f14a00;
+  --primary-orange-700: #f66b34;
 }
 
 * {
@@ -32,7 +37,7 @@ a {
 }
 
 ul li {
-  list-style: none;
+  list-style: none !important;
 }
 
 .ant-menu-dark.ant-menu-horizontal {

@@ -5,6 +5,7 @@ interface CategoryAttributes {
   id: number
   name: string
   image: string
+  slug: string
 }
 
 type CategoryCreationAttributes = Optional<CategoryAttributes, 'id' | 'image'>
@@ -16,6 +17,7 @@ class Category
   public id!: number
   public name!: string
   public image!: string
+  public slug!: string
 }
 
 Category.init(
@@ -32,6 +34,10 @@ Category.init(
     image: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
   },
   {

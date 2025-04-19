@@ -108,7 +108,7 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
   console.log(stateOpenKeys)
 
   return (
-    <>
+    <div className={styles.filter_bar}>
       <Title level={4}>{title}</Title>
       <Menu
         mode='inline'
@@ -118,7 +118,7 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
         onClick={onClick}
         items={items}
       />
-    </>
+    </div>
   )
 }
 

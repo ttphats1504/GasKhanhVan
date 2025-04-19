@@ -57,12 +57,12 @@ const MainRouter = () => {
             {
               key: '2',
               icon: <AppstoreAddOutlined />,
-              label: 'Category',
+              label: 'Menu Items',
             },
             {
               key: '3',
               icon: <UploadOutlined />,
-              label: 'nav 3',
+              label: 'Incentives Items',
             },
           ]}
         />
