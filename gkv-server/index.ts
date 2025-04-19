@@ -17,7 +17,6 @@ const PORT = process.env.PORT || 3001
 const dbURL = `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@cluster0.dh8fo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
 const app = express()
 const bodyParser = require('body-parser')
-const router = express.Router()
 
 app.use(cors())
 app.use(express.json())
@@ -55,7 +54,6 @@ app.use('/auth', userRouter)
 app.use('/api/products', productRoutes)
 app.use('/api/categories', categoryRoutes)
 
-app.use('/.netlify/functions/app', router)
 const startServer = async () => {
   await Product.sync({alter: true}) // syncs model with table structure
   await Category.sync({alter: true}) // syncs model with table structure
