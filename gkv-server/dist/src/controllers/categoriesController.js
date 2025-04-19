@@ -19,7 +19,7 @@ const fs_1 = __importDefault(require("fs"));
 // Create
 const addCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name } = req.body;
+        const { name, slug } = req.body;
         const file = req.file;
         let imageUrl = '';
         if (file) {
@@ -33,6 +33,7 @@ const addCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const newCategory = yield CategoryModel_1.default.create({
             name,
             image: imageUrl,
+            slug: slug,
         });
         res.status(201).json(newCategory);
     }

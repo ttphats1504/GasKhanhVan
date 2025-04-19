@@ -47,7 +47,6 @@ const connectMongoDB = () => __awaiter(void 0, void 0, void 0, function* () {
 const connectMySQL = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const connection = yield mysql_1.mysqlDB.getConnection();
-        yield connection.query('SELECT 1'); // simple query to test the connection
         connection.release();
         console.log('Connected to MySQL successfully!!!');
     }

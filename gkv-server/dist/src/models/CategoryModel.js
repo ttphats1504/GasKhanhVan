@@ -21,6 +21,10 @@ Category.init({
         type: sequelize_1.DataTypes.STRING,
         allowNull: true,
     },
+    slug: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+    },
 }, {
     sequelize: db_1.default,
     tableName: 'categories',
