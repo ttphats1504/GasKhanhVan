@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./dist/index.js",
     "dev": "nodemon index.ts",
-    "build": "netlify deploy --prod",
+    "build": "tsc",
     "test": "jest"
   },
   "author": "",
@@ -37,6 +37,7 @@
     "netlify-cli": "^20.0.2",
     "netlify-lambda": "^2.0.16",
     "nodemon": "^3.1.9",
+    "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7",
     "serverless-http": "^3.2.0"
   },
