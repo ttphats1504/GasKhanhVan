@@ -13,7 +13,7 @@ const {Search} = Input
 interface Category {
   id: number
   name: string
-  slug?: string
+  slug: string
   children?: Category[]
 }
 
@@ -36,10 +36,10 @@ const Navbar = () => {
       key: 'category',
       icon: <MenuUnfoldOutlined />,
       children: categories.map((cat) => ({
-        key: cat.slug || cat.id.toString(),
+        key: cat.slug,
         label: cat.name,
         children: cat.children?.map((subCat) => ({
-          key: subCat.slug || subCat.id.toString(),
+          key: subCat.slug,
           label: subCat.name,
         })),
       })),
@@ -47,20 +47,12 @@ const Navbar = () => {
 
     // Individual categories as top-level items
     const individualCategoryItems: MenuItem[] = categories.map((cat) => ({
-      key: `cat-${cat.slug || cat.id}`,
+      key: cat.slug,
       label: cat.name,
     }))
 
-    // Static items
-    const staticItems: MenuItem[] = [
-      // {label: 'Bình Gas', key: 'binh-gas'},
-      // {label: 'Bếp Gas', key: 'bep-gas'},
-      // {label: 'Phụ kiện Gas', key: 'phu-kien-gas'},
-      // {label: 'Gia dụng', key: 'gia-dung'},
-    ]
-
     // Final combined menu
-    return [groupedCategoryMenu, ...individualCategoryItems, ...staticItems]
+    return [groupedCategoryMenu, ...individualCategoryItems]
   }
 
   useEffect(() => {
