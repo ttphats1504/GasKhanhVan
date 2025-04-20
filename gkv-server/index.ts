@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import userRouter from './src/routers/user'
 import productRoutes from './src/routers/productRoutes'
 import categoryRoutes from './src/routers/categoryRoutes'
+import incentiveRoutes from './src/routers/incentiveRoutes'
 import cors from 'cors'
 import {mysqlDB} from './src/database/mysql'
 import Product from './src/models/ProductModel'
@@ -53,6 +54,7 @@ const connectMySQL = async () => {
 app.use('/auth', userRouter)
 app.use('/api/products', productRoutes)
 app.use('/api/categories', categoryRoutes)
+app.use('/api/incentives', incentiveRoutes)
 
 const startServer = async () => {
   await Product.sync({alter: true}) // syncs model with table structure
@@ -61,7 +63,7 @@ const startServer = async () => {
   await connectMySQL()
 
   app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`)
+    console.log(`Server is running at port ${PORT}`)
   })
 }
 

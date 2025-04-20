@@ -10,6 +10,7 @@ import {Breadcrumb, Button, Layout, Menu, theme} from 'antd'
 import {Route, Routes, useLocation, useNavigate} from 'react-router-dom'
 import ProductMange from '../screens/product/ProductManage'
 import CategoryManage from '../screens/category/CategoryManage'
+import IncentiveManage from '../screens/incentive/IncentiveManage'
 
 const {Header, Content, Footer, Sider} = Layout
 
@@ -30,6 +31,8 @@ const MainRouter = () => {
       setSelectedKey('1')
     } else if (location.pathname.includes('/category')) {
       setSelectedKey('2')
+    } else if (location.pathname.includes('/incentive')) {
+      setSelectedKey('3')
     }
   }, [location.pathname])
 
@@ -37,6 +40,7 @@ const MainRouter = () => {
     setSelectedKey(e.key)
     if (e.key === '1') navigate('/product')
     else if (e.key === '2') navigate('/category')
+    else if (e.key === '3') navigate('/incentive')
   }
 
   return (
@@ -93,6 +97,7 @@ const MainRouter = () => {
             <Route path='/' element={<ProductMange />} />
             <Route path='/product' element={<ProductMange />} />
             <Route path='/category' element={<CategoryManage />} />
+            <Route path='/incentive' element={<IncentiveManage />} />
           </Routes>
         </Content>
         <Footer style={{textAlign: 'center'}}>
