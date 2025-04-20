@@ -60,7 +60,7 @@ export default function ProductSection() {
       <Row className={styles.card_wrap} gutter={[24, 24]}>
         {cylinders.map((cylinder: any) => (
           <Col key={cylinder.id} xs={24} sm={8} md={4}>
-            <ProductCard cylinder={cylinder} />
+            <ProductCard product={cylinder} />
           </Col>
         ))}
       </Row>

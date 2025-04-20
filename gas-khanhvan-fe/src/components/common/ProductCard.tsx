@@ -1,31 +1,38 @@
 import React from 'react'
 import {Badge, Card, Space, Image} from 'antd'
 import Link from 'next/link'
-import {Cylinder} from '../../../data/cylinders'
+import Product from '@/models/Product'
 
 const {Meta} = Card
 
 interface ProductCardProps {
-  cylinder: Cylinder
+  product: Product
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({cylinder}) => (
+const ProductCard: React.FC<ProductCardProps> = ({product}) => (
   <>
-    <Badge.Ribbon text='Giảm 20%' color='volcano'>
-      <Link href={`/product/${cylinder.id}`} passHref>
-        <Card hoverable cover={<Image alt='example' src={cylinder?.image} preview={false} />}>
-          <Meta
-            title='BÌNH GAS GIA ĐÌNH XANH BIỂN 12KG'
-            description={
-              cylinder.price.toLocaleString('vi', {
-                style: 'currency',
-                currency: 'VND',
-              }) || 'LIÊN HỆ'
+    {product && (
+      <Badge.Ribbon text='Giảm 20%' color='volcano'>
+        <Link href={`/product/${product.id}`} passHref>
+          <Card
+            hoverable
+            cover={
+              <Image height='225px' alt='Product image' src={product?.image} preview={false} />
             }
-          />
-        </Card>
-      </Link>
-    </Badge.Ribbon>
+          >
+            <Meta
+              title={product.name}
+              description={
+                product.price.toLocaleString('vi', {
+                  style: 'currency',
+                  currency: 'VND',
+                }) || 'LIÊN HỆ'
+              }
+            />
+          </Card>
+        </Link>
+      </Badge.Ribbon>
+    )}
   </>
 )
 

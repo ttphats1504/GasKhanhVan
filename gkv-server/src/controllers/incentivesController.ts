@@ -12,7 +12,7 @@ export const addIncentive = async (req: Request, res: Response) => {
 
     if (file) {
       const result = await cloudinary.uploader.upload(file.path, {
-        folder: 'categories',
+        folder: 'incentives',
         use_filename: true,
       })
       imageUrl = result.secure_url

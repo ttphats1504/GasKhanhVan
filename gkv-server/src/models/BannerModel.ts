@@ -24,7 +24,7 @@ Banner.init(
     },
     image: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     order: {
       type: DataTypes.INTEGER,
