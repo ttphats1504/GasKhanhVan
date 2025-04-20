@@ -204,7 +204,7 @@ const ProductDetail: React.FC = () => {
               {relatedProducts.length > 0 ? (
                 relatedProducts.map((relatedProduct: any) => (
                   <Col key={relatedProduct.id} xs={24} sm={12} md={8} lg={6}>
-                    <ProductCard cylinder={relatedProduct} />
+                    <ProductCard product={relatedProduct} />
                   </Col>
                 ))
               ) : (
