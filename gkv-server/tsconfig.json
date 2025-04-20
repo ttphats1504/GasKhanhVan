@@ -112,5 +112,5 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
   "lib": ["es2015"],
-  "include": ["src", "netlify/functions"]
+  "include": ["index.ts", "src/**/*", "netlify/functions"]
 }
