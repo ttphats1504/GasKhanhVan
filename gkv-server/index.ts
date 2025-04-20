@@ -22,11 +22,12 @@ const dbURL = `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATA
 const app = express()
 const bodyParser = require('body-parser')
 const corsOptions = {
-  origin: ['https://gkv-admin-fe.vercel.app', 'https://gaskhanhvanquan7.vercel.app/'], // replace with your actual Vercel frontend domain
+  origin: ['https://gkv-admin-fe.vercel.app', 'https://gaskhanhvanquan7.vercel.app'], // replace with your actual Vercel frontend domain
   credentials: true, // if you're using cookies or authorization headers
 }
 
 app.options('*', cors(corsOptions))
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use(
   bodyParser.urlencoded({

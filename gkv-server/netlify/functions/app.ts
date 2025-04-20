@@ -19,12 +19,13 @@ dotenv.config()
 
 const app = express()
 const corsOptions = {
-  origin: ['https://gkv-admin-fe.vercel.app', 'https://gaskhanhvanquan7.vercel.app/'], // replace with your actual Vercel frontend domain
+  origin: ['https://gkv-admin-fe.vercel.app', 'https://gaskhanhvanquan7.vercel.app'], // replace with your actual Vercel frontend domain
   credentials: true, // if you're using cookies or authorization headers
 }
 
 // Middleware
 app.options('*', cors(corsOptions))
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
