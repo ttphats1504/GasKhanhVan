@@ -11,6 +11,7 @@ import {Route, Routes, useLocation, useNavigate} from 'react-router-dom'
 import ProductMange from '../screens/product/ProductManage'
 import CategoryManage from '../screens/category/CategoryManage'
 import IncentiveManage from '../screens/incentive/IncentiveManage'
+import BannerManage from '../screens/banner/BannerManage'
 
 const {Header, Content, Footer, Sider} = Layout
 
@@ -33,6 +34,8 @@ const MainRouter = () => {
       setSelectedKey('2')
     } else if (location.pathname.includes('/incentive')) {
       setSelectedKey('3')
+    } else if (location.pathname.includes('/banner')) {
+      setSelectedKey('4')
     }
   }, [location.pathname])
 
@@ -41,6 +44,7 @@ const MainRouter = () => {
     if (e.key === '1') navigate('/product')
     else if (e.key === '2') navigate('/category')
     else if (e.key === '3') navigate('/incentive')
+    else if (e.key === '4') navigate('/banner')
   }
 
   return (
@@ -67,6 +71,11 @@ const MainRouter = () => {
               key: '3',
               icon: <UploadOutlined />,
               label: 'Incentives Items',
+            },
+            {
+              key: '4',
+              icon: <UploadOutlined />,
+              label: 'Banners',
             },
           ]}
         />
@@ -98,6 +107,7 @@ const MainRouter = () => {
             <Route path='/product' element={<ProductMange />} />
             <Route path='/category' element={<CategoryManage />} />
             <Route path='/incentive' element={<IncentiveManage />} />
+            <Route path='/banner' element={<BannerManage />} />
           </Routes>
         </Content>
         <Footer style={{textAlign: 'center'}}>
