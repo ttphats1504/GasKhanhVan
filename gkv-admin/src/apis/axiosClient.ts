@@ -6,6 +6,7 @@ const baseURL = process.env.REACT_APP_BASE_URL || `http://localhost:3002`
 
 const axiosClient = axios.create({
   baseURL,
+  withCredentials: true,
   paramsSerializer: (params) => queryString.stringify(params),
 })
 
