@@ -11,6 +11,7 @@ const handleAPI = async (
       method, // HTTP method (GET, POST, etc.)
       ...(method === 'get' ? {params: data} : {data}), // Handles GET vs other requests
       headers, // Custom headers (optional)
+      withCredentials: true,
     })
 
     return response
