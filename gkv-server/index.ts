@@ -24,6 +24,8 @@ const bodyParser = require('body-parser')
 const corsOptions = {
   origin: ['https://gkv-admin-fe.vercel.app', 'https://gaskhanhvanquan7.vercel.app'], // replace with your actual Vercel frontend domain
   credentials: true, // if you're using cookies or authorization headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization', 'X-Request-With'],
 }
 
 app.options('*', cors(corsOptions))
