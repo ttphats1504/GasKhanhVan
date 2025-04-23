@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {Form, Input, Button, Modal, Upload, message, Flex} from 'antd'
+import {Form, Input, Button, Modal, Upload, message, Flex, InputNumber} from 'antd'
 import {RedoOutlined, UploadOutlined} from '@ant-design/icons'
 import Cropper from 'react-easy-crop'
 import type {UploadFile} from 'antd/es/upload/interface'
@@ -51,6 +51,7 @@ const IncentiveForm: React.FC<IncentiveFormProps> = ({visible, onClose, onSucces
 
     const formData = new FormData()
     formData.append('name', values.name)
+    formData.append('order', values.order.toString())
 
     const fileToUpload = file as Blob
     formData.append('image', fileToUpload)
@@ -142,6 +143,9 @@ const IncentiveForm: React.FC<IncentiveFormProps> = ({visible, onClose, onSucces
           rules={[{required: true, message: 'Please enter the incentive name!'}]}
         >
           <Input placeholder='Enter incentive name' />
+        </Form.Item>
+        <Form.Item label='Order' name='order'>
+          <InputNumber min={1} style={{width: '100%'}} placeholder='Enter display order' />
         </Form.Item>
         <Form.Item label='Upload Image' name='image'>
           <Upload.Dragger

@@ -1,12 +1,12 @@
 import {Request, Response} from 'express'
 import Banner from '../models/BannerModel'
 import cloudinary from '../config/cloudinary'
-import fs from 'fs'
 import streamifier from 'streamifier'
 
 // Create
 export const addBanner = async (req: Request, res: Response) => {
   try {
+    const {order} = req.body
     const file = req.file
     let imageUrl = ''
 
@@ -30,6 +30,7 @@ export const addBanner = async (req: Request, res: Response) => {
     }
 
     const newBanner = await Banner.create({
+      order,
       image: imageUrl,
     })
 

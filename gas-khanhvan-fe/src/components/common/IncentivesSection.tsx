@@ -14,7 +14,11 @@ const Incentives = () => {
       setLoading(true)
       try {
         const data: any = await handleAPI('/api/incentives', 'get')
-        setIncentives(data)
+        if (data && data.length > 0) {
+          // Sort incentives by order
+          const sortedData = data.sort((a: any, b: any) => a.order - b.order)
+          setIncentives(sortedData)
+        }
       } catch (error) {
         message.error('Failed to load incentives')
       } finally {

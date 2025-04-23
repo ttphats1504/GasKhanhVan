@@ -76,6 +76,11 @@ const IncentiveList: React.FC = () => {
       key: 'name',
     },
     {
+      title: 'Order',
+      dataIndex: 'order',
+      key: 'order',
+    },
+    {
       title: 'Image',
       dataIndex: 'image',
       key: 'image',
@@ -125,7 +130,7 @@ const IncentiveList: React.FC = () => {
             setModalVisible(true)
           }}
         >
-          Add New Product
+          Add New Incentive
         </Button>
       }
       style={{margin: '20px'}}

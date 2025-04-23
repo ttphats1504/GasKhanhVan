@@ -7,7 +7,7 @@ import streamifier from 'streamifier'
 // Create
 export const addIncentive = async (req: Request, res: Response) => {
   try {
-    const {name} = req.body
+    const {name, order} = req.body
     const file = req.file
     let imageUrl = ''
 
@@ -33,6 +33,7 @@ export const addIncentive = async (req: Request, res: Response) => {
     const newIncentive = await Incentive.create({
       name,
       image: imageUrl,
+      order,
     })
 
     res.status(201).json(newIncentive)

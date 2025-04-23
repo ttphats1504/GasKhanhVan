@@ -5,9 +5,10 @@ interface IncentiveAttributes {
   id: number
   name: string
   image: string
+  order: number
 }
 
-type IncentiveCreationAttributes = Optional<IncentiveAttributes, 'id' | 'image'>
+type IncentiveCreationAttributes = Optional<IncentiveAttributes, 'id' | 'image' | 'order'>
 
 class Incentive
   extends Model<IncentiveAttributes, IncentiveCreationAttributes>
@@ -17,6 +18,7 @@ class Incentive
   public name!: string
   public image!: string
   public slug!: string
+  public order!: number
 }
 
 Incentive.init(
@@ -33,6 +35,11 @@ Incentive.init(
     image: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    order: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
     },
   },
   {
