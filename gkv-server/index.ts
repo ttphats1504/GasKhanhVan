@@ -27,6 +27,21 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization', 'X-Request-With'],
 }
+const allowedOrigins = ['https://gkv-admin-fe.vercel.app', 'https://gaskhanhvanquan7.vercel.app']
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin as string
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin)
+    res.header('Access-Control-Allow-Credentials', 'true')
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS')
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin,Content-Type,Accept,Authorization,X-Requested-With'
+    )
+  }
+  next()
+})
 
 app.options('*', cors(corsOptions))
 app.use(cors(corsOptions))
