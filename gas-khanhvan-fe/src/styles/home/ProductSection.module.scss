@@ -29,3 +29,14 @@
 .card_wrap {
   margin: 30px auto;
 }
+
+.carousel {
+  :global {
+    .ant-carousel .ant-image {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block;
+    }
+  }
+}

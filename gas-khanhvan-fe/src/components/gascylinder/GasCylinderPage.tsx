@@ -1,5 +1,4 @@
 import {Carousel, Col, Flex, Image, Layout, Row, Typography} from 'antd'
-
 import styles from '@/styles/gascylinder/GasCylinderPage.module.scss'
 import FilterSideBar from '../common/FilterSidebar'
 import ProductCard from '../common/ProductCard'
@@ -20,25 +19,38 @@ const fetchProductDatas = async () => {
   }
 }
 
+const fetchBannerImages = async () => {
+  const api = '/api/banners'
+  try {
+    const res = await handleAPI(api, 'get')
+    return res
+  } catch (error) {
+    console.error('Error fetching Banners:', error)
+    return []
+  }
+}
+
 const GasCylinderPage = () => {
   const [products, setProducts] = useState<Product[]>([])
+  const [banners, setBanners] = useState<string[]>([])
   const [loading, setLoading] = useState<boolean>(false)
 
-  // Fetch data from the backend
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
 
-      const res: any = await fetchProductDatas() // Call the function
+      const [productRes, bannerRes]: any = await Promise.all([
+        fetchProductDatas(),
+        fetchBannerImages(),
+      ])
 
-      if (res && res.length > 0) {
-        setProducts(res)
-      }
+      if (productRes?.length) setProducts(productRes)
+      if (bannerRes?.length) setBanners(bannerRes.map((b: any) => b.imageUrl))
 
       setLoading(false)
     }
 
-    fetchData() // Call the async function inside useEffect
+    fetchData()
   }, [])
 
   if (loading) return <>Loading...</>
@@ -46,71 +58,28 @@ const GasCylinderPage = () => {
   return (
     <div className={styles.wrapper}>
       <Carousel autoplay className={styles.carousel}>
-        <div>
-          <h3 className={styles.carousel_item}>1</h3>
-        </div>
-        <div>
-          <h3 className={styles.carousel_item}>2</h3>
-        </div>
-        <div>
-          <h3 className={styles.carousel_item}>3</h3>
-        </div>
-        <div>
-          <h3 className={styles.carousel_item}>4</h3>
-        </div>
+        {banners.map((url, index) => (
+          <div key={index}>
+            <img src={url} alt={`Banner ${index}`} className={styles.carousel_image} />
+          </div>
+        ))}
       </Carousel>
+
       <div>
         <Row>
-          <Col span={4}>
-            <Image
-              className={styles.partner_image}
-              src='/assets/partners/petro-gas.png'
-              alt='Petro Gas Image'
-              preview={false}
-            />
-          </Col>
-          <Col span={4}>
-            <Image
-              className={styles.partner_image}
-              src='/assets/partners/petro-gas.png'
-              alt='Petro Gas Image'
-              preview={false}
-            />
-          </Col>
-          <Col span={4}>
-            <Image
-              className={styles.partner_image}
-              src='/assets/partners/petro-gas.png'
-              alt='Petro Gas Image'
-              preview={false}
-            />
-          </Col>
-          <Col span={4}>
-            <Image
-              className={styles.partner_image}
-              src='/assets/partners/petro-gas.png'
-              alt='Petro Gas Image'
-              preview={false}
-            />
-          </Col>
-          <Col span={4}>
-            <Image
-              className={styles.partner_image}
-              src='/assets/partners/petro-gas.png'
-              alt='Petro Gas Image'
-              preview={false}
-            />
-          </Col>
-          <Col span={4}>
-            <Image
-              className={styles.partner_image}
-              src='/assets/partners/petro-gas.png'
-              alt='Petro Gas Image'
-              preview={false}
-            />
-          </Col>
+          {[...Array(6)].map((_, idx) => (
+            <Col key={idx} span={4}>
+              <Image
+                className={styles.partner_image}
+                src='/assets/partners/petro-gas.png'
+                alt='Petro Gas Image'
+                preview={false}
+              />
+            </Col>
+          ))}
         </Row>
       </div>
+
       <div>
         <Row gutter={32}>
           <Col sm={24} md={6}>

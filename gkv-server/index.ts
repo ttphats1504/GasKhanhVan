@@ -27,7 +27,12 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization', 'X-Request-With'],
 }
-const allowedOrigins = ['https://gkv-admin-fe.vercel.app', 'https://gaskhanhvanquan7.vercel.app']
+const allowedOrigins = [
+  'https://gkv-admin-fe.vercel.app',
+  'https://gaskhanhvanquan7.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:3002',
+]
 
 app.use((req, res, next) => {
   const origin = req.headers.origin as string
