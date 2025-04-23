@@ -1,11 +1,12 @@
 .content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  height: 480px;
-  color: #fff;
-  line-height: 160px;
-  text-align: center;
-  background: var(--primary-yellow-800);
+  height: 37.5rem; // Set your desired max height
+  overflow: hidden;
+  :global {
+    .ant-carousel .ant-image {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block;
+    }
+  }
 }

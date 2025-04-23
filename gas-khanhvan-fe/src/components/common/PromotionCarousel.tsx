@@ -24,18 +24,20 @@ const PromotionCarousel = () => {
   }, [])
 
   return (
-    <Carousel arrows infinite={false} autoplay className={styles.carousel}>
-      {banners.map((banner) => (
-        <div key={banner.id}>
-          <Image
-            src={banner.image}
-            alt={`Banner ${banner.id}`}
-            preview={false}
-            className={styles.content_image}
-          />
-        </div>
-      ))}
-    </Carousel>
+    <div className={styles.content}>
+      <Carousel autoplay>
+        {banners.map((banner) => (
+          <div key={banner.id}>
+            <Image
+              src={banner.image}
+              alt={`Banner ${banner.id}`}
+              preview={false}
+              className={styles.image_content}
+            />
+          </div>
+        ))}
+      </Carousel>
+    </div>
   )
 }
 
