@@ -1,7 +1,6 @@
 import {Request, Response} from 'express'
 import Product from '../models/ProductModel'
 import cloudinary from '../config/cloudinary'
-import fs from 'fs'
 import streamifier from 'streamifier'
 
 // Create
@@ -98,6 +97,8 @@ export const updateProduct = async (req: Request, res: Response) => {
 
         streamifier.createReadStream(file.buffer).pipe(uploadStream)
       })
+
+      imageUrl = (result as any).secure_url
     }
 
     await existing.update({...req.body, image: imageUrl})
