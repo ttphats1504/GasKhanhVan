@@ -2,7 +2,11 @@ import {Typography, Menu} from 'antd'
 import type {MenuProps} from 'antd'
 
 import styles from '@/styles/common/FilterSideBar.module.scss'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
+import handleAPI from '@/apis/handleAPI'
+import {MenuUnfoldOutlined} from '@ant-design/icons'
+import Category from '../../../../gkv-server/src/models/CategoryModel'
+import {useRouter} from 'next/router'
 
 const {Title} = Typography
 
@@ -10,36 +14,36 @@ type FilterSideBarProps = {
   title: string
 }
 
-const items: MenuItem[] = [
-  {
-    key: '1',
-    label: 'Bình Gas',
-    children: [
-      {key: '11', label: 'Option 1'},
-      {key: '12', label: 'Option 2'},
-      {key: '13', label: 'Option 3'},
-      {key: '14', label: 'Option 4'},
-    ],
-  },
-  {
-    key: '2',
-    label: 'Thiết bị Gas',
-    children: [
-      {key: '21', label: 'Option 1'},
-      {key: '22', label: 'Option 2'},
-    ],
-  },
-  {
-    key: '3',
-    label: 'Hàng tiêu dùng',
-    children: [
-      {key: '31', label: 'Option 1'},
-      {key: '32', label: 'Option 2'},
-      {key: '33', label: 'Option 3'},
-      {key: '34', label: 'Option 4'},
-    ],
-  },
-]
+// const items: MenuItem[] = [
+//   {
+//     key: '1',
+//     label: 'Bình Gas',
+//     children: [
+//       {key: '11', label: 'Option 1'},
+//       {key: '12', label: 'Option 2'},
+//       {key: '13', label: 'Option 3'},
+//       {key: '14', label: 'Option 4'},
+//     ],
+//   },
+//   {
+//     key: '2',
+//     label: 'Thiết bị Gas',
+//     children: [
+//       {key: '21', label: 'Option 1'},
+//       {key: '22', label: 'Option 2'},
+//     ],
+//   },
+//   {
+//     key: '3',
+//     label: 'Hàng tiêu dùng',
+//     children: [
+//       {key: '31', label: 'Option 1'},
+//       {key: '32', label: 'Option 2'},
+//       {key: '33', label: 'Option 3'},
+//       {key: '34', label: 'Option 4'},
+//     ],
+//   },
+// ]
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -64,13 +68,53 @@ const getLevelKeys = (items1: LevelKeysProps[]) => {
   return key
 }
 
-const levelKeys = getLevelKeys(items as LevelKeysProps[])
-
 const FilterSideBar = ({title}: FilterSideBarProps) => {
-  const [stateOpenKeys, setStateOpenKeys] = useState(['3', '31'])
+  const router = useRouter()
+  const [stateOpenKeys, setStateOpenKeys] = useState<string[]>([])
+  const [items, setItems] = useState<MenuItem[]>([])
+  const selectedSlug = router.query.slug as string | undefined
+
+  const buildMenuItems = (categories: Category[]): MenuItem[] => {
+    // Individual categories as top-level items
+    const individualCategoryItems: MenuItem[] = categories.map((cat: any) => ({
+      key: cat.slug,
+      label: cat.name,
+      children: cat.children?.map((subCat: any) => ({
+        key: subCat.slug,
+        label: subCat.name,
+      })),
+    }))
+
+    // Final combined menu
+    return [...individualCategoryItems]
+  }
+
+  const levelKeys = getLevelKeys(items as LevelKeysProps[])
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res: any = await handleAPI('/api/categories', 'get')
+        const menuItems = buildMenuItems(res)
+        setItems(menuItems)
+      } catch (error) {
+        console.error('Failed to load categories:', error)
+      }
+    }
+
+    fetchCategories()
+  }, [])
 
   const onClick: MenuProps['onClick'] = (e) => {
-    console.log('click ')
+    const path = e.key.startsWith('/') ? e.key : `/${e.key}`
+    router.push(path)
+
+    // // Find the parent of clicked item if any
+    // const parentKey: any = items.find((item: any) =>
+    //   item.children?.some((child: any) => child.key === e.key)
+    // )?.key
+
+    // setStateOpenKeys(parentKey ? [parentKey, e.key] : [e.key])
   }
 
   const onOpenChange: MenuProps['onOpenChange'] = (openKeys) => {
@@ -104,15 +148,12 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
       setStateOpenKeys(openKeys)
     }
   }
-
-  console.log(stateOpenKeys)
-
   return (
     <div className={styles.filter_bar}>
       <Title level={4}>{title}</Title>
       <Menu
         mode='inline'
-        selectedKeys={stateOpenKeys}
+        selectedKeys={selectedSlug ? [selectedSlug] : []}
         openKeys={stateOpenKeys}
         onOpenChange={onOpenChange}
         onClick={onClick}

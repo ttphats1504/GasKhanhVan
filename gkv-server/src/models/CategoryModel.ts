@@ -38,6 +38,7 @@ Category.init(
     slug: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
   },
   {

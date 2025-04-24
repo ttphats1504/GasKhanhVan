@@ -1,8 +1,9 @@
 import {Request, Response} from 'express'
 import Category from '../models/CategoryModel'
 import cloudinary from '../config/cloudinary'
-import fs from 'fs'
 import streamifier from 'streamifier'
+import sequelize from '../config/db'
+import {col, fn, where} from 'sequelize'
 
 // Create
 export const addCategory = async (req: Request, res: Response) => {
@@ -112,6 +113,23 @@ export const deleteCategory = async (req: Request, res: Response) => {
     const {id} = req.params
     await Category.destroy({where: {id}})
     res.status(200).json({message: 'Category deleted successfully'})
+  } catch (err) {
+    res.status(500).json({error: (err as Error).message})
+  }
+}
+
+// Read by Slug
+export const getCategoryBySlug = async (req: Request, res: Response) => {
+  try {
+    const {slug} = req.params
+    const category = await Category.findOne({where: {slug}})
+
+    console.log(category)
+    if (!category) {
+      res.status(404).json({message: 'Category not found'})
+    }
+
+    res.status(200).json(category)
   } catch (err) {
     res.status(500).json({error: (err as Error).message})
   }

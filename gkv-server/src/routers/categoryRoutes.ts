@@ -1,9 +1,9 @@
 import express from 'express'
-import multer from 'multer'
 import {
   addCategory,
   getAllCategories,
   getCategoryById,
+  getCategoryBySlug,
   updateCategory,
   deleteCategory,
 } from '../controllers/categoriesController'
@@ -14,6 +14,7 @@ const router = express.Router()
 router.post('/', upload.single('image'), addCategory)
 router.get('/', getAllCategories)
 router.get('/:id', getCategoryById)
+router.get('/slug/:slug', getCategoryBySlug)
 router.put('/:id', upload.single('image'), updateCategory)
 router.delete('/:id', deleteCategory)
 

@@ -6,14 +6,14 @@ import handleAPI from '../apis/handleAPI'
 import ProductForm from './ProductForm'
 import Product from '../models/Product'
 
-const fetchProductDatas = async () => {
-  const api = '/api/products'
+const fetchProductDatas = async (page = 1, limit = 5) => {
+  const api = `/api/products?page=${page}&limit=${limit}`
   try {
     const res = await handleAPI(api, 'get')
     return res
   } catch (error) {
     console.error('Error fetching Products:', error)
-    return []
+    return null
   }
 }
 
@@ -22,44 +22,49 @@ const ProductList: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 5,
+    total: 0,
+  })
 
-  // Fetch data from the backend
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-
-      const res: any = await fetchProductDatas() // Call the function
-
-      if (res && res.length > 0) {
-        setProducts(res)
-      }
-
-      setLoading(false)
+  const fetchData = async (page = 1, limit = 5) => {
+    setLoading(true)
+    const res: any = await fetchProductDatas(page, limit)
+    if (res) {
+      setProducts(res.data)
+      setPagination((prev) => ({
+        ...prev,
+        current: page,
+        pageSize: limit,
+        total: res.totalItems,
+      }))
     }
+    setLoading(false)
+  }
 
-    fetchData() // Call the async function inside useEffect
+  useEffect(() => {
+    fetchData(pagination.current, pagination.pageSize)
   }, [])
+
+  const handleTableChange = (pagination: any) => {
+    fetchData(pagination.current, pagination.pageSize)
+  }
 
   // Handle delete action
   const handleDelete = async (id: string) => {
     try {
       await handleAPI(`/api/products/${id}`, 'delete')
-
-      // Update UI by removing deleted item
-      setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id))
-
       message.success('Product deleted successfully!')
+      fetchData(pagination.current, pagination.pageSize)
     } catch (error) {
       message.error('Error deleting product')
     }
   }
 
   const handleAddSuccess = (newProduct: Product) => {
-    setProducts((prev) =>
-      editingProduct
-        ? prev.map((c) => (c.id === newProduct.id ? newProduct : c))
-        : [...prev, newProduct]
-    )
+    setModalVisible(false)
+    fetchData(pagination.current, pagination.pageSize)
     setEditingProduct(null)
   }
 
@@ -175,7 +180,14 @@ const ProductList: React.FC = () => {
             dataSource={products}
             loading={loading}
             rowKey='id'
-            pagination={{pageSize: 5}}
+            pagination={{
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              total: pagination.total,
+              showSizeChanger: true,
+              pageSizeOptions: ['5', '10', '20'],
+            }}
+            onChange={handleTableChange}
           />
         </Col>
       </Row>

@@ -20,6 +20,8 @@ import MainLayout from '@/layouts/MainLayout'
 import ProductCard from '@/components/common/ProductCard'
 import handleAPI from '@/apis/handleAPI'
 import Product from '@/models/Product'
+import Spinner from '@/components/common/Spinner'
+import CustomBreadcrumbs from '../../components/common/CustomBreadcrumbs'
 
 const {Title, Text, Paragraph} = Typography
 const {TabPane} = Tabs
@@ -85,20 +87,19 @@ const ProductDetail: React.FC = () => {
     fetchData() // Call the async function inside useEffect
   }, [id])
 
-  if (loading) return <Spin size='large' style={{display: 'block', margin: '50px auto'}} />
-  if (!cylinder) return <Text type='danger'>Product not found.</Text>
+  if (loading) return <Spinner />
 
   // Fetch related products (e.g., same category or type)
   //   const relatedProducts = cylinders.filter((c) => c.type === cylinder.type && c.id !== cylinder.id)
   const relatedProducts: Product[] = cylinders.filter((c) => parseInt(c.id) < 5)
-
+  const items = [
+    {label: 'Homaaaae', href: '/'},
+    {label: 'Products', href: '/products'},
+    {label: 'Product Details'}, // current page
+  ]
   return (
     <MainLayout>
-      <Breadcrumb style={{padding: '10px 50px'}}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>List</Breadcrumb.Item>
-        <Breadcrumb.Item>App</Breadcrumb.Item>
-      </Breadcrumb>
+      <CustomBreadcrumbs items={items} />
       {cylinder ? (
         <Row gutter={[32, 32]} style={{padding: '20px'}}>
           {/* Smaller Image Section */}
@@ -172,7 +173,7 @@ const ProductDetail: React.FC = () => {
                   </li>
                   <li>
                     <strong>Giá:</strong> $
-                    {cylinder.price.toLocaleString('vi', {
+                    {cylinder?.price?.toLocaleString('vi', {
                       style: 'currency',
                       currency: 'VND',
                     }) || 'LIÊN HỆ'}

@@ -25,7 +25,8 @@ const Navbar = () => {
   const [items, setItems] = useState<MenuItem[]>([])
 
   const onClick: MenuProps['onClick'] = (e) => {
-    router.push(e.key)
+    const path = e.key.startsWith('/') ? e.key : `/${e.key}`
+    router.push(path)
     setCurrent(e.key)
   }
 

@@ -45,11 +45,34 @@ export const addProduct = async (req: Request, res: Response) => {
 }
 
 // Read All
-export const getAllProducts = async (_req: Request, res: Response) => {
+export const getAllProducts = async (req: Request, res: Response) => {
   try {
-    const products = await Product.findAll()
+    const page = parseInt(req.query.page as string) || 1
+    const limit = parseInt(req.query.limit as string) || 10
+    const offset = (page - 1) * limit
+    const {categoryId} = req.query
 
-    res.status(200).json(products)
+    const whereClause: any = {}
+    if (categoryId) {
+      whereClause.typeId = categoryId
+    }
+
+    const [totalItems, products] = await Promise.all([
+      Product.count({where: whereClause}), // Count with filter applied
+      Product.findAll({
+        where: whereClause, // Apply the filter here as well
+        limit,
+        offset,
+      }),
+    ])
+
+    res.status(200).json({
+      page,
+      limit,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      data: products,
+    })
   } catch (err) {
     res.status(500).json({error: (err as Error).message})
   }

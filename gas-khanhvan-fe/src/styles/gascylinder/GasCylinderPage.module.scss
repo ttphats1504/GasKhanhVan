@@ -7,7 +7,20 @@
 }
 
 .partner_image {
-    width: 200px !important;
-    height: 200px !important;
-    object-fit: contain;
+  width: 200px !important;
+  height: 200px !important;
+  object-fit: contain;
+}
+
+.carousel {
+  height: 15rem;
+  overflow: hidden;
+  :global {
+    .ant-carousel .ant-image {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block;
+    }
+  }
 }

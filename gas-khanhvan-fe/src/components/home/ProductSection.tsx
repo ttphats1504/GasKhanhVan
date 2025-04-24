@@ -1,4 +1,4 @@
-import {Col, Flex, Row} from 'antd'
+import {Col, Flex, Pagination, Row} from 'antd'
 import {Typography} from 'antd'
 import Container from '../common/Container'
 
@@ -10,39 +10,46 @@ import Product from '@/models/Product'
 
 const {Title} = Typography
 
-const fetchProductDatas = async () => {
-  const api = '/api/products'
+const fetchProductDatas = async (page = 1, limit = 6) => {
+  const api = `/api/products?page=${page}&limit=${limit}`
   try {
     const res = await handleAPI(api, 'get')
     return res
   } catch (error) {
     console.error('Error fetching Products:', error)
-    return []
+    return null
   }
 }
 
 export default function ProductSection() {
   const [cylinders, setCylinders] = useState<Product[]>([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [page, setPage] = useState<number>(1)
+  const [totalItems, setTotalItems] = useState<number>(0)
+  const limit = 6 // Products per page
 
-  // Fetch data from the backend
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
+  const fetchData = async (page: number) => {
+    setLoading(true)
+    const res: any = await fetchProductDatas(page, limit)
 
-      const res: any = await fetchProductDatas() // Call the function
-
-      if (res && res.length > 0) {
-        setCylinders(res)
-      }
-
-      setLoading(false)
+    if (res) {
+      setCylinders(res.data)
+      setTotalItems(res.totalItems)
     }
 
-    fetchData() // Call the async function inside useEffect
-  }, [])
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    fetchData(page)
+  }, [page])
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+  }
 
   if (loading) return <>Loading...</>
+
   return (
     <Container>
       <Flex justify='center' align='center'>
@@ -57,13 +64,24 @@ export default function ProductSection() {
         </Title>
         <div className={styles.line_break}></div>
       </Flex>
+
       <Row className={styles.card_wrap} gutter={[24, 24]}>
         {cylinders.map((cylinder: any) => (
-          <Col key={cylinder.id} xs={24} sm={8} md={4}>
+          <Col key={cylinder.id} xs={24} sm={12} md={6} lg={4}>
             <ProductCard product={cylinder} />
           </Col>
         ))}
       </Row>
+
+      <Flex justify='center' style={{marginTop: '2rem', marginBottom: '2rem'}}>
+        <Pagination
+          current={page}
+          total={totalItems}
+          pageSize={limit}
+          onChange={handlePageChange}
+          showSizeChanger={false}
+        />
+      </Flex>
     </Container>
   )
 }
