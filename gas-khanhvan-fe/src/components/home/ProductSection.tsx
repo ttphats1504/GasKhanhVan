@@ -7,6 +7,7 @@ import ProductCard from '../common/ProductCard'
 import handleAPI from '@/apis/handleAPI'
 import {useEffect, useState} from 'react'
 import Product from '@/models/Product'
+import Spinner from '../common/Spinner'
 
 const {Title} = Typography
 
@@ -48,7 +49,7 @@ export default function ProductSection() {
     setPage(newPage)
   }
 
-  if (loading) return <>Loading...</>
+  if (loading) return <Spinner />
 
   return (
     <Container>
