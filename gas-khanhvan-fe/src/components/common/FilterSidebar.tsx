@@ -4,9 +4,8 @@ import type {MenuProps} from 'antd'
 import styles from '@/styles/common/FilterSideBar.module.scss'
 import {useEffect, useState} from 'react'
 import handleAPI from '@/apis/handleAPI'
-import {MenuUnfoldOutlined} from '@ant-design/icons'
-import Category from '../../../../gkv-server/src/models/CategoryModel'
 import {useRouter} from 'next/router'
+import Category from '@/models/Category'
 
 const {Title} = Typography
 

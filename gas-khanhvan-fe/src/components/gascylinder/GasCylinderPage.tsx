@@ -6,7 +6,7 @@ import handleAPI from '@/apis/handleAPI'
 import Product from '../../../../gkv-admin/src/models/Product'
 import {useEffect, useState} from 'react'
 import Spinner from '../common/Spinner'
-import Category from '../../../../gkv-server/src/models/CategoryModel'
+import Category from '@/models/Category'
 
 interface Props {
   categoryId: number
