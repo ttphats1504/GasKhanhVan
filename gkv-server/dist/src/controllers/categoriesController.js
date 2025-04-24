@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategory = exports.updateCategory = exports.getCategoryById = exports.getAllCategories = exports.addCategory = void 0;
+exports.getCategoryBySlug = exports.deleteCategory = exports.updateCategory = exports.getCategoryById = exports.getAllCategories = exports.addCategory = void 0;
 const CategoryModel_1 = __importDefault(require("../models/CategoryModel"));
 const cloudinary_1 = __importDefault(require("../config/cloudinary"));
-const fs_1 = __importDefault(require("fs"));
+const streamifier_1 = __importDefault(require("streamifier"));
 // Create
 const addCategory = async (req, res) => {
     try {
@@ -14,12 +14,18 @@ const addCategory = async (req, res) => {
         const file = req.file;
         let imageUrl = '';
         if (file) {
-            const result = await cloudinary_1.default.uploader.upload(file.path, {
-                folder: 'categories',
-                use_filename: true,
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary_1.default.uploader.upload_stream({
+                    folder: 'categories',
+                    use_filename: true,
+                }, (error, result) => {
+                    if (error)
+                        return reject(error);
+                    resolve(result);
+                });
+                streamifier_1.default.createReadStream(file.buffer).pipe(uploadStream);
             });
             imageUrl = result.secure_url;
-            fs_1.default.unlinkSync(file.path);
         }
         const newCategory = await CategoryModel_1.default.create({
             name,
@@ -72,12 +78,18 @@ const updateCategory = async (req, res) => {
         }
         let imageUrl = existing.image;
         if (file) {
-            const result = await cloudinary_1.default.uploader.upload(file.path, {
-                folder: 'categories',
-                use_filename: true,
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary_1.default.uploader.upload_stream({
+                    folder: 'categories',
+                    use_filename: true,
+                }, (error, result) => {
+                    if (error)
+                        return reject(error);
+                    resolve(result);
+                });
+                streamifier_1.default.createReadStream(file.buffer).pipe(uploadStream);
             });
             imageUrl = result.secure_url;
-            fs_1.default.unlinkSync(file.path);
         }
         await existing.update(Object.assign(Object.assign({}, req.body), { image: imageUrl }));
         res.status(200).json(existing);
@@ -99,4 +111,20 @@ const deleteCategory = async (req, res) => {
     }
 };
 exports.deleteCategory = deleteCategory;
+// Read by Slug
+const getCategoryBySlug = async (req, res) => {
+    try {
+        const { slug } = req.params;
+        const category = await CategoryModel_1.default.findOne({ where: { slug } });
+        console.log(category);
+        if (!category) {
+            res.status(404).json({ message: 'Category not found' });
+        }
+        res.status(200).json(category);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+exports.getCategoryBySlug = getCategoryBySlug;
 //# sourceMappingURL=categoriesController.js.map

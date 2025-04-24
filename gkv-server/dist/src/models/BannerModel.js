@@ -15,7 +15,7 @@ Banner.init({
     },
     image: {
         type: sequelize_1.DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
     },
     order: {
         type: sequelize_1.DataTypes.INTEGER,

@@ -24,6 +24,7 @@ Category.init({
     slug: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
+        unique: true,
     },
 }, {
     sequelize: db_1.default,

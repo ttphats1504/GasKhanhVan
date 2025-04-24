@@ -5,25 +5,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteIncentive = exports.updateIncentive = exports.getIncentiveById = exports.getAllIncentives = exports.addIncentive = void 0;
 const cloudinary_1 = __importDefault(require("../config/cloudinary"));
-const fs_1 = __importDefault(require("fs"));
 const IncentiveModel_1 = __importDefault(require("../models/IncentiveModel"));
+const streamifier_1 = __importDefault(require("streamifier"));
 // Create
 const addIncentive = async (req, res) => {
     try {
-        const { name } = req.body;
+        const { name, order } = req.body;
         const file = req.file;
         let imageUrl = '';
         if (file) {
-            const result = await cloudinary_1.default.uploader.upload(file.path, {
-                folder: 'categories',
-                use_filename: true,
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary_1.default.uploader.upload_stream({
+                    folder: 'incentives',
+                    use_filename: true,
+                }, (error, result) => {
+                    if (error)
+                        return reject(error);
+                    resolve(result);
+                });
+                streamifier_1.default.createReadStream(file.buffer).pipe(uploadStream);
             });
             imageUrl = result.secure_url;
-            fs_1.default.unlinkSync(file.path);
         }
         const newIncentive = await IncentiveModel_1.default.create({
             name,
             image: imageUrl,
+            order,
         });
         res.status(201).json(newIncentive);
     }
@@ -71,12 +78,18 @@ const updateIncentive = async (req, res) => {
         }
         let imageUrl = existing.image;
         if (file) {
-            const result = await cloudinary_1.default.uploader.upload(file.path, {
-                folder: 'incentives',
-                use_filename: true,
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary_1.default.uploader.upload_stream({
+                    folder: 'incentives',
+                    use_filename: true,
+                }, (error, result) => {
+                    if (error)
+                        return reject(error);
+                    resolve(result);
+                });
+                streamifier_1.default.createReadStream(file.buffer).pipe(uploadStream);
             });
             imageUrl = result.secure_url;
-            fs_1.default.unlinkSync(file.path);
         }
         await existing.update(Object.assign(Object.assign({}, req.body), { image: imageUrl }));
         res.status(200).json(existing);

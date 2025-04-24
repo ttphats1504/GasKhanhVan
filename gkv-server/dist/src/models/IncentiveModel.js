@@ -21,6 +21,11 @@ Incentive.init({
         type: sequelize_1.DataTypes.STRING,
         allowNull: true,
     },
+    order: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+    },
 }, {
     sequelize: db_1.default,
     tableName: 'incentives',

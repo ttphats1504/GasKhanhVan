@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProduct = exports.updateProduct = exports.getProductById = exports.getAllProducts = exports.addProduct = void 0;
 const ProductModel_1 = __importDefault(require("../models/ProductModel"));
 const cloudinary_1 = __importDefault(require("../config/cloudinary"));
-const fs_1 = __importDefault(require("fs"));
+const streamifier_1 = __importDefault(require("streamifier"));
 // Create
 const addProduct = async (req, res) => {
     try {
@@ -14,12 +14,18 @@ const addProduct = async (req, res) => {
         const file = req.file;
         let imageUrl = '';
         if (file) {
-            const result = await cloudinary_1.default.uploader.upload(file.path, {
-                folder: 'products',
-                use_filename: true,
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary_1.default.uploader.upload_stream({
+                    folder: 'products',
+                    use_filename: true,
+                }, (error, result) => {
+                    if (error)
+                        return reject(error);
+                    resolve(result);
+                });
+                streamifier_1.default.createReadStream(file.buffer).pipe(uploadStream);
             });
             imageUrl = result.secure_url;
-            fs_1.default.unlinkSync(file.path);
         }
         const newProduct = await ProductModel_1.default.create({
             name,
@@ -37,10 +43,31 @@ const addProduct = async (req, res) => {
 };
 exports.addProduct = addProduct;
 // Read All
-const getAllProducts = async (_req, res) => {
+const getAllProducts = async (req, res) => {
     try {
-        const products = await ProductModel_1.default.findAll();
-        res.status(200).json(products);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = (page - 1) * limit;
+        const { categoryId } = req.query;
+        const whereClause = {};
+        if (categoryId) {
+            whereClause.typeId = categoryId;
+        }
+        const [totalItems, products] = await Promise.all([
+            ProductModel_1.default.count({ where: whereClause }), // Count with filter applied
+            ProductModel_1.default.findAll({
+                where: whereClause, // Apply the filter here as well
+                limit,
+                offset,
+            }),
+        ]);
+        res.status(200).json({
+            page,
+            limit,
+            totalItems,
+            totalPages: Math.ceil(totalItems / limit),
+            data: products,
+        });
     }
     catch (err) {
         res.status(500).json({ error: err.message });
@@ -75,12 +102,18 @@ const updateProduct = async (req, res) => {
         }
         let imageUrl = existing.image;
         if (file) {
-            const result = await cloudinary_1.default.uploader.upload(file.path, {
-                folder: 'products',
-                use_filename: true,
+            const result = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary_1.default.uploader.upload_stream({
+                    folder: 'products',
+                    use_filename: true,
+                }, (error, result) => {
+                    if (error)
+                        return reject(error);
+                    resolve(result);
+                });
+                streamifier_1.default.createReadStream(file.buffer).pipe(uploadStream);
             });
             imageUrl = result.secure_url;
-            fs_1.default.unlinkSync(file.path);
         }
         await existing.update(Object.assign(Object.assign({}, req.body), { image: imageUrl }));
         res.status(200).json(existing);
