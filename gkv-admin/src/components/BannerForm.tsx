@@ -50,7 +50,7 @@ const BannerForm: React.FC<BannerFormProps> = ({visible, onClose, onSuccess, ban
     }
 
     const formData = new FormData()
-    formData.append('order', values.order.toString())
+    formData.append('order', values.order?.toString())
 
     if (file) {
       formData.append('image', file as Blob)
@@ -142,7 +142,7 @@ const BannerForm: React.FC<BannerFormProps> = ({visible, onClose, onSuccess, ban
           name='order'
           rules={[{required: true, message: 'Please enter the banner order!'}]}
         >
-          <InputNumber min={1} style={{width: '100%'}} placeholder='Enter display order' />
+          <InputNumber min={0} style={{width: '100%'}} placeholder='Enter display order' />
         </Form.Item>
         <Form.Item label='Upload Image' name='image'>
           <Upload.Dragger

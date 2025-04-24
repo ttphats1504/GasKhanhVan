@@ -1,4 +1,6 @@
 import handleAPI from '@/apis/handleAPI'
+import CustomBreadcrumbs, {CustomBreadcrumbItem} from '@/components/common/CustomBreadcrumbs'
+import Spinner from '@/components/common/Spinner'
 import GasCylinderPage from '@/components/gascylinder/GasCylinderPage'
 import CategoryLayout from '@/layouts/CategoryLayout'
 import {useRouter} from 'next/router'
@@ -18,27 +20,40 @@ export const fetchCategoryBySlug = async (slug: string) => {
 export default function CategoryPagePage() {
   const router = useRouter()
   const [categoryId, setCategoryId] = useState<number>()
+  const [breadcrumbs, setBreadcrumbs] = useState<CustomBreadcrumbItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadCategory = async () => {
-      if (router.query.slug) {
-        const category = await fetchCategoryBySlug(router.query.slug as string)
-        if (category) {
-          setCategoryId(category.id)
-        }
-        setLoading(false)
+      const slug = router.query.slug as string
+      if (!slug) return
+
+      const category = await fetchCategoryBySlug(slug)
+      if (category) {
+        setCategoryId(category.id)
+
+        const items: CustomBreadcrumbItem[] = [{label: 'Trang chủ', href: '/'}]
+
+        items.push({
+          label: category.name,
+          href: `${category.slug}`,
+        })
+        console.log(items)
+        setBreadcrumbs(items)
       }
+
+      setLoading(false)
     }
 
     loadCategory()
   }, [router.query.slug])
 
-  if (loading) return <>Loading...</>
+  if (loading) return <Spinner />
   if (!categoryId) return <>Category not found.</>
 
   return (
     <CategoryLayout>
+      <CustomBreadcrumbs items={breadcrumbs} />
       <GasCylinderPage categoryId={categoryId} />
     </CategoryLayout>
   )

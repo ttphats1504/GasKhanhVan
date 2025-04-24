@@ -16,14 +16,14 @@ type CustomBreadcrumbsProps = {
 
 const CustomBreadcrumbs: React.FC<CustomBreadcrumbsProps> = ({items, style}) => {
   return (
-    <Breadcrumb style={{padding: '10px 50px', ...style}}>
+    <Breadcrumb style={{margin: '20px 0', ...style}}>
       {items.map((item, index) =>
         item.href ? (
           <Breadcrumb.Item key={index}>
-            <Link href={item.href}>{item.href}</Link>
+            <Link href={item.href}>{item.label}</Link>
           </Breadcrumb.Item>
         ) : (
-          <Breadcrumb.Item key={index}>{item.href}</Breadcrumb.Item>
+          <Breadcrumb.Item key={index}>{item.label}</Breadcrumb.Item>
         )
       )}
     </Breadcrumb>

@@ -51,8 +51,8 @@ const IncentiveForm: React.FC<IncentiveFormProps> = ({visible, onClose, onSucces
 
     const formData = new FormData()
     formData.append('name', values.name)
-    formData.append('order', values.order.toString())
-
+    formData.append('order', values.order ? values.order.toString() : '0')
+    console.log(values)
     const fileToUpload = file as Blob
     formData.append('image', fileToUpload)
 
@@ -145,7 +145,12 @@ const IncentiveForm: React.FC<IncentiveFormProps> = ({visible, onClose, onSucces
           <Input placeholder='Enter incentive name' />
         </Form.Item>
         <Form.Item label='Order' name='order'>
-          <InputNumber min={1} style={{width: '100%'}} placeholder='Enter display order' />
+          <InputNumber
+            min={0}
+            style={{width: '100%'}}
+            defaultValue={0}
+            placeholder='Enter display order'
+          />
         </Form.Item>
         <Form.Item label='Upload Image' name='image'>
           <Upload.Dragger
