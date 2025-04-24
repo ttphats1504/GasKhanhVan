@@ -2,8 +2,6 @@ import {Request, Response} from 'express'
 import Category from '../models/CategoryModel'
 import cloudinary from '../config/cloudinary'
 import streamifier from 'streamifier'
-import sequelize from '../config/db'
-import {col, fn, where} from 'sequelize'
 
 // Create
 export const addCategory = async (req: Request, res: Response) => {
