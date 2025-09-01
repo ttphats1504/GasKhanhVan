@@ -1,8 +1,10 @@
 import '@/styles/globals.css'
+import 'antd/dist/reset.css' // với Antd v5
 import type {AppProps} from 'next/app'
 import {Roboto} from 'next/font/google'
 import {DefaultSeo} from 'next-seo'
 import {ConfigProvider} from 'antd'
+import {StyleProvider} from '@ant-design/cssinjs'
 
 const roboto = Roboto({
   weight: '400',
@@ -18,22 +20,23 @@ export default function App({Component, pageProps}: AppProps) {
         openGraph={{
           type: 'website',
           locale: 'vi_VN',
-          url: 'https://gas-khanh-van.vercel.app/',
+          url: 'https://gaskhanhvanquan7.vercel.app/',
           siteName: 'Cửa Hàng Gas Khánh Vân - Đại lý Gas Quận 7, Gas Quận 7',
         }}
       />
-      <ConfigProvider
-        theme={{
-          token: {
-            // Seed Token
-            colorPrimary: '#F14A00',
-          },
-        }}
-      >
-        <main className={roboto.className}>
-          <Component {...pageProps} />
-        </main>
-      </ConfigProvider>
+      <StyleProvider hashPriority='high'>
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: '#F14A00',
+            },
+          }}
+        >
+          <main className={roboto.className}>
+            <Component {...pageProps} />
+          </main>
+        </ConfigProvider>
+      </StyleProvider>
     </>
   )
 }

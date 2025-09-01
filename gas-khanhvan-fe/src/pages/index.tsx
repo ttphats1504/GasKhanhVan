@@ -9,7 +9,6 @@ import styles from '../styles/home/Home.module.scss'
 import ProductSection from '@/components/home/ProductSection'
 import Head from 'next/head'
 import SaleBanner from '@/components/common/SaleBanner'
-import MainLayout from '@/layouts/MainLayout'
 import HomeLayout from '@/layouts/HomeLayout'
 
 export default function Home() {
