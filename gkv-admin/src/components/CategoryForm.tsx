@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {Form, Input, Button, Modal, Upload, message, Flex} from 'antd'
+import {Form, Input, Button, Modal, Upload, message, Flex, Select} from 'antd'
 import {RedoOutlined, UploadOutlined} from '@ant-design/icons'
 import handleAPI from '../apis/handleAPI'
 import {UploadFile} from 'antd/es/upload/interface'
@@ -10,12 +10,26 @@ interface CategoryFormProps {
   onClose: () => void
   onSuccess: (newCategory: Category) => void
   category?: Category | null // If provided, form will be in edit mode
+  parentId: number | null
+}
+
+interface CategoryOption {
+  id: number
+  name: string
 }
 
 const CategoryForm: React.FC<CategoryFormProps> = ({visible, onClose, onSuccess, category}) => {
   const [form] = Form.useForm()
   const [file, setFile] = useState<UploadFile | null>(null)
   const isEditing = !!category
+  const [categories, setCategories] = useState<CategoryOption[]>([])
+
+  useEffect(() => {
+    // Fetch all categories for parent select
+    handleAPI('/api/categories', 'get').then((res: any) => {
+      setCategories(res)
+    })
+  }, [])
 
   useEffect(() => {
     if (category) {
@@ -40,6 +54,9 @@ const CategoryForm: React.FC<CategoryFormProps> = ({visible, onClose, onSuccess,
     const formData = new FormData()
     formData.append('name', values.name)
     formData.append('slug', values.slug)
+    if (values.parentId) {
+      formData.append('parentId', values.parentId.toString())
+    }
     // Cast file to Blob safely
     const fileBlob = file as unknown as Blob
     // Append file as Blob
@@ -106,6 +123,17 @@ const CategoryForm: React.FC<CategoryFormProps> = ({visible, onClose, onSuccess,
             <p>Click or drag file to upload</p>
           </Upload.Dragger>
         </Form.Item> */}
+        <Form.Item label='Parent Category' name='parentId'>
+          <Select placeholder='Select parent category' allowClear>
+            {categories
+              .filter((c: any) => !category || c.id !== category.id) // avoid setting itself as parent
+              .map((c) => (
+                <Select.Option key={c.id} value={c.id}>
+                  {c.name}
+                </Select.Option>
+              ))}
+          </Select>
+        </Form.Item>
         <Form.Item>
           {isEditing ? (
             <Button type='primary' htmlType='submit'>

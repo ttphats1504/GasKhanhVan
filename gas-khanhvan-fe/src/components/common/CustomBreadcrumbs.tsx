@@ -15,8 +15,9 @@ type CustomBreadcrumbsProps = {
 }
 
 const CustomBreadcrumbs: React.FC<CustomBreadcrumbsProps> = ({items, style}) => {
+  console.log(items)
   return (
-    <Breadcrumb style={{margin: '20px 0', ...style}}>
+    <Breadcrumb style={{...style}}>
       {items.map((item, index) =>
         item.href ? (
           <Breadcrumb.Item key={index}>

@@ -9,12 +9,23 @@ import Spinner from '../common/Spinner'
 import Category from '@/models/Category'
 
 interface Props {
-  categoryId: number
+  cate: Category
 }
 
 const {Title} = Typography
 
-const fetchProductDatas = async (categoryId: number) => {
+const fetchProductDatas = async () => {
+  const api = `/api/products`
+  try {
+    const res = await handleAPI(api, 'get')
+    return res
+  } catch (error) {
+    console.error('Error fetching Products:', error)
+    return []
+  }
+}
+
+const fetchProductDatasByCateId = async (categoryId: number) => {
   const api = `/api/products?categoryId=${categoryId}`
   try {
     const res = await handleAPI(api, 'get')
@@ -47,7 +58,7 @@ const fetchBannerImages = async () => {
   }
 }
 
-const GasCylinderPage = ({categoryId}: Props) => {
+const GasCylinderPage = ({cate}: Props) => {
   const [products, setProducts] = useState<Product[]>([])
   const [category, setCategory] = useState<Category | null>()
   const [banners, setBanners] = useState<string[]>([])
@@ -60,20 +71,25 @@ const GasCylinderPage = ({categoryId}: Props) => {
     const fetchData = async () => {
       setLoading(true)
 
-      const [productRes, bannerRes, cateRes]: any = await Promise.all([
-        fetchProductDatas(categoryId),
-        fetchBannerImages(),
-        fetchCategoryById(categoryId),
-      ])
-      if (productRes?.totalItems) setProducts(productRes.data)
-      if (cateRes) setCategory(cateRes)
-      if (bannerRes?.length) setBanners(bannerRes.map((b: any) => b.image))
+      if (cate) {
+        const isSanPham = cate.slug === 'san-pham'
+
+        const [productRes, bannerRes, cateRes]: any = await Promise.all([
+          isSanPham ? fetchProductDatas() : fetchProductDatasByCateId(cate.id),
+          fetchBannerImages(),
+          fetchCategoryById(cate.id),
+        ])
+
+        if (productRes?.totalItems) setProducts(productRes.data)
+        if (cateRes) setCategory(cateRes)
+        if (bannerRes?.length) setBanners(bannerRes.map((b: any) => b.image))
+      }
 
       setLoading(false)
     }
 
     fetchData()
-  }, [categoryId])
+  }, [cate.id])
 
   if (loading) return <Spinner />
   return (
@@ -104,7 +120,7 @@ const GasCylinderPage = ({categoryId}: Props) => {
       <div>
         <Row gutter={32}>
           <Col sm={24} md={6}>
-            <FilterSideBar title='Danh mục tìm kiếm' />
+            <FilterSideBar title='Danh mục sản phẩm' />
           </Col>
           <Col sm={24} md={18}>
             <Flex vertical>

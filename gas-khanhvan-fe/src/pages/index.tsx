@@ -10,6 +10,7 @@ import ProductSection from '@/components/home/ProductSection'
 import Head from 'next/head'
 import SaleBanner from '@/components/common/SaleBanner'
 import MainLayout from '@/layouts/MainLayout'
+import HomeLayout from '@/layouts/HomeLayout'
 
 export default function Home() {
   return (
@@ -51,7 +52,7 @@ export default function Home() {
           }}
         />
       </Head>
-      <MainLayout>
+      <HomeLayout>
         <PromotionCarousel />
         <div>
           <div className={styles.top_bg}>
@@ -61,7 +62,7 @@ export default function Home() {
           </div>
         </div>
         <Footer />
-      </MainLayout>
+      </HomeLayout>
     </>
   )
 }

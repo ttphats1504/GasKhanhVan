@@ -6,7 +6,7 @@ import streamifier from 'streamifier'
 // Create
 export const addCategory = async (req: Request, res: Response) => {
   try {
-    const {name, slug} = req.body
+    const {name, slug, parentId} = req.body
     const file = req.file
     let imageUrl = ''
 
@@ -32,7 +32,8 @@ export const addCategory = async (req: Request, res: Response) => {
     const newCategory = await Category.create({
       name,
       image: imageUrl,
-      slug: slug,
+      slug,
+      parentId: parentId || null,
     })
 
     res.status(201).json(newCategory)
@@ -44,7 +45,18 @@ export const addCategory = async (req: Request, res: Response) => {
 // Read All
 export const getAllCategories = async (_req: Request, res: Response) => {
   try {
-    const categories = await Category.findAll()
+    const categories = await Category.findAll({
+      where: {parentId: null}, // only root
+      include: [
+        {
+          model: Category,
+          as: 'children',
+          include: [
+            {model: Category, as: 'children'}, // 👈 allows 2-level nesting
+          ],
+        },
+      ],
+    })
 
     res.status(200).json(categories)
   } catch (err) {
@@ -56,7 +68,20 @@ export const getAllCategories = async (_req: Request, res: Response) => {
 export const getCategoryById = async (req: Request, res: Response) => {
   try {
     const {id} = req.params
-    const category = await Category.findByPk(id)
+    const category = await Category.findByPk(id, {
+      include: [
+        {
+          model: Category,
+          as: 'children',
+          include: [
+            {
+              model: Category,
+              as: 'children', // nested children (grandchildren)
+            },
+          ],
+        },
+      ],
+    })
     if (!category) {
       res.status(404).json({message: 'Category not found'})
       return
@@ -119,13 +144,42 @@ export const deleteCategory = async (req: Request, res: Response) => {
 // Read by Slug
 export const getCategoryBySlug = async (req: Request, res: Response) => {
   try {
-    const {slug} = req.params
-    const category = await Category.findOne({where: {slug}})
+    let {slug} = req.params
 
-    console.log(category)
-    if (!category) {
-      res.status(404).json({message: 'Category not found'})
+    // Handle cases where slug is nested: "parent/child"
+    const slugParts = slug.split('/')
+
+    let category
+    if (slugParts.length === 1) {
+      // simple slug
+      category = await Category.findOne({
+        where: {slug: slugParts[0]},
+        include: [
+          {
+            model: Category,
+            as: 'children',
+            include: [{model: Category, as: 'children'}],
+          },
+        ],
+      })
+    } else {
+      // nested slug: resolve last slug only
+      const lastSlug = slugParts[slugParts.length - 1]
+      category = await Category.findOne({
+        where: {slug: lastSlug},
+        include: [
+          {
+            model: Category,
+            as: 'children',
+            include: [{model: Category, as: 'children'}],
+          },
+        ],
+      })
     }
+
+    // if (!category) {
+    //   res.status(404).json({message: 'Category not found'})
+    // }
 
     res.status(200).json(category)
   } catch (err) {

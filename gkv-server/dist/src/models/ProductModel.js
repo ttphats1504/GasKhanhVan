@@ -20,6 +20,10 @@ Product.init({
     image: { type: sequelize_1.DataTypes.TEXT, allowNull: true },
     description: { type: sequelize_1.DataTypes.TEXT, allowNull: false },
     createdAt: { type: sequelize_1.DataTypes.DATE, defaultValue: sequelize_1.DataTypes.NOW },
+    slug: {
+        type: sequelize_1.DataTypes.STRING,
+        unique: 'prod_slug_unique_index',
+    },
 }, {
     sequelize: db_1.default,
     tableName: 'products',

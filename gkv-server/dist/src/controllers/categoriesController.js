@@ -10,7 +10,7 @@ const streamifier_1 = __importDefault(require("streamifier"));
 // Create
 const addCategory = async (req, res) => {
     try {
-        const { name, slug } = req.body;
+        const { name, slug, parentId } = req.body;
         const file = req.file;
         let imageUrl = '';
         if (file) {
@@ -30,7 +30,8 @@ const addCategory = async (req, res) => {
         const newCategory = await CategoryModel_1.default.create({
             name,
             image: imageUrl,
-            slug: slug,
+            slug,
+            parentId: parentId || null,
         });
         res.status(201).json(newCategory);
     }
@@ -42,7 +43,18 @@ exports.addCategory = addCategory;
 // Read All
 const getAllCategories = async (_req, res) => {
     try {
-        const categories = await CategoryModel_1.default.findAll();
+        const categories = await CategoryModel_1.default.findAll({
+            where: { parentId: null }, // only root
+            include: [
+                {
+                    model: CategoryModel_1.default,
+                    as: 'children',
+                    include: [
+                        { model: CategoryModel_1.default, as: 'children' }, // 👈 allows 2-level nesting
+                    ],
+                },
+            ],
+        });
         res.status(200).json(categories);
     }
     catch (err) {
@@ -54,7 +66,20 @@ exports.getAllCategories = getAllCategories;
 const getCategoryById = async (req, res) => {
     try {
         const { id } = req.params;
-        const category = await CategoryModel_1.default.findByPk(id);
+        const category = await CategoryModel_1.default.findByPk(id, {
+            include: [
+                {
+                    model: CategoryModel_1.default,
+                    as: 'children',
+                    include: [
+                        {
+                            model: CategoryModel_1.default,
+                            as: 'children', // nested children (grandchildren)
+                        },
+                    ],
+                },
+            ],
+        });
         if (!category) {
             res.status(404).json({ message: 'Category not found' });
             return;
@@ -114,12 +139,40 @@ exports.deleteCategory = deleteCategory;
 // Read by Slug
 const getCategoryBySlug = async (req, res) => {
     try {
-        const { slug } = req.params;
-        const category = await CategoryModel_1.default.findOne({ where: { slug } });
-        console.log(category);
-        if (!category) {
-            res.status(404).json({ message: 'Category not found' });
+        let { slug } = req.params;
+        // Handle cases where slug is nested: "parent/child"
+        const slugParts = slug.split('/');
+        let category;
+        if (slugParts.length === 1) {
+            // simple slug
+            category = await CategoryModel_1.default.findOne({
+                where: { slug: slugParts[0] },
+                include: [
+                    {
+                        model: CategoryModel_1.default,
+                        as: 'children',
+                        include: [{ model: CategoryModel_1.default, as: 'children' }],
+                    },
+                ],
+            });
         }
+        else {
+            // nested slug: resolve last slug only
+            const lastSlug = slugParts[slugParts.length - 1];
+            category = await CategoryModel_1.default.findOne({
+                where: { slug: lastSlug },
+                include: [
+                    {
+                        model: CategoryModel_1.default,
+                        as: 'children',
+                        include: [{ model: CategoryModel_1.default, as: 'children' }],
+                    },
+                ],
+            });
+        }
+        // if (!category) {
+        //   res.status(404).json({message: 'Category not found'})
+        // }
         res.status(200).json(category);
     }
     catch (err) {

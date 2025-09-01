@@ -7,6 +7,7 @@ interface Product {
   image: string
   description: string
   createdAt: string
+  slug: string
 }
 
 export default Product

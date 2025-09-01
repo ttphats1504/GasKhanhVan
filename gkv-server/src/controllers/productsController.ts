@@ -2,6 +2,7 @@ import {Request, Response} from 'express'
 import Product from '../models/ProductModel'
 import cloudinary from '../config/cloudinary'
 import streamifier from 'streamifier'
+import {slugify} from '../utils/slugify'
 
 // Create
 export const addProduct = async (req: Request, res: Response) => {
@@ -9,6 +10,7 @@ export const addProduct = async (req: Request, res: Response) => {
     const {name, typeId, price, stock, description} = req.body
     const file = req.file
     let imageUrl = ''
+    const slug = slugify(name)
 
     if (file) {
       const result = await new Promise((resolve, reject) => {
@@ -36,6 +38,7 @@ export const addProduct = async (req: Request, res: Response) => {
       stock,
       description,
       image: imageUrl,
+      slug,
     })
 
     res.status(201).json(newProduct)
@@ -93,10 +96,46 @@ export const getProductById = async (req: Request, res: Response) => {
   }
 }
 
+// Read One by Name
+export const getProductByName = async (req: Request, res: Response) => {
+  try {
+    const {name} = req.params
+
+    const product = await Product.findOne({
+      where: {name},
+    })
+
+    if (!product) {
+      res.status(404).json({message: 'Product not found'})
+    }
+
+    res.status(200).json(product)
+  } catch (err) {
+    res.status(500).json({error: (err as Error).message})
+  }
+}
+
+export const getProductBySlug = async (req: Request, res: Response) => {
+  try {
+    const {slug} = req.params
+    const product = await Product.findOne({where: {slug}})
+
+    if (!product) {
+      res.status(404).json({message: 'Product not found'})
+    }
+
+    res.json(product)
+  } catch (err) {
+    res.status(500).json({error: (err as Error).message})
+  }
+}
+
 // Update
 export const updateProduct = async (req: Request, res: Response) => {
   try {
     const {id} = req.params
+    const {name} = req.body
+    const slug = name ? slugify(name) : undefined
     const file = req.file
     const existing = await Product.findByPk(id)
     if (!existing) {
@@ -124,7 +163,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       imageUrl = (result as any).secure_url
     }
 
-    await existing.update({...req.body, image: imageUrl})
+    await existing.update({...req.body, image: imageUrl, ...(slug && {slug})})
     res.status(200).json(existing)
   } catch (err) {
     res.status(500).json({error: (err as Error).message})

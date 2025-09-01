@@ -24,12 +24,32 @@ Category.init({
     slug: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
-        unique: true,
+        unique: 'slug_unique_index',
+    },
+    parentId: {
+        type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+        allowNull: true,
+        references: {
+            model: 'categories', // self-reference
+            key: 'id',
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
     },
 }, {
     sequelize: db_1.default,
     tableName: 'categories',
     timestamps: false,
+});
+// One category can have many children
+Category.hasMany(Category, {
+    as: 'children',
+    foreignKey: 'parentId',
+});
+// Each category can belong to one parent
+Category.belongsTo(Category, {
+    as: 'parent',
+    foreignKey: 'parentId',
 });
 exports.default = Category;
 //# sourceMappingURL=CategoryModel.js.map

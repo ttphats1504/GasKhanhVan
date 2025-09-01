@@ -10,6 +10,7 @@ interface ProductAttributes {
   image: string
   description: string
   createdAt?: Date
+  slug: string
 }
 
 type ProductCreationAttributes = Optional<ProductAttributes, 'id' | 'image' | 'createdAt'>
@@ -26,6 +27,7 @@ class Product
   public image!: string
   public description!: string
   public readonly createdAt!: Date
+  public slug!: string
 }
 
 Product.init(
@@ -42,6 +44,10 @@ Product.init(
     image: {type: DataTypes.TEXT, allowNull: true},
     description: {type: DataTypes.TEXT, allowNull: false},
     createdAt: {type: DataTypes.DATE, defaultValue: DataTypes.NOW},
+    slug: {
+      type: DataTypes.STRING,
+      unique: 'prod_slug_unique_index',
+    },
   },
   {
     sequelize,

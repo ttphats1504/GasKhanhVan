@@ -118,6 +118,35 @@ const CategoryList: React.FC = () => {
     },
   ]
 
+  const buildTree = (list: Category[]) => {
+    const map: {[key: number]: any} = {}
+    const roots: Category[] = []
+
+    list.forEach((item: any) => (map[item.id] = {...item, children: []}))
+
+    list.forEach((item: any) => {
+      if (item.parentId) {
+        map[item.parentId]?.children.push(map[item.id])
+      } else {
+        roots.push(map[item.id])
+      }
+    })
+
+    return roots
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true)
+      const res: any = await fetchCategoryDatas()
+      if (res && res.length > 0) {
+        setCategories(buildTree(res)) // 👈 transform flat → tree
+      }
+      setLoading(false)
+    }
+    fetchData()
+  }, [])
+
   return (
     <Card
       title='Manage Gas Category'
@@ -149,6 +178,7 @@ const CategoryList: React.FC = () => {
             loading={loading}
             rowKey='id'
             pagination={{pageSize: 5}}
+            expandable={{defaultExpandAllRows: true}}
           />
         </Col>
       </Row>
@@ -161,6 +191,7 @@ const CategoryList: React.FC = () => {
         }}
         onSuccess={handleAddSuccess}
         category={editingCategory}
+        parentId={editingCategory?.parentId ? Number(editingCategory.parentId) : null}
       />
     </Card>
   )

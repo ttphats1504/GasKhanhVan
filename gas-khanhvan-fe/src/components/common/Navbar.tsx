@@ -1,12 +1,11 @@
-import {MenuUnfoldOutlined} from '@ant-design/icons'
-import type {MenuProps} from 'antd'
-import {Input, Menu} from 'antd'
 import {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
-
-import styles from '../../styles/common/Navbar.module.scss'
+import {Menu, Input} from 'antd'
+import {MenuUnfoldOutlined} from '@ant-design/icons'
+import type {MenuProps} from 'antd'
 import Link from 'next/link'
 import handleAPI from '@/apis/handleAPI'
+import styles from '../../styles/common/Navbar.module.scss'
 
 const {Search} = Input
 
@@ -21,38 +20,66 @@ type MenuItem = Required<MenuProps>['items'][number]
 
 const Navbar = () => {
   const router = useRouter()
-  const [current, setCurrent] = useState('category')
+  const [current, setCurrent] = useState<string>('category')
   const [items, setItems] = useState<MenuItem[]>([])
 
+  // find key to open menu when slug is children key
+  const findParentKey = (items: any[], slug: string): string | undefined => {
+    for (const item of items) {
+      if (item.children?.some((child: any) => child.key === slug)) {
+        return item.key as string
+      }
+      // 🔁 đệ quy để tìm trong children sâu hơn
+      if (item.children) {
+        const found = findParentKey(item.children, slug)
+        if (found) return found
+      }
+    }
+    return undefined
+  }
+
+  const normalizeKey = (key: string) => {
+    // remove "group-" or "cat-" prefixes
+    return key.replace(/^group-/, '').replace(/^cat-/, '')
+  }
+
   const onClick: MenuProps['onClick'] = (e) => {
-    const path = e.key.startsWith('/') ? e.key : `/${e.key}`
+    let path = ''
+    if (items.length > 0 && e.key) {
+      const parentKey = findParentKey(items, e.key)
+      if (parentKey) {
+        // child => build /parent/child
+        path = `/${normalizeKey(parentKey)}/${normalizeKey(e.key)}`
+      } else {
+        // parent => just /parent
+        path = `/${normalizeKey(e.key)}`
+      }
+    }
+    console.log(e.key)
     router.push(path)
-    setCurrent(e.key)
+    setCurrent(e.key) // still keep menu highlight with original key
   }
 
   const buildMenuItems = (categories: Category[]): MenuItem[] => {
-    // Grouped under "Danh mục sản phẩm"
     const groupedCategoryMenu: MenuItem = {
       label: 'Danh mục sản phẩm',
-      key: 'category',
+      key: 'grouped-category', // unique root key
       icon: <MenuUnfoldOutlined />,
       children: categories.map((cat) => ({
-        key: cat.slug,
+        key: `group-${cat.slug}`, // prefix to avoid conflict
         label: cat.name,
         children: cat.children?.map((subCat) => ({
-          key: subCat.slug,
+          key: `group-${subCat.slug}`, // nested prefix
           label: subCat.name,
         })),
       })),
     }
 
-    // Individual categories as top-level items
     const individualCategoryItems: MenuItem[] = categories.map((cat) => ({
-      key: cat.slug,
+      key: `cat-${cat.slug}`, // separate prefix for top-level
       label: cat.name,
     }))
 
-    // Final combined menu
     return [groupedCategoryMenu, ...individualCategoryItems]
   }
 
@@ -60,15 +87,23 @@ const Navbar = () => {
     const fetchCategories = async () => {
       try {
         const res: any = await handleAPI('/api/categories', 'get')
-        const menuItems = buildMenuItems(res)
+        const filtered = res.filter((cat: any) => cat.slug !== 'san-pham')
+        const menuItems = buildMenuItems(filtered)
         setItems(menuItems)
       } catch (error) {
         console.error('Failed to load categories:', error)
       }
     }
-
     fetchCategories()
   }, [])
+
+  // ✅ Sync menu selection with current URL
+  useEffect(() => {
+    if (!router.isReady) return
+
+    const pathSlug = router.asPath.split('/')[1] || 'category'
+    setCurrent(pathSlug)
+  }, [router.asPath, router.isReady])
 
   return (
     <div className={styles.navbar_sticky}>

@@ -4,6 +4,8 @@ import {
   addProduct,
   getAllProducts,
   getProductById,
+  getProductByName,
+  getProductBySlug,
   updateProduct,
   deleteProduct,
 } from '../controllers/productsController'
@@ -14,6 +16,8 @@ const router = express.Router()
 router.post('/', upload.single('image'), addProduct)
 router.get('/', getAllProducts)
 router.get('/:id', getProductById)
+router.get('/:name', getProductByName)
+router.get('/slug/:slug', getProductBySlug)
 router.put('/:id', upload.single('image'), updateProduct)
 router.delete('/:id', deleteProduct)
 
