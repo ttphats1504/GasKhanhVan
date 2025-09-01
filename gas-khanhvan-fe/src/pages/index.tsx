@@ -19,7 +19,7 @@ export default function Home() {
         <title>Cửa Hàng Gas Khánh Vân - Gas Quận 7 Uy Tín Và Chất Lượng</title>
         <meta
           name='google-site-verification'
-          content='1576YrYuw5N2zO2oH75ShLXhWDn9rbJAd8DSNBcQYIs'
+          content='fGBYkhFdJUL3GIjICrtondPt09jdkdNqVVpDK1hoW6Y'
         />
         <meta
           property='og:title'
@@ -30,7 +30,7 @@ export default function Home() {
           content='Cửa hàng Gas tại TP.HCM cùng đội ngũ chuyên nghiệp. Cửa hàng Gas Quận 7 Giá Rẻ, Uy Tín và Chất Lượng.Chúng tôi cung cấp dịch vụ giao Gas Khánh Vân và lắp đặt miễn phí. Các phụ kiện về Gas gọi là có.'
         />
         <meta property='og:type' content='website' />
-        <meta property='og:url' content='https://gas-khanh-van.vercel.app/' />
+        <meta property='og:url' content='https://gaskhanhvanquan7.vercel.app/' />
         <meta
           property='og:image'
           content='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV6JUe_TejYzBFTSUEVdiHsHzVqWOLE1fGXg&s'
@@ -41,11 +41,11 @@ export default function Home() {
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'WebSite',
-              url: 'https://gas-khanh-van.vercel.app/',
+              url: 'https://gaskhanhvanquan7.vercel.app/',
               name: 'Cửa Hàng Gas Gas Quận 7 - Gas Khánh Vân',
               potentialAction: {
                 '@type': 'SearchAction',
-                target: 'https://gas-khanh-van.vercel.app/search?q={search_term_string}',
+                target: 'https://gaskhanhvanquan7.vercel.app/search?q={search_term_string}',
                 'query-input': 'required name=search_term_string',
               },
             }),
