@@ -49,6 +49,7 @@
     ]
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.20",
     "@types/react-easy-crop": "^2.0.0"
   }
 }
