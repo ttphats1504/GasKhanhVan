@@ -18,7 +18,7 @@ export default function Home() {
         <title>Cửa Hàng Gas Khánh Vân - Gas Quận 7 Uy Tín Và Chất Lượng</title>
         <meta
           name='google-site-verification'
-          content='fGBYkhFdJUL3GIjICrtondPt09jdkdNqVVpDK1hoW6Y'
+          content='1576YrYuw5N2zO2oH75ShLXhWDn9rbJAd8DSNBcQYIs'
         />
         <meta
           property='og:title'

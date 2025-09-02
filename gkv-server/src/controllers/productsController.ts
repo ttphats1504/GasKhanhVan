@@ -8,7 +8,7 @@ import {Op} from 'sequelize'
 // Create
 export const addProduct = async (req: Request, res: Response) => {
   try {
-    const {name, typeId, price, stock, description} = req.body
+    const {name, typeId, price, stock, description, description2} = req.body
     const file = req.file
     let imageUrl = ''
     const slug = slugify(name)
@@ -40,6 +40,7 @@ export const addProduct = async (req: Request, res: Response) => {
       description,
       image: imageUrl,
       slug,
+      description2,
     })
 
     res.status(201).json(newProduct)
@@ -62,10 +63,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     }
 
     if (search) {
-      whereClause[Op.or] = [
-        {name: {[Op.like]: `%${search}%`}},
-        {description: {[Op.like]: `%${search}%`}},
-      ]
+      whereClause[Op.or] = [{name: {[Op.like]: `%${search}%`}}]
     }
 
     const [totalItems, products] = await Promise.all([

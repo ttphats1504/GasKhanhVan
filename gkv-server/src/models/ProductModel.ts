@@ -9,6 +9,7 @@ interface ProductAttributes {
   stock: number
   image: string
   description: string
+  description2: string
   createdAt?: Date
   slug: string
 }
@@ -28,6 +29,7 @@ class Product
   public description!: string
   public readonly createdAt!: Date
   public slug!: string
+  public description2!: string
 }
 
 Product.init(
@@ -48,6 +50,7 @@ Product.init(
       type: DataTypes.STRING,
       unique: 'prod_slug_unique_index',
     },
+    description2: {type: DataTypes.TEXT},
   },
   {
     sequelize,

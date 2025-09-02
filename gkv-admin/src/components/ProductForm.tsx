@@ -30,6 +30,7 @@ const ProductForm: React.FC<ProductFormProps> = ({visible, onClose, onSuccess, p
   const [form] = Form.useForm()
   const [file, setFile] = useState<UploadFile | null>(null)
   const [description, setDescription] = useState<string>('')
+  const [description2, setDescription2] = useState<string>('')
   const isEditing = !!product
   const [categories, setCategories] = useState([])
 
@@ -73,6 +74,7 @@ const ProductForm: React.FC<ProductFormProps> = ({visible, onClose, onSuccess, p
     formData.append('price', values.price.toString())
     formData.append('stock', values.stock.toString())
     formData.append('description', values.description)
+    formData.append('description2', values.description2)
 
     // Cast file to Blob safely
     const fileBlob = file as unknown as Blob
@@ -164,10 +166,18 @@ const ProductForm: React.FC<ProductFormProps> = ({visible, onClose, onSuccess, p
             <p>Click or drag file to upload</p>
           </Upload.Dragger>
         </Form.Item>
-        <Form.Item label='Description' name='description'>
+        <Form.Item label='Promotion' name='description'>
           <ReactQuill
             value={description}
             onChange={setDescription}
+            placeholder='Enter product promotion'
+          />
+        </Form.Item>
+
+        <Form.Item label='Description' name='description2'>
+          <ReactQuill
+            value={description2}
+            onChange={setDescription2}
             placeholder='Enter product description'
           />
         </Form.Item>
