@@ -24,6 +24,11 @@ Product.init({
         type: sequelize_1.DataTypes.STRING,
         unique: 'prod_slug_unique_index',
     },
+    description2: { type: sequelize_1.DataTypes.TEXT },
+    isFeatured: {
+        type: sequelize_1.DataTypes.TINYINT, // dùng tinyint thay vì boolean
+        defaultValue: 0,
+    },
 }, {
     sequelize: db_1.default,
     tableName: 'products',

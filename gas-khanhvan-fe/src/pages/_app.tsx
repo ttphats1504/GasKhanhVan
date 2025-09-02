@@ -3,8 +3,11 @@ import 'antd/dist/reset.css' // với Antd v5
 import type {AppProps} from 'next/app'
 import {Roboto} from 'next/font/google'
 import {DefaultSeo} from 'next-seo'
-import {ConfigProvider} from 'antd'
+import {ConfigProvider, Image} from 'antd'
 import {StyleProvider} from '@ant-design/cssinjs'
+import {BackTop, FloatButton} from 'antd'
+import {PhoneOutlined, MessageOutlined, CustomerServiceOutlined} from '@ant-design/icons'
+import styles from '../styles/home/Home.module.scss'
 
 const roboto = Roboto({
   weight: '400',
@@ -33,6 +36,53 @@ export default function App({Component, pageProps}: AppProps) {
           }}
         >
           <main className={roboto.className}>
+            {/* Back to Top */}
+            <BackTop />
+            <FloatButton.Group shape='circle' className={styles.fabGroup}>
+              {/* Call */}
+              <FloatButton
+                icon={<PhoneOutlined />}
+                onClick={() => (window.location.href = 'tel:0938183330')}
+                tooltip='Gọi ngay'
+                className={styles.callBtn}
+              >
+                <span className={styles.callNumber}>0938 183 330</span>
+              </FloatButton>
+
+              {/* Zalo with PNG logo */}
+              <FloatButton
+                icon={
+                  <Image
+                    src='/assets/zalo.png'
+                    alt='Zalo'
+                    width={20}
+                    height={20}
+                    preview={false}
+                    className={styles.iconFix}
+                  />
+                }
+                onClick={() => window.open('https://zalo.me/0938183330', '_blank')}
+                tooltip='Chat Zalo'
+                className={styles.zaloBtn}
+              />
+
+              {/* Messenger */}
+              <FloatButton
+                icon={
+                  <Image
+                    src='/assets/messenger.png'
+                    alt='Messenger'
+                    width={20}
+                    height={20}
+                    preview={false}
+                    className={styles.iconFix}
+                  />
+                }
+                onClick={() => window.open('https://m.me/khanhvangas', '_blank')}
+                tooltip='Messenger'
+                className={styles.messBtn}
+              />
+            </FloatButton.Group>
             <Component {...pageProps} />
           </main>
         </ConfigProvider>

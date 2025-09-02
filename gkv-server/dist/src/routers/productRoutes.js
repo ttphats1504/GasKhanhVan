@@ -12,6 +12,7 @@ router.get('/', productsController_1.getAllProducts);
 router.get('/:id', productsController_1.getProductById);
 router.get('/:name', productsController_1.getProductByName);
 router.get('/slug/:slug', productsController_1.getProductBySlug);
+router.patch('/:id/featured', productsController_1.setFeatured);
 router.put('/:id', multer_1.default.single('image'), productsController_1.updateProduct);
 router.delete('/:id', productsController_1.deleteProduct);
 exports.default = router;

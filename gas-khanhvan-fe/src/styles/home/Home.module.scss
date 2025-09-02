@@ -18,3 +18,54 @@
   font-weight: 700;
   margin: 20px auto;
 }
+
+.fabGroup {
+  right: 24px;
+  bottom: 100px; // lift up a little
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Common animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.fabGroup :global(.ant-float-btn) {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: pulse 2s infinite;
+}
+
+.fabGroup :global(.ant-float-btn:hover) {
+  transform: scale(1.2);
+}
+
+/* Specific brand styles */
+.callBtn :global(.ant-float-btn-body) {
+  background: #e53935;
+  color: white;
+}
+
+.zaloBtn :global(.ant-float-btn-body) {
+  background: #0068ff; // Zalo brand blue
+}
+
+.messBtn :global(.ant-float-btn-body) {
+  background: #00b2ff; // Messenger blue
+  color: white;
+}
+
+.iconFix {
+  display: block !important;
+  margin: 0 auto !important;
+}

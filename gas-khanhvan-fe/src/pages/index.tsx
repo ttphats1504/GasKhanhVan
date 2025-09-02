@@ -1,5 +1,3 @@
-import Navbar from '@/components/common/Navbar'
-import HeadTag from '../components/home/HeadTag'
 import React, {useEffect, useState} from 'react'
 import PromotionCarousel from '@/components/common/PromotionCarousel'
 import Incentives from '@/components/common/IncentivesSection'
@@ -12,7 +10,6 @@ import SaleBanner from '@/components/common/SaleBanner'
 import HomeLayout from '@/layouts/HomeLayout'
 import handleAPI from '@/apis/handleAPI'
 import Category from '@/models/Category'
-import Product from '@/models/Product'
 import {Flex, Typography} from 'antd'
 
 const {Title} = Typography
