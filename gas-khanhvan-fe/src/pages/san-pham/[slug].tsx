@@ -29,6 +29,7 @@ import MainLayout from '@/layouts/MainLayout'
 import ProductCard from '@/components/common/ProductCard'
 import handleAPI from '@/apis/handleAPI'
 import Product from '@/models/Product'
+import formatCurrency from '@/utils/formatCurrency'
 
 const {Title, Text, Paragraph} = Typography
 
@@ -140,12 +141,7 @@ const ProductDetail: React.FC = () => {
                         level={3}
                         style={{color: '#E53935', fontWeight: 'bold', marginBottom: 0}}
                       >
-                        {product?.price
-                          ? product.price.toLocaleString('vi-VN', {
-                              style: 'currency',
-                              currency: 'VND',
-                            })
-                          : 'LIÊN HỆ'}{' '}
+                        {product?.price ? formatCurrency(product.price) : 'LIÊN HỆ'}{' '}
                         <Text style={{fontSize: 14}}>(Đã bao gồm VAT)</Text>
                       </Title>
                       <Text delete type='secondary'>

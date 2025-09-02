@@ -23,7 +23,6 @@ const ProductCard: React.FC<ProductCardProps> = ({product}) => (
             cover={
               <div className={styles.imageWrapper}>
                 <Image
-                  height={225}
                   alt='Product image'
                   src={product?.image}
                   preview={false}
@@ -35,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({product}) => (
           >
             <Space direction='vertical' size={6} style={{width: '100%'}}>
               {/* Tên sản phẩm */}
-              <Title level={5} ellipsis={{rows: 2}}>
+              <Title level={5} ellipsis={{rows: 2}} className={styles.product_name}>
                 {product.name}
               </Title>
 

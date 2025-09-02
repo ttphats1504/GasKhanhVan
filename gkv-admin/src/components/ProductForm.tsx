@@ -10,7 +10,8 @@ interface ProductFormProps {
   visible: boolean
   onClose: () => void
   onSuccess: (newProduct: Product) => void
-  product?: Product | null // If provided, form will be in edit mode
+  product?: Product | null
+  mode?: 'add' | 'edit' | 'duplicate' // thêm mode
 }
 
 const {Option} = Select
@@ -26,21 +27,38 @@ const fetchCategoryDatas = async () => {
   }
 }
 
-const ProductForm: React.FC<ProductFormProps> = ({visible, onClose, onSuccess, product}) => {
+const ProductForm: React.FC<ProductFormProps> = ({
+  visible,
+  onClose,
+  onSuccess,
+  product,
+  mode = 'add',
+}) => {
   const [form] = Form.useForm()
   const [file, setFile] = useState<UploadFile | null>(null)
   const [description, setDescription] = useState<string>('')
   const [description2, setDescription2] = useState<string>('')
-  const isEditing = !!product
+  const isEditing = mode === 'edit'
+  const isDuplicating = mode === 'duplicate'
   const [categories, setCategories] = useState([])
 
   useEffect(() => {
-    if (product) {
+    if (product && (isEditing || isDuplicating)) {
       form.setFieldsValue(product)
+
+      setDescription(product.description || '')
+      setDescription2(product.description2 || '')
+
+      // ❌ Duplicate thì không set id
+      if (isDuplicating) {
+        form.setFieldValue('name', `${product.name} (Copy)`)
+      }
     } else {
       form.resetFields()
+      setDescription('')
+      setDescription2('')
     }
-  }, [product, form])
+  }, [product, mode, form])
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -186,6 +204,10 @@ const ProductForm: React.FC<ProductFormProps> = ({visible, onClose, onSuccess, p
           {isEditing ? (
             <Button type='primary' htmlType='submit'>
               Update Product
+            </Button>
+          ) : isDuplicating ? (
+            <Button type='primary' htmlType='submit'>
+              Duplicate Product
             </Button>
           ) : (
             <Flex gap={8}>

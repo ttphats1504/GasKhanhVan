@@ -41,6 +41,7 @@ export const addProduct = async (req: Request, res: Response) => {
       image: imageUrl,
       slug,
       description2,
+      isFeatured: 0,
     })
 
     res.status(201).json(newProduct)

@@ -23,7 +23,7 @@ const fetchProductDatas = async (
 ) => {
   let api = `/api/products?page=${page}&limit=${limit}`
   if (categoryId) api += `&typeId=${categoryId}`
-  if (isFeatured) api += `&isFeatured=1`
+  if (isFeatured) api += `&featured=true`
 
   try {
     const res = await handleAPI(api, 'get')
@@ -43,6 +43,7 @@ export default function ProductSection({title, categoryId, isFeatured}: ProductS
 
   const fetchData = async (page: number) => {
     setLoading(true)
+
     const res: any = await fetchProductDatas(page, limit, categoryId, isFeatured)
 
     if (res) {
@@ -62,18 +63,10 @@ export default function ProductSection({title, categoryId, isFeatured}: ProductS
   }
 
   if (loading) return <Spinner />
+  if (products.length <= 0) return <></>
 
   return (
     <Container>
-      {isFeatured && (
-        <Flex justify='center' align='center'>
-          <Title level={2} className={styles.title}>
-            SẢN PHẨM
-          </Title>
-          <div className={styles.border}></div>
-        </Flex>
-      )}
-
       <Flex vertical>
         <Title level={3} className={styles.product_title}>
           {title}

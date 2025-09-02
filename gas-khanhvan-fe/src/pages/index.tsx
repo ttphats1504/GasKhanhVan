@@ -13,21 +13,19 @@ import HomeLayout from '@/layouts/HomeLayout'
 import handleAPI from '@/apis/handleAPI'
 import Category from '@/models/Category'
 import Product from '@/models/Product'
+import {Flex, Typography} from 'antd'
+
+const {Title} = Typography
 
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([])
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [featuredRes, categoryRes]: any = await Promise.all([
-          handleAPI('/api/products?featured=true', 'get'),
-          handleAPI('/api/categories', 'get'),
-        ])
+        const categoryRes: any = await handleAPI('/api/categories', 'get')
         const filteredCategory = categoryRes.filter((cat: any) => cat.slug !== 'san-pham')
 
-        setFeaturedProducts(featuredRes?.data || [])
         setCategories(filteredCategory)
       } catch (err) {
         console.error(err)
@@ -79,6 +77,12 @@ export default function Home() {
         <div>
           <div className={styles.top_bg}>
             <Incentives />
+            <Flex justify='center' align='center'>
+              <Title level={2} className={styles.title}>
+                SẢN PHẨM
+              </Title>
+              <div className={styles.border}></div>
+            </Flex>
             {/* Featured Products */}
             <ProductSection isFeatured title='Khuyến mãi hôm nay' />
 

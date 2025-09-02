@@ -39,6 +39,7 @@ const ProductList: React.FC = () => {
   const [activeSlug, setActiveSlug] = useState<string>('') // slug để check san-pham
   const [products, setProducts] = useState<Product[]>([])
   const [modalVisible, setModalVisible] = useState(false)
+  const [formMode, setFormMode] = useState<any>('add')
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [pagination, setPagination] = useState({
@@ -147,10 +148,25 @@ const ProductList: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => {
               setEditingProduct(record)
+              setFormMode('edit')
               setModalVisible(true)
             }}
           >
             Edit
+          </Button>
+          <Button
+            type='link'
+            onClick={() => {
+              // copy product để prefill form
+              const cloneProduct: any = {...record}
+              delete cloneProduct.id
+              cloneProduct.name = record.name
+              setFormMode('duplicate')
+              setEditingProduct(cloneProduct as Product)
+              setModalVisible(true)
+            }}
+          >
+            Duplicate
           </Button>
           <Popconfirm
             title='Are you sure you want to delete this product?'
@@ -239,6 +255,7 @@ const ProductList: React.FC = () => {
         }}
         onSuccess={handleAddSuccess}
         product={editingProduct}
+        mode={formMode}
       />
     </Card>
   )

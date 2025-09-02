@@ -5,14 +5,12 @@
 .imageWrapper {
   position: relative;
   overflow: hidden;
-  border: 5px solid var(--primary-yellow-800);
-  border-radius: 3px;
 }
 
 .productImage {
   width: 100%;
   height: 225px;
-  object-fit: cover;
+  border: 5px solid var(--primary-yellow-800);
   display: block;
   transition: transform 0.4s ease;
 }
@@ -33,8 +31,17 @@
 }
 
 /* trigger khi hover vào card */
+.cardWrapper:hover {
+  border: 1px solid var(--primary-yellow-800) !important;
+}
+
+.cardWrapper:hover .product_name {
+  color: var(--primary-yellow-800);
+}
+
 .cardWrapper:hover .productImage {
   transform: scale(1.05);
+  border: none;
 }
 
 .cardWrapper:hover .shinyEffect {
