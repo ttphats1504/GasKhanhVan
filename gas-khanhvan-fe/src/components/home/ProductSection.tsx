@@ -1,7 +1,5 @@
-import {Col, Flex, Pagination, Row} from 'antd'
-import {Typography} from 'antd'
+import {Col, Flex, Pagination, Row, Typography} from 'antd'
 import Container from '../common/Container'
-
 import styles from '../../styles/home/ProductSection.module.scss'
 import ProductCard from '../common/ProductCard'
 import handleAPI from '@/apis/handleAPI'
@@ -11,8 +9,22 @@ import Spinner from '../common/Spinner'
 
 const {Title} = Typography
 
-const fetchProductDatas = async (page = 1, limit = 6) => {
-  const api = `/api/products?page=${page}&limit=${limit}`
+type ProductSectionProps = {
+  title: string
+  categoryId?: number
+  isFeatured?: boolean
+}
+
+const fetchProductDatas = async (
+  page = 1,
+  limit = 6,
+  categoryId?: number,
+  isFeatured?: boolean
+) => {
+  let api = `/api/products?page=${page}&limit=${limit}`
+  if (categoryId) api += `&typeId=${categoryId}`
+  if (isFeatured) api += `&isFeatured=1`
+
   try {
     const res = await handleAPI(api, 'get')
     return res
@@ -22,8 +34,8 @@ const fetchProductDatas = async (page = 1, limit = 6) => {
   }
 }
 
-export default function ProductSection() {
-  const [cylinders, setCylinders] = useState<Product[]>([])
+export default function ProductSection({title, categoryId, isFeatured}: ProductSectionProps) {
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [page, setPage] = useState<number>(1)
   const [totalItems, setTotalItems] = useState<number>(0)
@@ -31,10 +43,10 @@ export default function ProductSection() {
 
   const fetchData = async (page: number) => {
     setLoading(true)
-    const res: any = await fetchProductDatas(page, limit)
+    const res: any = await fetchProductDatas(page, limit, categoryId, isFeatured)
 
     if (res) {
-      setCylinders(res.data)
+      setProducts(res.data)
       setTotalItems(res.totalItems)
     }
 
@@ -43,7 +55,7 @@ export default function ProductSection() {
 
   useEffect(() => {
     fetchData(page)
-  }, [page])
+  }, [page, categoryId, isFeatured])
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage)
@@ -53,36 +65,41 @@ export default function ProductSection() {
 
   return (
     <Container>
-      <Flex justify='center' align='center'>
-        <Title level={2} className={styles.title}>
-          SẢN PHẨM
-        </Title>
-        <div className={styles.border}></div>
-      </Flex>
+      {isFeatured && (
+        <Flex justify='center' align='center'>
+          <Title level={2} className={styles.title}>
+            SẢN PHẨM
+          </Title>
+          <div className={styles.border}></div>
+        </Flex>
+      )}
+
       <Flex vertical>
         <Title level={3} className={styles.product_title}>
-          Khuyến mãi hôm nay
+          {title}
         </Title>
         <div className={styles.line_break}></div>
       </Flex>
 
       <Row className={styles.card_wrap} gutter={[16, 16]}>
-        {cylinders.map((cylinder: any) => (
-          <Col key={cylinder.id} xs={24} sm={12} md={8} lg={4}>
-            <ProductCard product={cylinder} />
+        {products.map((product: Product) => (
+          <Col key={product.id} xs={24} sm={12} md={8} lg={4}>
+            <ProductCard product={product} />
           </Col>
         ))}
       </Row>
 
-      <Flex justify='center' style={{marginTop: '2rem', marginBottom: '2rem'}}>
-        <Pagination
-          current={page}
-          total={totalItems}
-          pageSize={limit}
-          onChange={handlePageChange}
-          showSizeChanger={false}
-        />
-      </Flex>
+      {totalItems > limit && (
+        <Flex justify='center' style={{marginTop: '2rem', marginBottom: '2rem'}}>
+          <Pagination
+            current={page}
+            total={totalItems}
+            pageSize={limit}
+            onChange={handlePageChange}
+            showSizeChanger={false}
+          />
+        </Flex>
+      )}
     </Container>
   )
 }

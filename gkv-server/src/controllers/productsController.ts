@@ -55,7 +55,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     const page = parseInt(req.query.page as string) || 1
     const limit = parseInt(req.query.limit as string) || 10
     const offset = (page - 1) * limit
-    const {typeId, search} = req.query
+    const {typeId, search, featured} = req.query
 
     const whereClause: any = {}
     if (typeId) {
@@ -64,6 +64,10 @@ export const getAllProducts = async (req: Request, res: Response) => {
 
     if (search) {
       whereClause[Op.or] = [{name: {[Op.like]: `%${search}%`}}]
+    }
+
+    if (featured === 'true') {
+      whereClause.isFeatured = 1 // tinyint
     }
 
     const [totalItems, products] = await Promise.all([
@@ -132,6 +136,26 @@ export const getProductBySlug = async (req: Request, res: Response) => {
     }
 
     res.status(200).json(product)
+  } catch (err) {
+    res.status(500).json({error: (err as Error).message})
+  }
+}
+
+// controllers/productsController.ts
+export const setFeatured = async (req: Request, res: Response) => {
+  try {
+    const {id} = req.params
+    const {isFeatured} = req.body
+
+    const product = await Product.findByPk(id)
+    if (!product) {
+      res.status(404).json({message: 'Product not found'})
+    } else {
+      console.log(isFeatured)
+      product.isFeatured = isFeatured ? 1 : 0
+      await product.save()
+    }
+    res.json({message: 'Updated featured status', product})
   } catch (err) {
     res.status(500).json({error: (err as Error).message})
   }

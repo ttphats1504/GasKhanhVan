@@ -2,7 +2,7 @@ import axiosClient from './axiosClient'
 
 const handleAPI = async (
   url: string,
-  method: 'get' | 'post' | 'put' | 'delete',
+  method: 'get' | 'post' | 'put' | 'patch' | 'delete',
   data?: any,
   headers?: Record<string, string>
 ) => {

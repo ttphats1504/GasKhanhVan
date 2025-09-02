@@ -6,6 +6,7 @@ import {
   getProductById,
   getProductByName,
   getProductBySlug,
+  setFeatured,
   updateProduct,
   deleteProduct,
 } from '../controllers/productsController'
@@ -18,6 +19,7 @@ router.get('/', getAllProducts)
 router.get('/:id', getProductById)
 router.get('/:name', getProductByName)
 router.get('/slug/:slug', getProductBySlug)
+router.patch('/:id/featured', setFeatured)
 router.put('/:id', upload.single('image'), updateProduct)
 router.delete('/:id', deleteProduct)
 

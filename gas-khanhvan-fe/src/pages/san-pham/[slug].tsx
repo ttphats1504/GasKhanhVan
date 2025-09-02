@@ -44,22 +44,18 @@ const fetchProductDatas = async () => {
 const ProductDetail: React.FC = () => {
   const router = useRouter()
   const {slug} = router.query
-  const [cylinders, setCylinders] = useState<Product[]>([])
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
+  const [outstandingProducts, setOutstandingProducts] = useState<Product[]>([])
   const [product, setProduct] = useState<Product>()
   const [loading, setLoading] = useState(true)
-
-  // Fetch list
-  useEffect(() => {
-    fetchProductDatas().then((res: any) => {
-      if (res?.length) setCylinders(res)
-    })
-  }, [])
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res: any = await handleAPI(`/api/products/slug/${slug}`, 'get')
-        setProduct(res)
+        if (slug) {
+          const res: any = await handleAPI(`/api/products/slug/${slug}`, 'get')
+          setProduct(res)
+        }
       } catch (error) {
         console.error(error)
       } finally {
@@ -70,6 +66,20 @@ const ProductDetail: React.FC = () => {
     fetchProduct()
   }, [slug])
 
+  // Fetch list
+  useEffect(() => {
+    if (product) {
+      fetchProductDatas().then((res: any) => {
+        const relatedProducts: Product[] = res?.data
+          .filter((c: any) => parseInt(c.typeId) == product?.typeId)
+          .slice(0, 5)
+        const outstandingProducts: Product[] = res?.data.slice(0, 5)
+        setRelatedProducts(relatedProducts)
+        setOutstandingProducts(outstandingProducts)
+      })
+    }
+  }, [slug, product])
+
   if (loading) {
     return (
       <MainLayout>
@@ -79,10 +89,6 @@ const ProductDetail: React.FC = () => {
       </MainLayout>
     )
   }
-
-  // Related products
-  const relatedProducts: Product[] = cylinders.filter((c) => parseInt(c.id) < 5)
-  if (!product) return <div>Không tìm thấy sản phẩm</div>
   return (
     <MainLayout>
       <Breadcrumb style={{margin: '16px 0'}}>
@@ -93,7 +99,7 @@ const ProductDetail: React.FC = () => {
 
       {product ? (
         <Row gutter={[32, 32]}>
-          <Col xs={24} md={16}>
+          <Col xs={24} md={18}>
             <Row gutter={[24, 24]}>
               {/* Main product card */}
               <Col xs={24}>
@@ -161,8 +167,7 @@ const ProductDetail: React.FC = () => {
                           >
                             <Flex vertical align='center' gap={4}>
                               <Flex align='center' gap={8}>
-                                <ShoppingCartOutlined />
-                                <span>Thêm vào giỏ</span>
+                                <span>Liên hệ qua Zalo</span>
                               </Flex>
                               <Text style={{fontSize: 12, color: '#fff'}}>
                                 (Giải Pháp Hỗ Trợ Tức Thì)
@@ -226,26 +231,7 @@ const ProductDetail: React.FC = () => {
                       {
                         key: '1',
                         label: 'Thông tin sản phẩm',
-                        children: (
-                          <ul>
-                            <li>
-                              <strong>Danh mục:</strong> {product.typeId}
-                            </li>
-                            <li>
-                              <strong>Giá:</strong>{' '}
-                              {product?.price
-                                ? product.price.toLocaleString('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND',
-                                  })
-                                : 'LIÊN HỆ'}
-                            </li>
-                            <li>
-                              <strong>Số lượng:</strong>{' '}
-                              {product.stock > 0 ? `${product.stock} sản phẩm` : 'Hết hàng'}
-                            </li>
-                          </ul>
-                        ),
+                        children: <div dangerouslySetInnerHTML={{__html: product.description2}} />,
                       },
                       {
                         key: '2',
@@ -260,37 +246,58 @@ const ProductDetail: React.FC = () => {
           </Col>
 
           {/* Policy card */}
-          <Col xs={24} md={8}>
-            <Card
-              bordered={false}
-              style={{
-                borderRadius: '10px',
-                padding: '20px',
-                background: '#fafafa',
-                height: '100%',
-              }}
-            >
-              <Row gutter={[16, 16]}>
-                <Col span={24}>
-                  <Space direction='vertical'>
-                    <Title level={5}>🚚 Giao hàng nhanh</Title>
-                    <Text>Miễn phí giao hàng trong bán kính 5km.</Text>
-                  </Space>
-                </Col>
-                <Col span={24}>
-                  <Space direction='vertical'>
-                    <Title level={5}>🛡️ Bảo hành chính hãng</Title>
-                    <Text>Sản phẩm chính hãng, bảo hành đầy đủ.</Text>
-                  </Space>
-                </Col>
-                <Col span={24}>
-                  <Space direction='vertical'>
-                    <Title level={5}>📞 Hỗ trợ 24/7</Title>
-                    <Text>Hotline: 001230012 luôn sẵn sàng hỗ trợ bạn.</Text>
-                  </Space>
-                </Col>
-              </Row>
-            </Card>
+          <Col xs={24} md={6}>
+            <Flex vertical gap={16}>
+              <Card
+                bordered={false}
+                style={{
+                  borderRadius: '10px',
+                  padding: '20px',
+                  background: '#fafafa',
+                }}
+              >
+                <Row gutter={[16, 16]}>
+                  <Col span={24}>
+                    <Space direction='vertical'>
+                      <Title level={5}>🚚 Giao hàng nhanh</Title>
+                      <Text>Miễn phí giao hàng trong bán kính 5km.</Text>
+                    </Space>
+                  </Col>
+                  <Col span={24}>
+                    <Space direction='vertical'>
+                      <Title level={5}>🛡️ Bảo hành chính hãng</Title>
+                      <Text>Sản phẩm chính hãng, bảo hành đầy đủ.</Text>
+                    </Space>
+                  </Col>
+                  <Col span={24}>
+                    <Space direction='vertical'>
+                      <Title level={5}>📞 Hỗ trợ 24/7</Title>
+                      <Text>Hotline: 001230012 luôn sẵn sàng hỗ trợ bạn.</Text>
+                    </Space>
+                  </Col>
+                </Row>
+              </Card>
+              <Card
+                bordered={false}
+                style={{
+                  borderRadius: '10px',
+                  background: '#fafafa',
+                }}
+              >
+                <Title level={3}>Sản phẩm liên quan</Title>
+                <Row gutter={[16, 16]}>
+                  {outstandingProducts.length > 0 ? (
+                    outstandingProducts.map((prod: Product) => (
+                      <Col key={prod.id} xs={24}>
+                        <ProductCard product={prod} />
+                      </Col>
+                    ))
+                  ) : (
+                    <Text>Không tìm thấy sản phẩm liên quan.</Text>
+                  )}
+                </Row>
+              </Card>
+            </Flex>
           </Col>
 
           {/* Related Products */}

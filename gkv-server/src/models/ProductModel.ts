@@ -12,9 +12,13 @@ interface ProductAttributes {
   description2: string
   createdAt?: Date
   slug: string
+  isFeatured: number // dùng tinyint => number (0 | 1)
 }
 
-type ProductCreationAttributes = Optional<ProductAttributes, 'id' | 'image' | 'createdAt'>
+type ProductCreationAttributes = Optional<
+  ProductAttributes,
+  'id' | 'image' | 'createdAt' | 'isFeatured'
+>
 
 class Product
   extends Model<ProductAttributes, ProductCreationAttributes>
@@ -27,9 +31,10 @@ class Product
   public stock!: number
   public image!: string
   public description!: string
+  public description2!: string
   public readonly createdAt!: Date
   public slug!: string
-  public description2!: string
+  public isFeatured!: number // tinyint (0 = false, 1 = true)
 }
 
 Product.init(
@@ -51,6 +56,10 @@ Product.init(
       unique: 'prod_slug_unique_index',
     },
     description2: {type: DataTypes.TEXT},
+    isFeatured: {
+      type: DataTypes.TINYINT, // dùng tinyint thay vì boolean
+      defaultValue: 0,
+    },
   },
   {
     sequelize,

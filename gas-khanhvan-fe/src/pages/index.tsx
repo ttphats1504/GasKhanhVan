@@ -1,6 +1,6 @@
 import Navbar from '@/components/common/Navbar'
 import HeadTag from '../components/home/HeadTag'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import PromotionCarousel from '@/components/common/PromotionCarousel'
 import Incentives from '@/components/common/IncentivesSection'
 import Footer from '@/components/common/Footer'
@@ -10,8 +10,31 @@ import ProductSection from '@/components/home/ProductSection'
 import Head from 'next/head'
 import SaleBanner from '@/components/common/SaleBanner'
 import HomeLayout from '@/layouts/HomeLayout'
+import handleAPI from '@/apis/handleAPI'
+import Category from '@/models/Category'
+import Product from '@/models/Product'
 
 export default function Home() {
+  const [categories, setCategories] = useState<Category[]>([])
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [featuredRes, categoryRes]: any = await Promise.all([
+          handleAPI('/api/products?featured=true', 'get'),
+          handleAPI('/api/categories', 'get'),
+        ])
+        const filteredCategory = categoryRes.filter((cat: any) => cat.slug !== 'san-pham')
+
+        setFeaturedProducts(featuredRes?.data || [])
+        setCategories(filteredCategory)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    fetchData()
+  }, [])
   return (
     <>
       <Head>
@@ -56,7 +79,14 @@ export default function Home() {
         <div>
           <div className={styles.top_bg}>
             <Incentives />
-            <ProductSection />
+            {/* Featured Products */}
+            <ProductSection isFeatured title='Khuyến mãi hôm nay' />
+
+            {/* Products by Category */}
+            {categories.map((cat) => (
+              <ProductSection key={cat.id} title={cat.name} categoryId={cat.id} />
+            ))}
+
             <SaleBanner />
           </div>
         </div>

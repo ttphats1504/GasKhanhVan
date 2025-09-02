@@ -12,6 +12,7 @@ import ProductMange from '../screens/product/ProductManage'
 import CategoryManage from '../screens/category/CategoryManage'
 import IncentiveManage from '../screens/incentive/IncentiveManage'
 import BannerManage from '../screens/banner/BannerManage'
+import FeaturesMange from '../screens/features/FeaturesManage'
 
 const {Header, Content, Footer, Sider} = Layout
 
@@ -36,6 +37,8 @@ const MainRouter = () => {
       setSelectedKey('3')
     } else if (location.pathname.includes('/banner')) {
       setSelectedKey('4')
+    } else if (location.pathname.includes('/features-product')) {
+      setSelectedKey('5')
     }
   }, [location.pathname])
 
@@ -45,6 +48,7 @@ const MainRouter = () => {
     else if (e.key === '2') navigate('/category')
     else if (e.key === '3') navigate('/incentive')
     else if (e.key === '4') navigate('/banner')
+    else if (e.key === '5') navigate('/features-product')
   }
 
   return (
@@ -77,6 +81,11 @@ const MainRouter = () => {
               icon: <UploadOutlined />,
               label: 'Banners',
             },
+            {
+              key: '5',
+              icon: <UploadOutlined />,
+              label: 'Features Product',
+            },
           ]}
         />
       </Sider>
@@ -108,6 +117,7 @@ const MainRouter = () => {
             <Route path='/category' element={<CategoryManage />} />
             <Route path='/incentive' element={<IncentiveManage />} />
             <Route path='/banner' element={<BannerManage />} />
+            <Route path='/features-product' element={<FeaturesMange />} />
           </Routes>
         </Content>
         <Footer style={{textAlign: 'center'}}>

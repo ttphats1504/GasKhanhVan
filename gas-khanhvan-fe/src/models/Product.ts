@@ -8,6 +8,8 @@ interface Product {
   description: string
   createdAt: string
   slug: string
+  description2: string
+  isFutured: number
 }
 
 export default Product

@@ -8,6 +8,7 @@ interface Product {
   description: string
   createdAt: string
   description2: string
+  isFeatured: number
 }
 
 export default Product
