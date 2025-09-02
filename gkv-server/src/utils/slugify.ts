@@ -1,10 +1,12 @@
 export function slugify(str: string): string {
   return str
-    .toLowerCase() // chữ thường
+    .toLowerCase()
     .normalize('NFD') // tách dấu tiếng Việt
     .replace(/[\u0300-\u036f]/g, '') // xóa dấu
-    .replace(/[^a-z0-9\s-]/g, '') // xóa ký tự đặc biệt
-    .trim() // xóa khoảng trắng đầu cuối
-    .replace(/\s+/g, '-') // thay space bằng -
+    .replace(/đ/g, 'd') // thay đ → d
+    .replace(/Đ/g, 'd') // thay Đ → d
+    .replace(/[^a-z0-9\s-]/g, '') // xóa ký tự đặc biệt còn lại
+    .trim()
+    .replace(/\s+/g, '-') // space → -
     .replace(/-+/g, '-') // tránh nhiều dấu -
 }
