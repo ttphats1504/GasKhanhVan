@@ -3,6 +3,7 @@ import Product from '../models/ProductModel'
 import cloudinary from '../config/cloudinary'
 import streamifier from 'streamifier'
 import {slugify} from '../utils/slugify'
+import {Op} from 'sequelize'
 
 // Create
 export const addProduct = async (req: Request, res: Response) => {
@@ -53,19 +54,27 @@ export const getAllProducts = async (req: Request, res: Response) => {
     const page = parseInt(req.query.page as string) || 1
     const limit = parseInt(req.query.limit as string) || 10
     const offset = (page - 1) * limit
-    const {categoryId} = req.query
+    const {typeId, search} = req.query
 
     const whereClause: any = {}
-    if (categoryId) {
-      whereClause.typeId = categoryId
+    if (typeId) {
+      whereClause.typeId = typeId // lọc theo typeId
+    }
+
+    if (search) {
+      whereClause[Op.or] = [
+        {name: {[Op.like]: `%${search}%`}},
+        {description: {[Op.like]: `%${search}%`}},
+      ]
     }
 
     const [totalItems, products] = await Promise.all([
-      Product.count({where: whereClause}), // Count with filter applied
+      Product.count({where: whereClause}),
       Product.findAll({
-        where: whereClause, // Apply the filter here as well
+        where: whereClause,
         limit,
         offset,
+        order: [['createdAt', 'DESC']], // optional: sắp xếp mới nhất
       }),
     ])
 
@@ -124,7 +133,7 @@ export const getProductBySlug = async (req: Request, res: Response) => {
       res.status(404).json({message: 'Product not found'})
     }
 
-    res.json(product)
+    res.status(200).json(product)
   } catch (err) {
     res.status(500).json({error: (err as Error).message})
   }

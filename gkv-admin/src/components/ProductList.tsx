@@ -1,16 +1,32 @@
 import React, {useState, useEffect} from 'react'
-import {Table, Button, Popconfirm, message, Input, Card, Row, Col} from 'antd'
+import {Table, Button, Popconfirm, message, Input, Card, Row, Col, Tabs} from 'antd'
 import {EditOutlined, DeleteOutlined, PlusOutlined} from '@ant-design/icons'
+import {debounce} from 'lodash'
 
 import handleAPI from '../apis/handleAPI'
 import ProductForm from './ProductForm'
 import Product from '../models/Product'
 
-const fetchProductDatas = async (page = 1, limit = 5) => {
-  const api = `/api/products?page=${page}&limit=${limit}`
+const {Search} = Input
+const {TabPane} = Tabs
+
+// Lấy danh sách category
+const fetchCategories = async () => {
   try {
-    const res = await handleAPI(api, 'get')
-    return res
+    return await handleAPI('/api/categories', 'get')
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    return []
+  }
+}
+
+// Lấy product theo typeId + search
+const fetchProductDatas = async (typeId = '', page = 1, limit = 5, search = '') => {
+  let api = `/api/products?page=${page}&limit=${limit}`
+  if (typeId) api += `&typeId=${typeId}`
+  if (search) api += `&search=${search}`
+  try {
+    return await handleAPI(api, 'get')
   } catch (error) {
     console.error('Error fetching Products:', error)
     return null
@@ -18,6 +34,9 @@ const fetchProductDatas = async (page = 1, limit = 5) => {
 }
 
 const ProductList: React.FC = () => {
+  const [categories, setCategories] = useState<any[]>([])
+  const [activeTypeId, setActiveTypeId] = useState<string>('') // typeId active ('' = tất cả)
+  const [activeSlug, setActiveSlug] = useState<string>('') // slug để check san-pham
   const [products, setProducts] = useState<Product[]>([])
   const [modalVisible, setModalVisible] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
@@ -27,74 +46,83 @@ const ProductList: React.FC = () => {
     pageSize: 5,
     total: 0,
   })
+  const [searchValue, setSearchValue] = useState('')
 
-  const fetchData = async (page = 1, limit = 5) => {
+  // Load categories lần đầu
+  useEffect(() => {
+    const loadCategories = async () => {
+      const res: any = await fetchCategories()
+      if (res && res.length > 0) {
+        setCategories(res)
+        // chọn category đầu tiên mặc định
+        setActiveTypeId(res[0].slug === 'san-pham' ? '' : res[0].id)
+        setActiveSlug(res[0].slug)
+      }
+    }
+    loadCategories()
+  }, [])
+
+  // Khi đổi tab hoặc search thì load data
+  const fetchData = async (typeId: string, page = 1, limit = 5, search = '') => {
     setLoading(true)
-    const res: any = await fetchProductDatas(page, limit)
+    const res: any = await fetchProductDatas(typeId, page, limit, search)
     if (res) {
       setProducts(res.data)
-      setPagination((prev) => ({
-        ...prev,
+      setPagination({
         current: page,
         pageSize: limit,
         total: res.totalItems,
-      }))
+      })
     }
     setLoading(false)
   }
 
   useEffect(() => {
-    fetchData(pagination.current, pagination.pageSize)
-  }, [])
+    if (activeSlug) {
+      fetchData(activeTypeId, pagination.current, pagination.pageSize, searchValue)
+    }
+  }, [activeTypeId, activeSlug, searchValue])
 
   const handleTableChange = (pagination: any) => {
-    fetchData(pagination.current, pagination.pageSize)
+    fetchData(activeTypeId, pagination.current, pagination.pageSize, searchValue)
   }
 
-  // Handle delete action
+  // Delete
   const handleDelete = async (id: string) => {
     try {
       await handleAPI(`/api/products/${id}`, 'delete')
       message.success('Product deleted successfully!')
-      fetchData(pagination.current, pagination.pageSize)
+      fetchData(activeTypeId, pagination.current, pagination.pageSize, searchValue)
     } catch (error) {
       message.error('Error deleting product')
     }
   }
 
-  const handleAddSuccess = (newProduct: Product) => {
+  const handleAddSuccess = () => {
     setModalVisible(false)
-    fetchData(pagination.current, pagination.pageSize)
     setEditingProduct(null)
+    fetchData(activeTypeId, pagination.current, pagination.pageSize, searchValue)
   }
 
-  // Table columns
+  const handleSearchChange = debounce((value: string) => {
+    setSearchValue(value)
+    fetchData(activeTypeId, 1, pagination.pageSize, value)
+  }, 500)
+
   const columns = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
+    {title: 'ID', dataIndex: 'id', key: 'id'},
+    {title: 'Name', dataIndex: 'name', key: 'name'},
     {
       title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
+      dataIndex: 'typeId',
+      key: 'typeId',
+      render: (typeId: string) => {
+        const cat = categories.find((c) => c.id === typeId)
+        return cat ? cat.name : typeId
+      },
     },
-    {
-      title: 'Price ($)',
-      dataIndex: 'price',
-      key: 'price',
-    },
-    {
-      title: 'Stock',
-      dataIndex: 'stock',
-      key: 'stock',
-    },
+    {title: 'Price ($)', dataIndex: 'price', key: 'price'},
+    {title: 'Stock', dataIndex: 'stock', key: 'stock'},
     {
       title: 'Image',
       dataIndex: 'image',
@@ -104,21 +132,10 @@ const ProductList: React.FC = () => {
       ),
     },
     {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
-      render: (text: string) => <div dangerouslySetInnerHTML={{__html: text}} />,
-    },
-    {
       title: 'Created At',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (date: string) => {
-        const formattedDate = new Date(date).toLocaleString('vi-VN', {
-          hour12: false, // 24-hour format
-        })
-        return formattedDate
-      },
+      render: (date: string) => new Date(date).toLocaleString('vi-VN', {hour12: false}),
     },
     {
       title: 'Action',
@@ -167,30 +184,52 @@ const ProductList: React.FC = () => {
       }
       style={{margin: '20px'}}
     >
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <Input.Search
-            placeholder='Search products...'
-            style={{marginBottom: '20px', width: '300px'}}
-          />
-        </Col>
-        <Col span={24}>
-          <Table<Product>
-            columns={columns}
-            dataSource={products}
-            loading={loading}
-            rowKey='id'
-            pagination={{
-              current: pagination.current,
-              pageSize: pagination.pageSize,
-              total: pagination.total,
-              showSizeChanger: true,
-              pageSizeOptions: ['5', '10', '20'],
-            }}
-            onChange={handleTableChange}
-          />
-        </Col>
-      </Row>
+      <Tabs
+        activeKey={activeSlug}
+        onChange={(key) => {
+          const cat = categories.find((c) => c.slug === key)
+          setActiveSlug(key)
+          setActiveTypeId(cat?.slug === 'san-pham' ? '' : cat?.id || '')
+          setPagination({...pagination, current: 1})
+          setSearchValue('')
+        }}
+      >
+        {categories.map((cat) => (
+          <TabPane tab={cat.name} key={cat.slug}>
+            <Row gutter={[16, 16]}>
+              <Col span={24}>
+                <Search
+                  placeholder='Search products...'
+                  value={searchValue}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onSearch={(value) => {
+                    setSearchValue(value)
+                    fetchData(activeTypeId, 1, pagination.pageSize, value)
+                  }}
+                  allowClear
+                  style={{marginBottom: '20px', width: '300px'}}
+                />
+              </Col>
+              <Col span={24}>
+                <Table<Product>
+                  columns={columns}
+                  dataSource={products}
+                  loading={loading}
+                  rowKey='id'
+                  pagination={{
+                    current: pagination.current,
+                    pageSize: pagination.pageSize,
+                    total: pagination.total,
+                    showSizeChanger: true,
+                    pageSizeOptions: ['5', '10', '20'],
+                  }}
+                  onChange={handleTableChange}
+                />
+              </Col>
+            </Row>
+          </TabPane>
+        ))}
+      </Tabs>
 
       <ProductForm
         visible={modalVisible}

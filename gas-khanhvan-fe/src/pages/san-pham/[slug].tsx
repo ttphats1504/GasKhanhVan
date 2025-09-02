@@ -190,36 +190,28 @@ const ProductDetail: React.FC = () => {
                         </Col>
                       </Row>
                       {/* ƯU ĐÃI THÊM */}
-                      <Card
-                        bordered
-                        style={{
-                          borderColor: '#f5222d',
-                          borderRadius: 12,
-                          background: '#fffbe6',
-                        }}
-                      >
-                        <Space align='center' style={{marginBottom: 12}}>
-                          <GiftOutlined style={{fontSize: 20, color: '#faad14'}} />
-                          <Title level={4} style={{margin: 0, color: '#d4380d'}}>
-                            ƯU ĐÃI THÊM
-                          </Title>
-                        </Space>
+                      {product?.description && (
+                        <Card
+                          bordered
+                          style={{
+                            borderColor: '#f5222d',
+                            borderRadius: 12,
+                            background: '#fffbe6',
+                          }}
+                        >
+                          <Space align='center' style={{marginBottom: 12}}>
+                            <GiftOutlined style={{fontSize: 20, color: '#faad14'}} />
+                            <Title level={4} style={{margin: 0, color: '#d4380d'}}>
+                              ƯU ĐÃI THÊM
+                            </Title>
+                          </Space>
 
-                        <Space direction='vertical' size='small'>
-                          <Text>
-                            <CheckCircleOutlined style={{color: 'green', marginRight: 6}} />
-                            Bình Gas có tem <b>CHÍNH HÃNG</b>, ĐẠT CHUẨN PCCC
-                          </Text>
-                          <Text>
-                            <CheckCircleOutlined style={{color: 'green', marginRight: 6}} />
-                            Giao gas và lắp đặt gas <b>MIỄN PHÍ</b> tại nhà.
-                          </Text>
-                          <Text>
-                            <CheckCircleOutlined style={{color: 'green', marginRight: 6}} />
-                            Hệ thống rộng khắp Tp. HCM luôn đảm bảo giao hàng, lắp đặt nhanh nhất.
-                          </Text>
-                        </Space>
-                      </Card>
+                          <div
+                            dangerouslySetInnerHTML={{__html: product.description}}
+                            style={{lineHeight: 1.6}}
+                          />
+                        </Card>
+                      )}
                     </Col>
                   </Row>
                 </Card>
