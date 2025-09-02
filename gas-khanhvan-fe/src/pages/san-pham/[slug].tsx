@@ -74,7 +74,9 @@ const ProductDetail: React.FC = () => {
         const relatedProducts: Product[] = res?.data
           .filter((c: any) => parseInt(c.typeId) == product?.typeId)
           .slice(0, 5)
-        const outstandingProducts: Product[] = res?.data.slice(0, 5)
+        const outstandingProducts: Product[] = res?.data
+          .filter((c: any) => c.id != product?.id)
+          .slice(0, 5)
         setRelatedProducts(relatedProducts)
         setOutstandingProducts(outstandingProducts)
       })
@@ -248,10 +250,12 @@ const ProductDetail: React.FC = () => {
                 bordered={false}
                 style={{
                   borderRadius: '10px',
-                  padding: '20px',
                   background: '#fafafa',
                 }}
               >
+                <Title level={4} style={{color: '#f66b34'}}>
+                  Chính sách Gas Khánh Vân
+                </Title>
                 <Row gutter={[16, 16]}>
                   <Col span={24}>
                     <Space direction='vertical'>
@@ -280,7 +284,9 @@ const ProductDetail: React.FC = () => {
                   background: '#fafafa',
                 }}
               >
-                <Title level={3}>Sản phẩm liên quan</Title>
+                <Title level={4} style={{color: '#f66b34'}}>
+                  Sản phẩm nổi bật
+                </Title>
                 <Row gutter={[16, 16]}>
                   {outstandingProducts.length > 0 ? (
                     outstandingProducts.map((prod: Product) => (
