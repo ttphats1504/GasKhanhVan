@@ -1,10 +1,11 @@
 import React, {useState, useEffect} from 'react'
-import {Form, Input, Button, Modal, Upload, message, Flex, Select} from 'antd'
+import {Form, Input, Button, Modal, Upload, message, Flex, Select, Cascader} from 'antd'
 import {RedoOutlined, UploadOutlined} from '@ant-design/icons'
 import handleAPI from '../apis/handleAPI'
 import {UploadFile} from 'antd/es/upload/interface'
 import Product from '../models/Product'
 import ReactQuill from 'react-quill'
+import Category from '../models/Category'
 
 interface ProductFormProps {
   visible: boolean
@@ -42,9 +43,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const isDuplicating = mode === 'duplicate'
   const [categories, setCategories] = useState([])
 
+  function findPath(categories: any, id: any) {
+    for (const cat of categories) {
+      if (cat.id === id) return [cat.id]
+      if (cat.children) {
+        const path: any = findPath(cat.children, id)
+        if (path.length) return [cat.id, ...path]
+      }
+    }
+    return []
+  }
+
   useEffect(() => {
     if (product && (isEditing || isDuplicating)) {
-      form.setFieldsValue(product)
+      const path = findPath(categories, product.typeId)
+      form.setFieldsValue({...product, typeId: path})
 
       setDescription(product.description || '')
       setDescription2(product.description2 || '')
@@ -86,9 +99,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
       return
     }
 
+    const typeId = Array.isArray(values.typeId)
+      ? values.typeId[values.typeId.length - 1]
+      : values.typeId
     const formData = new FormData()
     formData.append('name', values.name)
-    formData.append('typeId', values.typeId.toString())
+    formData.append('typeId', typeId.toString())
     formData.append('price', values.price.toString())
     formData.append('stock', values.stock.toString())
     formData.append('description', values.description)
@@ -138,17 +154,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
           <Input placeholder='Enter product name' />
         </Form.Item>
         <Form.Item
-          label='Type'
+          label='Category'
           name='typeId'
-          rules={[{required: true, message: 'Please select the product type!'}]}
+          rules={[{required: true, message: 'Please select a category!'}]}
         >
-          <Select placeholder='Select product type'>
-            {categories.map((cat: any) => (
-              <Option key={cat.id} value={cat.id}>
-                {cat.name}
-              </Option>
-            ))}
-          </Select>
+          <Cascader
+            options={categories}
+            placeholder='Select category'
+            fieldNames={{label: 'name', value: 'id', children: 'children'}}
+            showSearch
+          />
         </Form.Item>
         <Form.Item
           label='Price ($)'

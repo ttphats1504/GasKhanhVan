@@ -13,37 +13,6 @@ type FilterSideBarProps = {
   title: string
 }
 
-// const items: MenuItem[] = [
-//   {
-//     key: '1',
-//     label: 'Bình Gas',
-//     children: [
-//       {key: '11', label: 'Option 1'},
-//       {key: '12', label: 'Option 2'},
-//       {key: '13', label: 'Option 3'},
-//       {key: '14', label: 'Option 4'},
-//     ],
-//   },
-//   {
-//     key: '2',
-//     label: 'Thiết bị Gas',
-//     children: [
-//       {key: '21', label: 'Option 1'},
-//       {key: '22', label: 'Option 2'},
-//     ],
-//   },
-//   {
-//     key: '3',
-//     label: 'Hàng tiêu dùng',
-//     children: [
-//       {key: '31', label: 'Option 1'},
-//       {key: '32', label: 'Option 2'},
-//       {key: '33', label: 'Option 3'},
-//       {key: '34', label: 'Option 4'},
-//     ],
-//   },
-// ]
-
 type MenuItem = Required<MenuProps>['items'][number]
 
 interface LevelKeysProps {
@@ -117,6 +86,9 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
         key: subCat.slug,
         label: subCat.name,
       })),
+      onTitleClick: () => {
+        router.push(`/${cat.slug}`)
+      },
     }))
 
     // Final combined menu
@@ -152,13 +124,29 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
   }
 
   const onClick: MenuProps['onClick'] = (e) => {
-    // lấy full path của slug
-    const path = buildFullPath(e.key as string, items)
-    if (path) {
+    // tìm item được click
+    const findItem = (items: any[], key: string): any | undefined => {
+      for (const item of items) {
+        if (item.key === key) return item
+        if (item.children) {
+          const found = findItem(item.children, key)
+          if (found) return found
+        }
+      }
+      return undefined
+    }
+
+    const clickedItem = findItem(items, e.key as string)
+
+    console.log(clickedItem)
+
+    // Nếu là parent có children → vẫn route về /slug cha
+    if (clickedItem) {
+      const path = `/${clickedItem.key}`
       router.push(path)
     }
 
-    // giữ state open
+    // Giữ state open
     const parentKey: any = items.find((item: any) =>
       item.children?.some((child: any) => child.key === e.key)
     )?.key
@@ -166,8 +154,7 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
     setStateOpenKeys((prev: any) => {
       const newKeys: any = new Set(prev)
       if (parentKey) newKeys.add(parentKey)
-      newKeys.add(e.key) // ✅ giữ child mở
-
+      newKeys.add(e.key) // ✅ giữ item được click mở
       return [...newKeys]
     })
   }
@@ -188,8 +175,6 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
       if (currentItem && currentItem?.length > 0 && currentItem[0].children.length > 0) {
         openKeys.push(currentItem[0].children[0].key)
       }
-
-      console.log(openKeys.filter((_, index) => index !== repeatIndex))
 
       setStateOpenKeys(
         openKeys

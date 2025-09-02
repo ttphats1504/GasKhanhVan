@@ -72,6 +72,9 @@ const Navbar = () => {
           key: `group-${subCat.slug}`, // nested prefix
           label: subCat.name,
         })),
+        onTitleClick: () => {
+          router.push(`/${cat.slug}`)
+        },
       })),
     }
 

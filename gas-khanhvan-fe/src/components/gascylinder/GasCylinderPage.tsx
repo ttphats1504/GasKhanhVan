@@ -26,7 +26,7 @@ const fetchProductDatas = async () => {
 }
 
 const fetchProductDatasByCateId = async (categoryId: number) => {
-  const api = `/api/products?categoryId=${categoryId}`
+  const api = `/api/products?typeId=${categoryId}`
   try {
     const res = await handleAPI(api, 'get')
     return res
@@ -90,6 +90,8 @@ const GasCylinderPage = ({cate}: Props) => {
 
     fetchData()
   }, [cate.id])
+
+  console.log(products)
 
   if (loading) return <Spinner />
   return (
