@@ -8,7 +8,7 @@ import {Op} from 'sequelize'
 // Create
 export const addProduct = async (req: Request, res: Response) => {
   try {
-    const {name, typeId, price, stock, description, description2} = req.body
+    const {name, typeId, price, stock, description, description2, old_price} = req.body
     const file = req.file
     let imageUrl = ''
     const slug = slugify(name)
@@ -42,6 +42,7 @@ export const addProduct = async (req: Request, res: Response) => {
       slug,
       description2,
       isFeatured: 0,
+      old_price,
     })
 
     res.status(201).json(newProduct)
@@ -56,11 +57,15 @@ export const getAllProducts = async (req: Request, res: Response) => {
     const page = parseInt(req.query.page as string) || 1
     const limit = parseInt(req.query.limit as string) || 10
     const offset = (page - 1) * limit
-    const {typeId, search, featured} = req.query
+    const {typeId, brandId, search, featured} = req.query
 
     const whereClause: any = {}
     if (typeId) {
       whereClause.typeId = typeId // lọc theo typeId
+    }
+
+    if (brandId) {
+      whereClause.brandId = brandId
     }
 
     if (search) {

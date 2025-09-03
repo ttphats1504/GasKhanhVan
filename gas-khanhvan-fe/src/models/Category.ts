@@ -3,6 +3,7 @@ interface Category {
   name: string
   image: string
   slug: string
+  children?: Category[]
 }
 
 export default Category

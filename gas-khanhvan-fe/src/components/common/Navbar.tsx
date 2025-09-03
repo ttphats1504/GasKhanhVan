@@ -1,20 +1,17 @@
 import {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
-import {Menu, Input} from 'antd'
+import {Menu, AutoComplete, Input, Image, Typography} from 'antd'
 import {MenuUnfoldOutlined} from '@ant-design/icons'
 import type {MenuProps} from 'antd'
 import Link from 'next/link'
 import handleAPI from '@/apis/handleAPI'
 import styles from '../../styles/common/Navbar.module.scss'
+import formatCurrency from '@/utils/formatCurrency'
+import Category from '@/models/Category'
+import Product from '@/models/Product'
 
 const {Search} = Input
-
-interface Category {
-  id: number
-  name: string
-  slug: string
-  children?: Category[]
-}
+const {Title, Text} = Typography
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -22,14 +19,15 @@ const Navbar = () => {
   const router = useRouter()
   const [current, setCurrent] = useState<string>('category')
   const [items, setItems] = useState<MenuItem[]>([])
+  const [options, setOptions] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
 
-  // find key to open menu when slug is children key
+  // 🔹 Find parent key for child navigation
   const findParentKey = (items: any[], slug: string): string | undefined => {
     for (const item of items) {
       if (item.children?.some((child: any) => child.key === slug)) {
         return item.key as string
       }
-      // 🔁 đệ quy để tìm trong children sâu hơn
       if (item.children) {
         const found = findParentKey(item.children, slug)
         if (found) return found
@@ -39,7 +37,6 @@ const Navbar = () => {
   }
 
   const normalizeKey = (key: string) => {
-    // remove "group-" or "cat-" prefixes
     return key.replace(/^group-/, '').replace(/^cat-/, '')
   }
 
@@ -48,28 +45,26 @@ const Navbar = () => {
     if (items.length > 0 && e.key) {
       const parentKey = findParentKey(items, e.key)
       if (parentKey) {
-        // child => build /parent/child
         path = `/${normalizeKey(parentKey)}/${normalizeKey(e.key)}`
       } else {
-        // parent => just /parent
         path = `/${normalizeKey(e.key)}`
       }
     }
-    console.log(e.key)
     router.push(path)
-    setCurrent(e.key) // still keep menu highlight with original key
+    setCurrent(e.key)
   }
 
+  // 🔹 Build menu items
   const buildMenuItems = (categories: Category[]): MenuItem[] => {
     const groupedCategoryMenu: MenuItem = {
       label: 'Danh mục sản phẩm',
-      key: 'grouped-category', // unique root key
+      key: 'grouped-category',
       icon: <MenuUnfoldOutlined />,
       children: categories.map((cat) => ({
-        key: `group-${cat.slug}`, // prefix to avoid conflict
+        key: `group-${cat.slug}`,
         label: cat.name,
         children: cat.children?.map((subCat) => ({
-          key: `group-${subCat.slug}`, // nested prefix
+          key: `group-${subCat.slug}`,
           label: subCat.name,
         })),
         onTitleClick: () => {
@@ -79,13 +74,14 @@ const Navbar = () => {
     }
 
     const individualCategoryItems: MenuItem[] = categories.map((cat) => ({
-      key: `cat-${cat.slug}`, // separate prefix for top-level
+      key: `cat-${cat.slug}`,
       label: cat.name,
     }))
 
     return [groupedCategoryMenu, ...individualCategoryItems]
   }
 
+  // 🔹 Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -100,20 +96,60 @@ const Navbar = () => {
     fetchCategories()
   }, [])
 
-  // ✅ Sync menu selection with current URL
+  // 🔹 Sync menu highlight with URL
   useEffect(() => {
     if (!router.isReady) return
-
     const pathSlug = router.asPath.split('/')[1] || 'category'
     setCurrent(pathSlug)
   }, [router.asPath, router.isReady])
 
+  // 🔹 Search suggestions
+  const handleSearch = async (value: string) => {
+    if (!value.trim()) {
+      setOptions([])
+      return
+    }
+    setLoading(true)
+    try {
+      const res: any = await handleAPI(`/api/products?search=${value}`, 'get')
+      const products: Product[] = res.data || []
+      setOptions(
+        products.map((p) => ({
+          value: p.slug,
+          label: (
+            <Link href={`/san-pham/${p.slug}`} className={styles.suggest_item}>
+              <Image src={p.image} alt={p.name} className={styles.suggest_img} preview={false} />
+              <div>
+                <div className={styles.suggest_name}>{p.name}</div>
+                <div className={styles.suggest_price}>{formatCurrency(p.price)}</div>
+                <Text delete type='secondary' style={{fontSize: 13}}>
+                  {formatCurrency(p.old_price)}
+                </Text>
+              </div>
+            </Link>
+          ),
+        }))
+      )
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const onSelect = (slug: string) => {
+    router.push(`/san-pham/${slug}`)
+  }
+
   return (
     <div className={styles.navbar_sticky}>
       <div className={styles.wrapper}>
-        <div>
-          <Link href='/'>Logo</Link>
+        {/* Logo */}
+        <div className={styles.logo}>
+          <Link href='/'>Gas Khánh Vân</Link>
         </div>
+
+        {/* Menu */}
         <Menu
           onClick={onClick}
           selectedKeys={[current]}
@@ -121,8 +157,18 @@ const Navbar = () => {
           items={items}
           triggerSubMenuAction='hover'
         />
-        <div>
-          <Search className={styles.search_box} placeholder='Tìm kiếm' />
+
+        {/* Search box */}
+        <div className={styles.search_wrap}>
+          <AutoComplete
+            options={options}
+            onSelect={onSelect}
+            onSearch={handleSearch}
+            notFoundContent={loading ? 'Đang tìm...' : 'Không tìm thấy'}
+            className={styles.search_box}
+          >
+            <Search placeholder='Tìm kiếm sản phẩm...' enterButton />
+          </AutoComplete>
         </div>
       </div>
     </div>

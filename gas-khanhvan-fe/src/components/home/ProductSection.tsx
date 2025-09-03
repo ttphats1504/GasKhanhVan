@@ -12,6 +12,7 @@ const {Title} = Typography
 type ProductSectionProps = {
   title: string
   categoryId?: number
+  brandId?: number // ✅ thêm brandId
   isFeatured?: boolean
 }
 
@@ -19,10 +20,12 @@ const fetchProductDatas = async (
   page = 1,
   limit = 6,
   categoryId?: number,
+  brandId?: number,
   isFeatured?: boolean
 ) => {
   let api = `/api/products?page=${page}&limit=${limit}`
   if (categoryId) api += `&typeId=${categoryId}`
+  if (brandId) api += `&brandId=${brandId}` // ✅ filter by brand
   if (isFeatured) api += `&featured=true`
 
   try {
@@ -34,7 +37,12 @@ const fetchProductDatas = async (
   }
 }
 
-export default function ProductSection({title, categoryId, isFeatured}: ProductSectionProps) {
+export default function ProductSection({
+  title,
+  categoryId,
+  brandId,
+  isFeatured,
+}: ProductSectionProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [page, setPage] = useState<number>(1)
@@ -44,7 +52,7 @@ export default function ProductSection({title, categoryId, isFeatured}: ProductS
   const fetchData = async (page: number) => {
     setLoading(true)
 
-    const res: any = await fetchProductDatas(page, limit, categoryId, isFeatured)
+    const res: any = await fetchProductDatas(page, limit, categoryId, brandId, isFeatured)
 
     if (res) {
       setProducts(res.data)
@@ -56,7 +64,7 @@ export default function ProductSection({title, categoryId, isFeatured}: ProductS
 
   useEffect(() => {
     fetchData(page)
-  }, [page, categoryId, isFeatured])
+  }, [page, categoryId, brandId, isFeatured]) // ✅ theo dõi brandId
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage)

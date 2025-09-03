@@ -11,25 +11,32 @@ import HomeLayout from '@/layouts/HomeLayout'
 import handleAPI from '@/apis/handleAPI'
 import Category from '@/models/Category'
 import {Flex, Typography} from 'antd'
+import Brand from '@/models/Brand'
 
 const {Title} = Typography
 
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([])
+  const [brands, setBrands] = useState<Brand[]>([])
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // fetch categories
         const categoryRes: any = await handleAPI('/api/categories', 'get')
         const filteredCategory = categoryRes.filter((cat: any) => cat.slug !== 'san-pham')
-
         setCategories(filteredCategory)
+
+        // fetch brands
+        const brandRes: any = await handleAPI('/api/brands', 'get')
+        setBrands(brandRes.data || [])
       } catch (err) {
         console.error(err)
       }
     }
     fetchData()
   }, [])
+
   return (
     <>
       <Head>
@@ -80,12 +87,30 @@ export default function Home() {
               </Title>
               <div className={styles.border}></div>
             </Flex>
+
             {/* Featured Products */}
             <ProductSection isFeatured title='Khuyến mãi hôm nay' />
 
             {/* Products by Category */}
-            {categories.map((cat) => (
-              <ProductSection key={cat.id} title={cat.name} categoryId={cat.id} />
+            {categories.map((cat: any) =>
+              cat.children && cat.children.length > 0 ? (
+                // Render children categories
+                cat.children.map((child: Category) => (
+                  <ProductSection
+                    key={`cat-${child.id}`}
+                    title={child.name}
+                    categoryId={child.id}
+                  />
+                ))
+              ) : (
+                // Render parent if no children
+                <ProductSection key={`cat-${cat.id}`} title={cat.name} categoryId={cat.id} />
+              )
+            )}
+
+            {/* Products by Brand */}
+            {brands.map((brand) => (
+              <ProductSection key={`brand-${brand.id}`} title={brand.name} brandId={brand.id} />
             ))}
 
             <SaleBanner />

@@ -6,6 +6,7 @@ import productRoutes from './src/routers/productRoutes'
 import categoryRoutes from './src/routers/categoryRoutes'
 import incentiveRoutes from './src/routers/incentiveRoutes'
 import bannerRoutes from './src/routers/bannerRoutes'
+import brandsRoutes from './src/routers/brandsRoutes'
 import cors from 'cors'
 import {mysqlDB} from './src/database/mysql'
 import Product from './src/models/ProductModel'
@@ -86,6 +87,7 @@ app.use('/api/products', productRoutes)
 app.use('/api/categories', categoryRoutes)
 app.use('/api/incentives', incentiveRoutes)
 app.use('/api/banners', bannerRoutes)
+app.use('/api/brands', brandsRoutes)
 
 const startServer = async () => {
   await Product.sync({alter: true}) // syncs model with table structure

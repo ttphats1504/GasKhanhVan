@@ -2,7 +2,9 @@ interface Product {
   id: string
   name: string
   typeId: number
+  brandId: number
   price: number
+  old_price: number
   stock: number
   image: string
   description: string

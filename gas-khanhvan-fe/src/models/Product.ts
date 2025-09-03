@@ -3,6 +3,7 @@ interface Product {
   name: string
   typeId: number
   price: number
+  old_price: number
   stock: number
   image: string
   description: string

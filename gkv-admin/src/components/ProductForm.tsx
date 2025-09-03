@@ -1,29 +1,35 @@
 import React, {useState, useEffect} from 'react'
-import {Form, Input, Button, Modal, Upload, message, Flex, Select, Cascader} from 'antd'
+import {Form, Input, Button, Modal, Upload, message, Flex, Cascader, Select} from 'antd'
 import {RedoOutlined, UploadOutlined} from '@ant-design/icons'
 import handleAPI from '../apis/handleAPI'
 import {UploadFile} from 'antd/es/upload/interface'
 import Product from '../models/Product'
 import ReactQuill from 'react-quill'
-import Category from '../models/Category'
 
 interface ProductFormProps {
   visible: boolean
   onClose: () => void
   onSuccess: (newProduct: Product) => void
   product?: Product | null
-  mode?: 'add' | 'edit' | 'duplicate' // thêm mode
+  mode?: 'add' | 'edit' | 'duplicate'
 }
 
 const {Option} = Select
 
 const fetchCategoryDatas = async () => {
-  const api = '/api/categories'
   try {
-    const res = await handleAPI(api, 'get')
-    return res
+    return await handleAPI('/api/categories', 'get')
   } catch (error) {
     console.error('Error fetching Categories:', error)
+    return []
+  }
+}
+
+const fetchBrandDatas = async () => {
+  try {
+    return await handleAPI('/api/brands', 'get')
+  } catch (error) {
+    console.error('Error fetching Brands:', error)
     return []
   }
 }
@@ -39,10 +45,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [file, setFile] = useState<UploadFile | null>(null)
   const [description, setDescription] = useState<string>('')
   const [description2, setDescription2] = useState<string>('')
+  const [categories, setCategories] = useState<any[]>([])
+  const [brands, setBrands] = useState<any[]>([])
+
   const isEditing = mode === 'edit'
   const isDuplicating = mode === 'duplicate'
-  const [categories, setCategories] = useState([])
 
+  // find category path
   function findPath(categories: any, id: any) {
     for (const cat of categories) {
       if (cat.id === id) return [cat.id]
@@ -57,12 +66,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
   useEffect(() => {
     if (product && (isEditing || isDuplicating)) {
       const path = findPath(categories, product.typeId)
-      form.setFieldsValue({...product, typeId: path})
+      form.setFieldsValue({
+        ...product,
+        typeId: path,
+        brandId: product.brandId, // 👈 thêm brand
+      })
 
       setDescription(product.description || '')
       setDescription2(product.description2 || '')
 
-      // ❌ Duplicate thì không set id
       if (isDuplicating) {
         form.setFieldValue('name', `${product.name} (Copy)`)
       }
@@ -71,29 +83,26 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setDescription('')
       setDescription2('')
     }
-  }, [product, mode, form])
+  }, [product, mode, categories])
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const loadData = async () => {
       try {
-        const res: any = await fetchCategoryDatas()
-        setCategories(res)
+        const [catRes, brandRes]: any = await Promise.all([fetchCategoryDatas(), fetchBrandDatas()])
+        setCategories(catRes)
+        setBrands(brandRes.data)
       } catch (err) {
-        message.error('Failed to load categories')
-        console.error(err)
+        message.error('Failed to load categories or brands')
       }
     }
-
-    fetchCategories()
+    loadData()
   }, [])
 
-  // Handle file change
   const handleFileChange = ({file}: any) => {
     setFile(file)
   }
 
-  // Handle form submission
-  const handleSubmit = async (values: Omit<Product, 'id' | 'createdAt'>) => {
+  const handleSubmit = async (values: any) => {
     if (!file && !isEditing) {
       message.error('Please upload an image!')
       return
@@ -102,20 +111,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const typeId = Array.isArray(values.typeId)
       ? values.typeId[values.typeId.length - 1]
       : values.typeId
+
     const formData = new FormData()
     formData.append('name', values.name)
     formData.append('typeId', typeId.toString())
+    formData.append('brandId', values.brandId.toString()) // 👈 thêm brand
     formData.append('price', values.price.toString())
+    formData.append('old_price', values.old_price.toString())
     formData.append('stock', values.stock.toString())
-    formData.append('description', values.description)
-    formData.append('description2', values.description2)
+    formData.append('description', description)
+    formData.append('description2', description2)
 
-    // Cast file to Blob safely
-    const fileBlob = file as unknown as Blob
-    // Append file as Blob
-    formData.append('image', fileBlob)
-
-    console.log('📝 FormData before sending:', Object.fromEntries(formData.entries()))
+    if (file) {
+      const fileBlob = file as unknown as Blob
+      formData.append('image', fileBlob)
+    }
 
     try {
       const response: any = isEditing
@@ -128,7 +138,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
       if (response) {
         message.success(`Product ${isEditing ? 'updated' : 'added'} successfully!`)
-        onSuccess(response) // Update the table
+        onSuccess(response)
         onClose()
         form.resetFields()
         setFile(null)
@@ -140,7 +150,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   return (
     <Modal
-      title={isEditing ? 'Edit Product' : 'Add Product'}
+      title={isEditing ? 'Edit Product' : isDuplicating ? 'Duplicate Product' : 'Add Product'}
       open={visible}
       onCancel={onClose}
       footer={null}
@@ -153,6 +163,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
         >
           <Input placeholder='Enter product name' />
         </Form.Item>
+
+        {/* Category */}
         <Form.Item
           label='Category'
           name='typeId'
@@ -165,30 +177,40 @@ const ProductForm: React.FC<ProductFormProps> = ({
             showSearch
           />
         </Form.Item>
+
+        {/* Brand */}
         <Form.Item
-          label='Price ($)'
-          name='price'
-          rules={[{required: true, message: 'Please enter the product price!'}]}
+          label='Brand'
+          name='brandId'
+          rules={[{required: true, message: 'Please select a brand!'}]}
         >
+          <Select placeholder='Select brand'>
+            {brands.map((b: any) => (
+              <Option key={b.id} value={b.id}>
+                {b.name}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item label='Price' name='price' rules={[{required: true}]}>
           <Input type='number' placeholder='Enter product price' />
         </Form.Item>
-        <Form.Item
-          label='Stock'
-          name='stock'
-          rules={[{required: true, message: 'Please enter the stock quantity!'}]}
-        >
+
+        <Form.Item label='Old/ Market Price' name='old_price' rules={[{required: true}]}>
+          <Input type='number' placeholder='Enter old price' />
+        </Form.Item>
+
+        <Form.Item label='Stock' name='stock' rules={[{required: true}]}>
           <Input type='number' placeholder='Enter stock quantity' />
         </Form.Item>
-        <Form.Item
-          label='Upload Image'
-          name='image'
-          rules={[{required: true, message: 'Please upload an image!'}]}
-        >
+
+        <Form.Item label='Upload Image' name='image'>
           <Upload.Dragger
             name='image'
             beforeUpload={(file) => {
               handleFileChange({file})
-              return false // Prevent automatic upload
+              return false
             }}
             maxCount={1}
             onRemove={() => setFile(null)}
@@ -199,20 +221,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <p>Click or drag file to upload</p>
           </Upload.Dragger>
         </Form.Item>
+
         <Form.Item label='Promotion' name='description'>
-          <ReactQuill
-            value={description}
-            onChange={setDescription}
-            placeholder='Enter product promotion'
-          />
+          <ReactQuill value={description} onChange={setDescription} />
         </Form.Item>
 
         <Form.Item label='Description' name='description2'>
-          <ReactQuill
-            value={description2}
-            onChange={setDescription2}
-            placeholder='Enter product description'
-          />
+          <ReactQuill value={description2} onChange={setDescription2} />
         </Form.Item>
 
         <Form.Item>
