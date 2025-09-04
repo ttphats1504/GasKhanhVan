@@ -36,8 +36,6 @@ export default function App({Component, pageProps}: AppProps) {
           }}
         >
           <main className={roboto.className}>
-            {/* Back to Top */}
-            <BackTop />
             <FloatButton.Group shape='circle' className={styles.fabGroup}>
               {/* Call */}
               <FloatButton
@@ -82,6 +80,8 @@ export default function App({Component, pageProps}: AppProps) {
                 tooltip='Messenger'
                 className={styles.messBtn}
               />
+
+              <FloatButton.BackTop visibilityHeight={200} />
             </FloatButton.Group>
             <Component {...pageProps} />
           </main>

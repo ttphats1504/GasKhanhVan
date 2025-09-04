@@ -36,7 +36,6 @@ export default function Home() {
     }
     fetchData()
   }, [])
-
   return (
     <>
       <Head>
@@ -109,14 +108,13 @@ export default function Home() {
             )}
 
             {/* Products by Brand */}
-            {brands.map((brand) => (
+            {brands.map((brand: any) => (
               <ProductSection key={`brand-${brand.id}`} title={brand.name} brandId={brand.id} />
             ))}
 
             <SaleBanner />
           </div>
         </div>
-        <Footer />
       </HomeLayout>
     </>
   )

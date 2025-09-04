@@ -79,17 +79,19 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
 
   const buildMenuItems = (categories: Category[]): MenuItem[] => {
     // Individual categories as top-level items
-    const individualCategoryItems: MenuItem[] = categories.map((cat: any) => ({
-      key: cat.slug,
-      label: cat.name,
-      children: cat.children?.map((subCat: any) => ({
-        key: subCat.slug,
-        label: subCat.name,
-      })),
-      onTitleClick: () => {
-        router.push(`/${cat.slug}`)
-      },
-    }))
+    const individualCategoryItems: MenuItem[] = categories
+      .filter((cat) => cat.slug !== 'tin-tuc')
+      .map((cat: any) => ({
+        key: cat.slug,
+        label: cat.name,
+        children: cat.children?.map((subCat: any) => ({
+          key: subCat.slug,
+          label: subCat.name,
+        })),
+        onTitleClick: () => {
+          router.push(`/${cat.slug}`)
+        },
+      }))
 
     // Final combined menu
     return [...individualCategoryItems]

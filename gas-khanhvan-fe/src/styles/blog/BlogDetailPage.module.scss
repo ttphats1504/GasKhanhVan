@@ -1,0 +1,31 @@
+.wrapper {
+  padding: 24px;
+  background: #fff;
+}
+
+.thumbnail {
+  margin: 16px 0;
+  border-radius: 8px;
+  max-height: 400px;
+  object-fit: cover;
+}
+
+.content {
+  margin-top: 16px;
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+.related_item {
+  margin-bottom: 12px;
+  cursor: pointer;
+
+  img {
+    border-radius: 6px;
+    margin-bottom: 6px;
+  }
+
+  &:hover {
+    color: #1677ff;
+  }
+}

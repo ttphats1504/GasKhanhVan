@@ -53,7 +53,6 @@ export default function ProductSection({
     setLoading(true)
 
     const res: any = await fetchProductDatas(page, limit, categoryId, brandId, isFeatured)
-
     if (res) {
       setProducts(res.data)
       setTotalItems(res.totalItems)
@@ -72,7 +71,7 @@ export default function ProductSection({
 
   if (loading) return <Spinner />
   if (products.length <= 0) return <></>
-
+  console.log(products)
   return (
     <Container>
       <Flex vertical>

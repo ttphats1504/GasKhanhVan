@@ -60,22 +60,31 @@ const Navbar = () => {
       label: 'Danh mục sản phẩm',
       key: 'grouped-category',
       icon: <MenuUnfoldOutlined />,
-      children: categories.map((cat) => ({
-        key: `group-${cat.slug}`,
-        label: cat.name,
-        children: cat.children?.map((subCat) => ({
-          key: `group-${subCat.slug}`,
-          label: subCat.name,
+      children: categories
+        .filter((cat) => cat.slug !== 'tin-tuc') // ❌ bỏ blog trong grouped-category
+        .map((cat) => ({
+          key: `group-${cat.slug}`,
+          label: cat.name,
+          children: cat.children?.map((subCat) => ({
+            key: `group-${subCat.slug}`,
+            label: subCat.name,
+          })),
+          onTitleClick: () => {
+            router.push(`/${cat.slug}`)
+          },
         })),
-        onTitleClick: () => {
-          router.push(`/${cat.slug}`)
-        },
-      })),
     }
 
     const individualCategoryItems: MenuItem[] = categories.map((cat) => ({
       key: `cat-${cat.slug}`,
       label: cat.name,
+      onClick: () => {
+        if (cat.slug === 'blog') {
+          router.push('/tin-tuc') // ✅ redirect blog -> tin-tuc
+        } else {
+          router.push(`/${cat.slug}`)
+        }
+      },
     }))
 
     return [groupedCategoryMenu, ...individualCategoryItems]

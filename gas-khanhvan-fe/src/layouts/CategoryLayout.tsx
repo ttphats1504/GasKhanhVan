@@ -1,10 +1,10 @@
 import {Breadcrumb, Layout, Menu, theme} from 'antd'
 import Navbar from '@/components/common/Navbar'
-import {Footer} from 'antd/es/layout/layout'
 import React, {ReactNode} from 'react'
 import HeadTag from '@/components/home/HeadTag'
 
 import styles from '../styles/layouts/CategoryLayout.module.scss'
+import Footer from '@/components/common/Footer'
 
 const {Content} = Layout
 

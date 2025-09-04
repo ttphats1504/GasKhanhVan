@@ -7,12 +7,15 @@ import categoryRoutes from './src/routers/categoryRoutes'
 import incentiveRoutes from './src/routers/incentiveRoutes'
 import bannerRoutes from './src/routers/bannerRoutes'
 import brandsRoutes from './src/routers/brandsRoutes'
+import blogRoutes from './src/routers/blogRoutes'
 import cors from 'cors'
 import {mysqlDB} from './src/database/mysql'
 import Product from './src/models/ProductModel'
 import Category from './src/models/CategoryModel'
 import Incentive from './src/models/IncentiveModel'
 import Banner from './src/models/BannerModel'
+import Brand from './src/models/BrandModel'
+import Blog from './src/models/BlogModel'
 
 dotenv.config()
 
@@ -88,12 +91,15 @@ app.use('/api/categories', categoryRoutes)
 app.use('/api/incentives', incentiveRoutes)
 app.use('/api/banners', bannerRoutes)
 app.use('/api/brands', brandsRoutes)
+app.use('/api/blogs', blogRoutes)
 
 const startServer = async () => {
   await Product.sync({alter: true}) // syncs model with table structure
   await Category.sync({alter: true}) // syncs model with table structure
   await Incentive.sync({alter: true}) // syncs model with table structure
   await Banner.sync({alter: true}) // syncs model with table structure
+  await Brand.sync({alter: true}) // syncs model with table structure
+  await Blog.sync({alter: true}) // syncs model with table structure
   await connectMongoDB()
   await connectMySQL()
 
