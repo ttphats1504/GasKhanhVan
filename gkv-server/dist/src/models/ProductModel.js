@@ -15,18 +15,25 @@ Product.init({
     },
     name: { type: sequelize_1.DataTypes.STRING, allowNull: false },
     typeId: { type: sequelize_1.DataTypes.INTEGER.UNSIGNED, allowNull: false },
+    brandId: { type: sequelize_1.DataTypes.INTEGER.UNSIGNED, allowNull: true },
     price: { type: sequelize_1.DataTypes.DECIMAL(10, 2), allowNull: false },
+    old_price: {
+        // ✅ thêm cấu hình cho Sequelize
+        type: sequelize_1.DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0,
+    },
     stock: { type: sequelize_1.DataTypes.INTEGER, allowNull: false },
     image: { type: sequelize_1.DataTypes.TEXT, allowNull: true },
     description: { type: sequelize_1.DataTypes.TEXT, allowNull: false },
+    description2: { type: sequelize_1.DataTypes.TEXT, allowNull: true },
     createdAt: { type: sequelize_1.DataTypes.DATE, defaultValue: sequelize_1.DataTypes.NOW },
     slug: {
         type: sequelize_1.DataTypes.STRING,
         unique: 'prod_slug_unique_index',
     },
-    description2: { type: sequelize_1.DataTypes.TEXT },
     isFeatured: {
-        type: sequelize_1.DataTypes.TINYINT, // dùng tinyint thay vì boolean
+        type: sequelize_1.DataTypes.TINYINT,
         defaultValue: 0,
     },
 }, {

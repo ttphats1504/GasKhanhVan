@@ -12,7 +12,7 @@ const sequelize_1 = require("sequelize");
 // Create
 const addProduct = async (req, res) => {
     try {
-        const { name, typeId, price, stock, description, description2 } = req.body;
+        const { name, typeId, price, stock, description, description2, old_price } = req.body;
         const file = req.file;
         let imageUrl = '';
         const slug = (0, slugify_1.slugify)(name);
@@ -40,6 +40,7 @@ const addProduct = async (req, res) => {
             slug,
             description2,
             isFeatured: 0,
+            old_price,
         });
         res.status(201).json(newProduct);
     }
@@ -54,10 +55,13 @@ const getAllProducts = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const offset = (page - 1) * limit;
-        const { typeId, search, featured } = req.query;
+        const { typeId, brandId, search, featured } = req.query;
         const whereClause = {};
         if (typeId) {
             whereClause.typeId = typeId; // lọc theo typeId
+        }
+        if (brandId) {
+            whereClause.brandId = brandId;
         }
         if (search) {
             whereClause[sequelize_1.Op.or] = [{ name: { [sequelize_1.Op.like]: `%${search}%` } }];
