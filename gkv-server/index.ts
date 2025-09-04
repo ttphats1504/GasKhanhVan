@@ -30,6 +30,7 @@ const corsOptions = {
     'https://gkv-admin-fe.vercel.app',
     'https://gaskhanhvanquan7.vercel.app',
     'https://www.gaskhanhvan.com',
+    'https://www.gaskhanhvan.com/',
   ], // replace with your actual Vercel frontend domain
   credentials: true, // if you're using cookies or authorization headers
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
