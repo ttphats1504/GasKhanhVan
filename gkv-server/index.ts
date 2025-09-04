@@ -36,6 +36,8 @@ const allowedOrigins = [
   'https://gaskhanhvanquan7.vercel.app',
   'http://localhost:3000',
   'http://localhost:3002',
+  'https://www.gaskhanhvan.com',
+  'http://www.gaskhanhvan.com',
 ]
 
 app.use((req, res, next) => {
