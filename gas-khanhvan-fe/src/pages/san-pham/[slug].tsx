@@ -30,6 +30,7 @@ import ProductCard from '@/components/common/ProductCard'
 import handleAPI from '@/apis/handleAPI'
 import Product from '@/models/Product'
 import formatCurrency from '@/utils/formatCurrency'
+import CategoryLayout from '@/layouts/CategoryLayout'
 
 const {Title, Text, Paragraph} = Typography
 
