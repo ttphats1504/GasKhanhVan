@@ -29,30 +29,18 @@ const dbURL = `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATA
 
 const app = express()
 
-// Allowed origins
-const allowedOrigins = [
-  'https://gkv-admin-fe.vercel.app',
-  'https://gaskhanhvanquan7.vercel.app',
-  'https://www.gaskhanhvan.com',
-  'https://api.gaskhanhvan.com',
-  'http://localhost:3000',
-  'http://localhost:3002',
-  'http://103.72.99.119:3001',
-]
-
 // ✅ Setup CORS middleware
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true) // Cho phép curl, Postman
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true)
-      }
-      return callback(new Error(`Not allowed by CORS: ${origin}`))
-    },
+    origin: [
+      'https://gkv-admin-fe.vercel.app',
+      'https://gaskhanhvanquan7.vercel.app',
+      'https://www.gaskhanhvan.com',
+      'http://localhost:3000',
+      'http://localhost:3002',
+      'http://103.72.99.119:3001',
+    ],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization', 'X-Requested-With'],
   })
 )
 
