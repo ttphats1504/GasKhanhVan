@@ -1,6 +1,9 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
+import cors from 'cors'
+import bodyParser from 'body-parser'
+
 import userRouter from './src/routers/user'
 import productRoutes from './src/routers/productRoutes'
 import categoryRoutes from './src/routers/categoryRoutes'
@@ -8,7 +11,7 @@ import incentiveRoutes from './src/routers/incentiveRoutes'
 import bannerRoutes from './src/routers/bannerRoutes'
 import brandsRoutes from './src/routers/brandsRoutes'
 import blogRoutes from './src/routers/blogRoutes'
-import cors from 'cors'
+
 import {mysqlDB} from './src/database/mysql'
 import Product from './src/models/ProductModel'
 import Category from './src/models/CategoryModel'
@@ -21,67 +24,70 @@ dotenv.config()
 
 const PORT = process.env.PORT || 3001
 
-// mongoose connection pool
+// MongoDB connection string
 const dbURL = `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@cluster0.dh8fo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+
 const app = express()
-const bodyParser = require('body-parser')
+
+// Allowed origins
 const allowedOrigins = [
   'https://gkv-admin-fe.vercel.app',
   'https://gaskhanhvanquan7.vercel.app',
   'https://www.gaskhanhvan.com',
+  'https://api.gaskhanhvan.com',
   'http://localhost:3000',
   'http://localhost:3002',
-  'http://103.72.99.119:3001', // thêm luôn IP nếu bạn test trực tiếp
-  'https://api.gaskhanhvan.com',
+  'http://103.72.99.119:3001',
 ]
 
+// ✅ Setup CORS middleware
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Cho phép nếu không có origin (curl) hoặc origin chứa vercel.app
-      if (!origin || origin.includes('vercel.app') || origin.includes('gaskhanhvan.com')) {
-        callback(null, true)
-      } else {
-        callback(new Error('Not allowed by CORS'))
+      if (!origin) return callback(null, true) // Cho phép curl, Postman
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true)
       }
+      return callback(new Error(`Not allowed by CORS: ${origin}`))
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization', 'X-Requested-With'],
   })
 )
 
-// xử lý preflight cho tất cả route
+// Handle preflight OPTIONS
 app.options('*', cors())
+
+// Middleware
 app.use(express.json())
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-)
+app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
 app.use('/uploads', express.static('uploads'))
 
+// Connect MongoDB
 const connectMongoDB = async () => {
   try {
     await mongoose.connect(dbURL)
-
-    console.log(`Connect to db successfully!!!`)
+    console.log(`✅ Connected to MongoDB successfully`)
   } catch (error) {
-    console.log(`Can not connect to db ${error}`)
+    console.error(`❌ Cannot connect to MongoDB: ${error}`)
   }
 }
 
+// Connect MySQL
 const connectMySQL = async () => {
   try {
     const connection = await mysqlDB.getConnection()
     connection.release()
-
-    console.log('Connected to MySQL successfully!!!')
+    console.log('✅ Connected to MySQL successfully')
   } catch (error) {
-    console.error(`Cannot connect to MySQL: ${error}`)
+    console.error(`❌ Cannot connect to MySQL: ${error}`)
     process.exit(1)
   }
 }
 
+// Routes
 app.use('/auth', userRouter)
 app.use('/api/products', productRoutes)
 app.use('/api/categories', categoryRoutes)
@@ -90,23 +96,25 @@ app.use('/api/banners', bannerRoutes)
 app.use('/api/brands', brandsRoutes)
 app.use('/api/blogs', blogRoutes)
 
+// Start server
 const startServer = async () => {
-  await Product.sync({alter: true}) // syncs model with table structure
-  await Category.sync({alter: true}) // syncs model with table structure
-  await Incentive.sync({alter: true}) // syncs model with table structure
-  await Banner.sync({alter: true}) // syncs model with table structure
-  await Brand.sync({alter: true}) // syncs model with table structure
-  await Blog.sync({alter: true}) // syncs model with table structure
+  await Product.sync({alter: true})
+  await Category.sync({alter: true})
+  await Incentive.sync({alter: true})
+  await Banner.sync({alter: true})
+  await Brand.sync({alter: true})
+  await Blog.sync({alter: true})
+
   await connectMongoDB()
   await connectMySQL()
 
   app.listen(PORT, () => {
-    console.log(`Server is running at port ${PORT}`)
+    console.log(`🚀 Server is running at port ${PORT}`)
   })
 }
 
 startServer().catch((err) => {
-  console.error('Failed to start server:', err)
+  console.error('❌ Failed to start server:', err)
 })
 
 export default app
