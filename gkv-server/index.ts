@@ -32,6 +32,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3002',
   'http://103.72.99.119:3001', // thêm luôn IP nếu bạn test trực tiếp
+  'https://api.gaskhanhvan.com',
 ]
 
 app.use(
