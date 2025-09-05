@@ -6,9 +6,16 @@
   background: #364d79;
 }
 
+.partners {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+}
+
 .partner_image {
-  width: 200px !important;
-  height: 200px !important;
+  width: 100%;
+  height: 80px;
   object-fit: contain;
 }
 

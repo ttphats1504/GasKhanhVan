@@ -1,5 +1,4 @@
 .content {
-  height: 37.5rem; // Set your desired max height
   overflow: hidden;
   :global {
     .ant-carousel .ant-image {
@@ -8,5 +7,23 @@
       object-fit: cover !important;
       display: block;
     }
+  }
+}
+.content {
+  width: 100%;
+  overflow: hidden;
+}
+
+.image_content {
+  width: 100%;
+  height: auto;
+  object-fit: cover; // ảnh vừa khung mà không méo
+  border-radius: 8px; // tuỳ thích
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .image_content {
+    border-radius: 0; // full screen trên mobile
   }
 }

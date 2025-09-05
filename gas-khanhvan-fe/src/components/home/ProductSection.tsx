@@ -1,4 +1,4 @@
-import {Col, Flex, Pagination, Row, Typography} from 'antd'
+import {Col, Flex, Grid, Pagination, Row, Typography} from 'antd'
 import Container from '../common/Container'
 import styles from '../../styles/home/ProductSection.module.scss'
 import ProductCard from '../common/ProductCard'
@@ -6,6 +6,8 @@ import handleAPI from '@/apis/handleAPI'
 import {useEffect, useState} from 'react'
 import Product from '@/models/Product'
 import Spinner from '../common/Spinner'
+
+const {useBreakpoint} = Grid
 
 const {Title} = Typography
 
@@ -47,7 +49,8 @@ export default function ProductSection({
   const [loading, setLoading] = useState<boolean>(false)
   const [page, setPage] = useState<number>(1)
   const [totalItems, setTotalItems] = useState<number>(0)
-  const limit = 6 // Products per page
+  const screens = useBreakpoint()
+  const [limit, setLimit] = useState(6)
 
   const fetchData = async (page: number) => {
     setLoading(true)
@@ -62,8 +65,20 @@ export default function ProductSection({
   }
 
   useEffect(() => {
+    if (screens.xs) setLimit(2)
+    // Mobile
+    else if (screens.sm) setLimit(4)
+    // Tablet nhỏ
+    else if (screens.md) setLimit(6)
+    // Tablet vừa
+    else if (screens.lg) setLimit(8)
+    // Desktop
+    else setLimit(12) // Desktop lớn
+  }, [screens])
+
+  useEffect(() => {
     fetchData(page)
-  }, [page, categoryId, brandId, isFeatured]) // ✅ theo dõi brandId
+  }, [page, limit, categoryId, brandId, isFeatured]) // ✅ theo dõi brandId
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage)
@@ -83,7 +98,7 @@ export default function ProductSection({
 
       <Row className={styles.card_wrap} gutter={[16, 16]}>
         {products.map((product: Product) => (
-          <Col key={product.id} xs={24} sm={12} md={8} lg={4}>
+          <Col key={product.id} sm={12} xs={12} md={8} lg={4}>
             <ProductCard product={product} />
           </Col>
         ))}

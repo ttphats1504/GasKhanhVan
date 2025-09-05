@@ -7,6 +7,7 @@ import Product from '../../../../gkv-admin/src/models/Product'
 import {useEffect, useState} from 'react'
 import Spinner from '../common/Spinner'
 import Category from '@/models/Category'
+import Brand from '@/models/Brand'
 
 interface Props {
   cate: Category
@@ -63,6 +64,20 @@ const GasCylinderPage = ({cate}: Props) => {
   const [category, setCategory] = useState<Category | null>()
   const [banners, setBanners] = useState<string[]>([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [brands, setBrands] = useState<Brand[]>([])
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res: any = await handleAPI('/api/brands', 'get')
+        setBrands(res?.data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchBrands()
+  }, [])
 
   useEffect(() => {
     setProducts([])
@@ -91,8 +106,6 @@ const GasCylinderPage = ({cate}: Props) => {
     fetchData()
   }, [cate.id])
 
-  console.log(products)
-
   if (loading) return <Spinner />
   return (
     <div className={styles.wrapper}>
@@ -105,13 +118,13 @@ const GasCylinderPage = ({cate}: Props) => {
       </Carousel>
 
       <div>
-        <Row>
-          {[...Array(6)].map((_, idx) => (
-            <Col key={idx} span={4}>
+        <Row gutter={[16, 16]} justify='center' className={styles.partners}>
+          {brands.map((brand) => (
+            <Col key={brand.id} xs={12} sm={8} md={4} lg={4}>
               <Image
                 className={styles.partner_image}
-                src='/assets/partners/petro-gas.png'
-                alt='Petro Gas Image'
+                src={brand.image}
+                alt={brand.name}
                 preview={false}
               />
             </Col>
@@ -130,7 +143,7 @@ const GasCylinderPage = ({cate}: Props) => {
               <Row gutter={[16, 16]}>
                 {products.length > 0 ? (
                   products.map((cylinder: any) => (
-                    <Col key={cylinder.id} xs={24} sm={12} md={8} xxl={6}>
+                    <Col key={cylinder.id} xs={12} sm={12} md={8} xxl={6}>
                       <ProductCard product={cylinder} />
                     </Col>
                   ))

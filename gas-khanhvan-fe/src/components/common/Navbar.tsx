@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
-import {Menu, AutoComplete, Input, Image, Typography} from 'antd'
-import {MenuUnfoldOutlined} from '@ant-design/icons'
+import {Menu, AutoComplete, Input, Image, Typography, Drawer, Button} from 'antd'
+import {MenuUnfoldOutlined, MenuOutlined, CloseOutlined} from '@ant-design/icons'
 import type {MenuProps} from 'antd'
 import Link from 'next/link'
 import handleAPI from '@/apis/handleAPI'
@@ -11,7 +11,7 @@ import Category from '@/models/Category'
 import Product from '@/models/Product'
 
 const {Search} = Input
-const {Title, Text} = Typography
+const {Text} = Typography
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -21,6 +21,10 @@ const Navbar = () => {
   const [items, setItems] = useState<MenuItem[]>([])
   const [options, setOptions] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+
+  // 🔹 Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   // 🔹 Find parent key for child navigation
   const findParentKey = (items: any[], slug: string): string | undefined => {
@@ -52,6 +56,7 @@ const Navbar = () => {
     }
     router.push(path)
     setCurrent(e.key)
+    setDrawerOpen(false) // đóng drawer khi chọn
   }
 
   // 🔹 Build menu items
@@ -61,7 +66,7 @@ const Navbar = () => {
       key: 'grouped-category',
       icon: <MenuUnfoldOutlined />,
       children: categories
-        .filter((cat) => cat.slug !== 'tin-tuc') // ❌ bỏ blog trong grouped-category
+        .filter((cat) => cat.slug !== 'tin-tuc')
         .map((cat) => ({
           key: `group-${cat.slug}`,
           label: cat.name,
@@ -71,6 +76,7 @@ const Navbar = () => {
           })),
           onTitleClick: () => {
             router.push(`/${cat.slug}`)
+            setDrawerOpen(false)
           },
         })),
     }
@@ -80,10 +86,11 @@ const Navbar = () => {
       label: cat.name,
       onClick: () => {
         if (cat.slug === 'blog') {
-          router.push('/tin-tuc') // ✅ redirect blog -> tin-tuc
+          router.push('/tin-tuc')
         } else {
           router.push(`/${cat.slug}`)
         }
+        setDrawerOpen(false)
       },
     }))
 
@@ -148,39 +155,98 @@ const Navbar = () => {
 
   const onSelect = (slug: string) => {
     router.push(`/san-pham/${slug}`)
+    setDrawerOpen(false)
   }
 
+  // 🔹 Detect screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   return (
-    <div className={styles.navbar_sticky}>
-      <div className={styles.wrapper}>
-        {/* Logo */}
-        <div className={styles.logo}>
+    <>
+      {isMobile && (
+        <div className={styles.logo_mobile}>
           <Link href='/'>Gas Khánh Vân</Link>
         </div>
+      )}
+      <div className={isMobile ? `${styles.navbar_sticky_mobile}` : `${styles.navbar_sticky}`}>
+        <div className={styles.wrapper}>
+          {/* Desktop Menu */}
+          {!isMobile && (
+            <>
+              {/* Logo */}
+              <div className={styles.logo}>
+                <Link href='/'>Gas Khánh Vân</Link>
+              </div>
+              <Menu
+                onClick={onClick}
+                selectedKeys={[current]}
+                mode='horizontal'
+                items={items}
+                triggerSubMenuAction='hover'
+              />
+              <div className={styles.search_wrap}>
+                <AutoComplete
+                  options={options}
+                  onSelect={onSelect}
+                  onSearch={handleSearch}
+                  notFoundContent={loading ? 'Đang tìm...' : 'Không tìm thấy'}
+                  className={styles.search_box}
+                >
+                  <Search placeholder='Tìm kiếm sản phẩm...' enterButton />
+                </AutoComplete>
+              </div>
+            </>
+          )}
 
-        {/* Menu */}
-        <Menu
-          onClick={onClick}
-          selectedKeys={[current]}
-          mode='horizontal'
-          items={items}
-          triggerSubMenuAction='hover'
-        />
-
-        {/* Search box */}
-        <div className={styles.search_wrap}>
-          <AutoComplete
-            options={options}
-            onSelect={onSelect}
-            onSearch={handleSearch}
-            notFoundContent={loading ? 'Đang tìm...' : 'Không tìm thấy'}
-            className={styles.search_box}
-          >
-            <Search placeholder='Tìm kiếm sản phẩm...' enterButton />
-          </AutoComplete>
+          {/* Mobile Menu Button */}
+          {isMobile && (
+            <div className={styles.mobile_header}>
+              {/* Drawer Button */}
+              <Button
+                type='text'
+                icon={<MenuOutlined />}
+                onClick={() => setDrawerOpen(true)}
+                className={styles.mobileMenuBtn}
+              />
+              {/* Search in center */}
+              <div className={styles.search_wrap_mobile}>
+                <AutoComplete
+                  options={options}
+                  onSelect={onSelect}
+                  onSearch={handleSearch}
+                  notFoundContent={loading ? 'Đang tìm...' : 'Không tìm thấy'}
+                  className={styles.search_box_mobile}
+                >
+                  <Search placeholder='Tìm sản phẩm...' enterButton={false} />
+                </AutoComplete>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Drawer for Mobile */}
+        <Drawer
+          title='Menu'
+          placement='left'
+          closable
+          onClose={() => setDrawerOpen(false)}
+          open={drawerOpen}
+          closeIcon={<CloseOutlined />}
+        >
+          <div className={styles.logo}>
+            <Link href='/'>Gas Khánh Vân</Link>
+          </div>
+          <Menu onClick={onClick} selectedKeys={[current]} mode='inline' items={items} />
+        </Drawer>
       </div>
-    </div>
+    </>
   )
 }
 

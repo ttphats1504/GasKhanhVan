@@ -30,8 +30,22 @@
   box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.2);
 }
 
+.navbar_sticky_mobile {
+  padding: 0 10px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #fff;
+  border-bottom: 1px solid #cacaca;
+  box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.2);
+}
+
 .search_box {
   width: 28rem !important;
+}
+.search_box_mobile {
+  width: 100% !important;
 }
 
 .search_wrap {
@@ -67,4 +81,24 @@
   font-size: 15px;
   font-weight: 500;
   color: #d4380d;
+}
+
+.mobile_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.search_wrap_mobile {
+  flex: 1;
+  width: 20rem; // search chiếm vừa đủ
+}
+
+.logo_mobile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 15px auto;
 }

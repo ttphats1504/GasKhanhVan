@@ -1,6 +1,4 @@
-import {Col, Flex, Row} from 'antd'
-import {Typography} from 'antd'
-
+import {Col, Flex, Row, Typography} from 'antd'
 import styles from '../../styles/common/Footer.module.scss'
 
 const {Title} = Typography
@@ -9,8 +7,9 @@ const Footer = () => {
   return (
     <>
       <footer className={styles.footer_container}>
-        <Row>
-          <Col span={8}>
+        <Row gutter={[16, 16]}>
+          {/* Logo + mô tả */}
+          <Col xs={24} md={8}>
             <Flex vertical>
               <div className={styles.logo}>LOGO</div>
               <div className={styles.description}>
@@ -20,9 +19,11 @@ const Footer = () => {
               </div>
             </Flex>
           </Col>
-          <Col span={16}>
-            <Row>
-              <Col span={6}>
+
+          {/* Menu cột */}
+          <Col xs={24} md={16}>
+            <Row gutter={[16, 16]}>
+              <Col xs={12} sm={12} md={6}>
                 <Title level={5}>VỀ CHÚNG TÔI</Title>
                 <ul className={styles.menu_list}>
                   <li>Giới thiệu Gas Khánh Vân</li>
@@ -31,7 +32,8 @@ const Footer = () => {
                   <li>Khách hàng tiêu biểu</li>
                 </ul>
               </Col>
-              <Col span={6}>
+
+              <Col xs={12} sm={12} md={6}>
                 <Title level={5}>CÁC CHÍNH SÁCH</Title>
                 <ul className={styles.menu_list}>
                   <li>Chính sách giao hàng</li>
@@ -40,7 +42,8 @@ const Footer = () => {
                   <li>Bảo mật thông tin</li>
                 </ul>
               </Col>
-              <Col span={6}>
+
+              <Col xs={12} sm={12} md={6}>
                 <Title level={5}>DANH MỤC SẢN PHẨM</Title>
                 <ul className={styles.menu_list}>
                   <li>Bình gas gia đình</li>
@@ -49,7 +52,8 @@ const Footer = () => {
                   <li>Dịch vụ lắp đặt</li>
                 </ul>
               </Col>
-              <Col span={6}>
+
+              <Col xs={12} sm={12} md={6}>
                 <Title level={5}>THÔNG TIN LIÊN HỆ</Title>
                 <ul className={styles.menu_list}>
                   <li>Đại lý Gas Khánh Vân - Quận 7</li>
@@ -62,6 +66,7 @@ const Footer = () => {
           </Col>
         </Row>
       </footer>
+
       <div className={styles.footer_mark}>
         © {`${new Date().getFullYear()}`} Gas Khánh Vân - Đại lý Gas Quận 7, Cửa hàng Gas Quận 7.
         Giao gas tận nơi nhanh chóng và uy tín. All Rights Reserved.

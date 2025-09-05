@@ -3,7 +3,7 @@ import {Flex, Image, Spin, message} from 'antd'
 import Container from './Container'
 import styles from '../../styles/common/Incentives.module.scss'
 import handleAPI from '../../apis/handleAPI'
-import Incentive from '../../models/Incentive' // assuming it has id, name, image
+import Incentive from '../../models/Incentive'
 
 const Incentives = () => {
   const [incentives, setIncentives] = useState<Incentive[]>([])
@@ -15,12 +15,11 @@ const Incentives = () => {
       try {
         const data: any = await handleAPI('/api/incentives', 'get')
         if (data && data.length > 0) {
-          // Sort incentives by order
           const sortedData = data.sort((a: any, b: any) => a.order - b.order)
           setIncentives(sortedData)
         }
       } catch (error) {
-        message.error('Failed to load incentives')
+        message.error('Không thể tải ưu đãi')
       } finally {
         setLoading(false)
       }
@@ -32,31 +31,27 @@ const Incentives = () => {
   return (
     <div className={styles.background}>
       <Container>
-        <div className={styles.wrap}>
-          {loading ? (
+        {loading ? (
+          <Flex align='center' justify='center' style={{minHeight: 200}}>
             <Spin size='large' />
-          ) : (
-            incentives.map((item) => (
-              <Flex
-                key={item.id}
-                gap='middle'
-                vertical
-                align='center'
-                justify='center'
-                className={styles.item}
-              >
+          </Flex>
+        ) : (
+          <div className={styles.grid}>
+            {incentives.map((item) => (
+              <Flex key={item.id} vertical align='center' justify='center' className={styles.item}>
                 <Image
                   src={item.image}
                   alt={item.name}
                   preview={false}
                   width={80}
+                  height={80}
                   style={{objectFit: 'contain'}}
                 />
-                <span>{item.name}</span>
+                <span className={styles.name}>{item.name}</span>
               </Flex>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </Container>
     </div>
   )

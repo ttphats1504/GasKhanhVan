@@ -33,6 +33,8 @@ const PromotionCarousel = () => {
               alt={`Banner ${banner.id}`}
               preview={false}
               className={styles.image_content}
+              width='100%'
+              height='auto'
             />
           </div>
         ))}
