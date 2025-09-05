@@ -89,7 +89,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const loadData = async () => {
       try {
         const [catRes, brandRes]: any = await Promise.all([fetchCategoryDatas(), fetchBrandDatas()])
-        setCategories(catRes)
+        const filterCat = catRes.filter((cat: any) => cat.slug !== 'tin-tuc')
+        setCategories(filterCat)
         setBrands(brandRes.data)
       } catch (err) {
         message.error('Failed to load categories or brands')
@@ -175,6 +176,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             placeholder='Select category'
             fieldNames={{label: 'name', value: 'id', children: 'children'}}
             showSearch
+            changeOnSelect // 👈 cho phép chọn cả parent
           />
         </Form.Item>
 

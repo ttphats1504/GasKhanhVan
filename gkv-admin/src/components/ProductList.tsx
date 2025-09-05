@@ -54,7 +54,8 @@ const ProductList: React.FC = () => {
     const loadCategories = async () => {
       const res: any = await fetchCategories()
       if (res && res.length > 0) {
-        setCategories(res)
+        const filterCat = res.filter((cat: any) => cat.slug !== 'tin-tuc')
+        setCategories(filterCat)
         // chọn category đầu tiên mặc định
         setActiveTypeId(res[0].slug === 'san-pham' ? '' : res[0].id)
         setActiveSlug(res[0].slug)
