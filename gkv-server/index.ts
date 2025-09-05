@@ -25,42 +25,32 @@ const PORT = process.env.PORT || 3001
 const dbURL = `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@cluster0.dh8fo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
 const app = express()
 const bodyParser = require('body-parser')
-const corsOptions = {
-  origin: [
-    'https://gkv-admin-fe.vercel.app',
-    'https://gaskhanhvanquan7.vercel.app',
-    'https://www.gaskhanhvan.com',
-    'https://www.gaskhanhvan.com/',
-  ], // replace with your actual Vercel frontend domain
-  credentials: true, // if you're using cookies or authorization headers
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization', 'X-Request-With'],
-}
 const allowedOrigins = [
   'https://gkv-admin-fe.vercel.app',
   'https://gaskhanhvanquan7.vercel.app',
+  'https://www.gaskhanhvan.com',
   'http://localhost:3000',
   'http://localhost:3002',
-  'https://www.gaskhanhvan.com',
-  'http://www.gaskhanhvan.com',
+  'http://103.72.99.119:3001', // thêm luôn IP nếu bạn test trực tiếp
 ]
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin as string
-  if (allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin)
-    res.header('Access-Control-Allow-Credentials', 'true')
-    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS')
-    res.header(
-      'Access-Control-Allow-Headers',
-      'Origin,Content-Type,Accept,Authorization,X-Requested-With'
-    )
-  }
-  next()
-})
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization', 'X-Requested-With'],
+  })
+)
 
-app.options('*', cors(corsOptions))
-app.use(cors(corsOptions))
+// xử lý preflight cho tất cả route
+app.options('*', cors())
 app.use(express.json())
 app.use(
   bodyParser.urlencoded({
