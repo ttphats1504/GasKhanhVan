@@ -18,13 +18,16 @@ import {
   Flex,
   Pagination,
 } from 'antd'
-import {GiftOutlined, MessageOutlined, PhoneOutlined} from '@ant-design/icons'
+import {CheckCircleOutlined, GiftOutlined, MessageOutlined, PhoneOutlined} from '@ant-design/icons'
 import MainLayout from '@/layouts/MainLayout'
 import ProductCard from '@/components/common/ProductCard'
 import handleAPI from '@/apis/handleAPI'
 import Product from '@/models/Product'
 import formatCurrency from '@/utils/formatCurrency'
 import styles from '@/styles/gascylinder/ProductDetailsPage.module.scss'
+import {Modal} from 'antd'
+import {RobotOutlined, LoadingOutlined} from '@ant-design/icons'
+import DOMPurify from 'dompurify'
 
 const {Title, Text, Paragraph} = Typography
 
@@ -49,6 +52,37 @@ const ProductDetail: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(4)
+  const [aiVisible, setAiVisible] = useState(false)
+  const [aiAnswer, setAiAnswer] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
+
+  const handleAskAI = async (question: string) => {
+    if (!product) return
+    try {
+      setAiLoading(true)
+      setAiAnswer('')
+
+      const response: any = await handleAPI(
+        '/api/products/ask-ai',
+        'post',
+        {
+          Id: product.id,
+          question,
+        },
+        {
+          'Content-Type': 'application/json',
+        }
+      )
+      const cleanHtml = DOMPurify.sanitize(response.html)
+      const stripMarkdown = cleanHtml.replace(/```[html]*|```/g, '')
+      setAiAnswer(stripMarkdown)
+    } catch (err) {
+      console.error('Ask AI error:', err)
+      setAiAnswer('Xin lỗi, AI hiện không phản hồi được. Vui lòng thử lại sau.')
+    } finally {
+      setAiLoading(false)
+    }
+  }
 
   // 🔹 Detect screen size
   useEffect(() => {
@@ -165,6 +199,26 @@ const ProductDetail: React.FC = () => {
                     {/* Info */}
                     <Col xs={24} md={14}>
                       <Title level={3}>{product.name}</Title>
+                      <Button
+                        type='primary'
+                        shape='round'
+                        icon={aiLoading ? <LoadingOutlined spin /> : <RobotOutlined />}
+                        onClick={() => {
+                          setAiVisible(true)
+                          handleAskAI(
+                            'Bạn có thể tư vấn về sản phẩm này không? và cho tôi xin review của những người khác khi dùng sản phẩm này, có dẫn link cụ thể thì càng tốt'
+                          )
+                        }}
+                        disabled={aiLoading}
+                        style={{
+                          background: 'linear-gradient(90deg,#36d1dc,#5b86e5)',
+                          border: 'none',
+                          transition: 'all 0.3s ease',
+                        }}
+                      >
+                        {aiLoading ? 'Đang tư vấn...' : 'AI tư vấn'}
+                      </Button>
+
                       <Flex gap='middle' align='center'>
                         <Rate allowHalf disabled defaultValue={4.5} style={{fontSize: '16px'}} />
                         <Text type='secondary'>
@@ -400,6 +454,42 @@ const ProductDetail: React.FC = () => {
       ) : (
         <Text>Không tìm thấy sản phẩm.</Text>
       )}
+      <Modal
+        title={
+          <Flex align='center' gap={8}>
+            <RobotOutlined style={{color: '#764ba2'}} />
+            <span>AI Tư Vấn Sản Phẩm</span>
+          </Flex>
+        }
+        open={aiVisible}
+        onCancel={() => setAiVisible(false)}
+        footer={null}
+        centered
+      >
+        {aiLoading ? (
+          <Flex align='center' justify='center' style={{minHeight: 120}}>
+            <LoadingOutlined style={{fontSize: 28, color: '#764ba2'}} spin />
+          </Flex>
+        ) : (
+          <Card
+            bordered={false}
+            style={{
+              background: '#fafafa',
+              borderRadius: 12,
+              padding: 16,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+              maxHeight: '60vh',
+              overflowY: 'auto',
+            }}
+          >
+            {aiAnswer ? (
+              <div className={styles.ai_answer} dangerouslySetInnerHTML={{__html: aiAnswer}} />
+            ) : (
+              <Paragraph type='secondary'>AI chưa có câu trả lời.</Paragraph>
+            )}
+          </Card>
+        )}
+      </Modal>
     </MainLayout>
   )
 }

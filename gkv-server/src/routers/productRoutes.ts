@@ -9,6 +9,7 @@ import {
   setFeatured,
   updateProduct,
   deleteProduct,
+  askGemini,
 } from '../controllers/productsController'
 import upload from '../utils/multer'
 
@@ -22,5 +23,6 @@ router.get('/slug/:slug', getProductBySlug)
 router.patch('/:id/featured', setFeatured)
 router.put('/:id', upload.single('image'), updateProduct)
 router.delete('/:id', deleteProduct)
+router.post('/ask-ai', askGemini)
 
 export default router

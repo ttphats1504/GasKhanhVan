@@ -4,6 +4,10 @@ import cloudinary from '../config/cloudinary'
 import streamifier from 'streamifier'
 import {slugify} from '../utils/slugify'
 import {Op} from 'sequelize'
+import {GoogleGenerativeAI} from '@google/generative-ai'
+import sanitizeHtml from 'sanitize-html'
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string)
 
 // Create
 export const addProduct = async (req: Request, res: Response) => {
@@ -215,5 +219,106 @@ export const deleteProduct = async (req: Request, res: Response) => {
     res.status(200).json({message: 'Product deleted successfully'})
   } catch (err) {
     res.status(500).json({error: (err as Error).message})
+  }
+}
+
+// AI tư vấn sản phẩm theo id
+export const askGemini = async (req: Request, res: Response) => {
+  try {
+    const {Id, question} = req.body
+    const product = await Product.findByPk(Id)
+    if (!product) {
+      res.status(404).json({message: 'Sản phẩm không tồn tại'})
+    } else {
+      const model = genAI.getGenerativeModel({model: 'gemini-1.5-flash'})
+
+      const prompt = `
+Bạn là trợ lý tư vấn sản phẩm chuyên nghiệp. 
+Dưới đây là thông tin sản phẩm:
+[THÔNG TIN SẢN PHẨM]
+Tên: ${product.name}
+Mô tả: ${product.description}
+Giá: ${product.price} VND
+- Dùng tên sản phẩm để tìm thêm thông tin trên Google
+
+[NGƯỜI DÙNG HỎI]
+${question}
+
+Yêu cầu trả **DUY NHẤT** HTML (không kèm text giải thích ngoài HTML). 
+
+[HƯỚNG DẪN XUẤT KẾT QUẢ]
+- Trả lời dưới dạng HTML hợp lệ (chỉ dùng <h3>, <p>, <ul>, <li>, <b>, <a>)
+- Không thêm Markdown (ví dụ dấu gạch ngang, in đậm, code block)
+- Không thêm bất kỳ văn bản ngoài HTML
+- Tiêu đề chính <h3>
+- Đoạn tóm tắt ngắn trong <p>
+- Mục "Ưu điểm" và "Hạn chế" dưới dạng <ul><li>
+- Gợi ý "Ai phù hợp" dưới dạng <p><strong>Ai phù hợp:</strong> ...
+- Gợi ý hành động (CTA) dưới dạng <a href="..." class="btn-cta">Mua ngay</a>
+- Nếu có gợi ý sản phẩm thay thế, đưa dưới danh sách có link (dùng <a>)
+- Tránh javascript inline (không dùng <script>), chỉ HTML thuần.
+
+Ví dụ format trả về:
+<h3>Tiêu đề</h3>
+<p>tóm tắt...</p>
+<ul><li>Ưu: ...</li><li>Ưu: ...</li></ul>
+<ul><li>Hạn chế: ...</li></ul>
+<p><strong>Ai phù hợp:</strong> ...</p>
+<p><a href="https://example.com/product/123" class="btn-cta">Mua ngay</a></p>
+
+Trả HTML ngắn gọn, thân thiện, tối đa ~300 từ.
+    `
+
+      const result = await model.generateContent(prompt)
+      let html = result.response.text()
+
+      // sanitize: chỉ cho phép các tag cần thiết và attribute href
+      const clean = sanitizeHtml(html, {
+        allowedTags: [
+          'h1',
+          'h2',
+          'h3',
+          'h4',
+          'h5',
+          'h6',
+          'b',
+          'i',
+          'strong',
+          'em',
+          'u',
+          'p',
+          'ul',
+          'ol',
+          'li',
+          'a',
+          'br',
+          'span',
+          'div',
+        ],
+        allowedAttributes: {
+          a: ['href', 'target', 'rel', 'title'],
+          span: ['class'],
+          div: ['class'],
+        },
+        transformTags: {
+          a: function (tagName, attribs) {
+            // ensure links open in new tab and no referrer
+            return {
+              tagName: 'a',
+              attribs: {
+                href: attribs.href || '#',
+                target: '_blank',
+                rel: 'noopener noreferrer nofollow',
+              },
+            }
+          },
+        },
+      })
+
+      res.json({html: clean})
+    }
+  } catch (err: any) {
+    console.error('Gemini error:', err)
+    res.status(500).json({error: err.message})
   }
 }
