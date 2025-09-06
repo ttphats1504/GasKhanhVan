@@ -16,21 +16,15 @@ import {
   Tag,
   Rate,
   Flex,
-  List,
+  Pagination,
 } from 'antd'
-import {
-  CheckCircleOutlined,
-  GiftOutlined,
-  MessageOutlined,
-  PhoneOutlined,
-  ShoppingCartOutlined,
-} from '@ant-design/icons'
+import {GiftOutlined, MessageOutlined, PhoneOutlined} from '@ant-design/icons'
 import MainLayout from '@/layouts/MainLayout'
 import ProductCard from '@/components/common/ProductCard'
 import handleAPI from '@/apis/handleAPI'
 import Product from '@/models/Product'
 import formatCurrency from '@/utils/formatCurrency'
-import CategoryLayout from '@/layouts/CategoryLayout'
+import styles from '@/styles/gascylinder/ProductDetailsPage.module.scss'
 
 const {Title, Text, Paragraph} = Typography
 
@@ -50,6 +44,21 @@ const ProductDetail: React.FC = () => {
   const [outstandingProducts, setOutstandingProducts] = useState<Product[]>([])
   const [product, setProduct] = useState<Product>()
   const [loading, setLoading] = useState(true)
+  const [savePrice, setSavePrice] = useState(0)
+  const [expand, setExpand] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(4)
+
+  // 🔹 Detect screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -81,8 +90,32 @@ const ProductDetail: React.FC = () => {
         setRelatedProducts(relatedProducts)
         setOutstandingProducts(outstandingProducts)
       })
+
+      const saved: any = product.old_price - product.price
+      setSavePrice(saved)
     }
   }, [slug, product])
+
+  const updatePageSize = () => {
+    if (window.innerWidth < 576) {
+      setPageSize(2) // mobile
+    } else if (window.innerWidth < 992) {
+      setPageSize(3) // tablet
+    } else {
+      setPageSize(4) // desktop
+    }
+  }
+
+  useEffect(() => {
+    updatePageSize()
+    window.addEventListener('resize', updatePageSize)
+    return () => window.removeEventListener('resize', updatePageSize)
+  }, [])
+
+  const pagedRelatedProducts = relatedProducts.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  )
 
   if (loading) {
     return (
@@ -148,10 +181,17 @@ const ProductDetail: React.FC = () => {
                         <Text style={{fontSize: 14}}>(Đã bao gồm VAT)</Text>
                       </Title>
                       <Text delete type='secondary'>
-                        Giá Thị Trường: 515.000 đ
+                        Giá Thị Trường:{' '}
+                        {product.old_price > 0
+                          ? formatCurrency(product.old_price)
+                          : formatCurrency(product.price)}
                       </Text>
                       <br />
-                      <Tag color='red'>Tiết Kiệm 60.000 đ</Tag>
+                      {savePrice > 0 ? (
+                        <Tag color='red'>Tiết Kiệm {formatCurrency(savePrice)}</Tag>
+                      ) : (
+                        <Tag color='green'>Giá tốt</Tag>
+                      )}
 
                       {/* CTA Buttons */}
                       <Row gutter={[16, 16]} style={{margin: '14px 0px'}}>
@@ -230,7 +270,32 @@ const ProductDetail: React.FC = () => {
                       {
                         key: '1',
                         label: 'Thông tin sản phẩm',
-                        children: <div dangerouslySetInnerHTML={{__html: product.description2}} />,
+                        children: (
+                          <>
+                            {isMobile ? (
+                              <>
+                                <div
+                                  style={{
+                                    maxHeight: expand ? 'none' : 300,
+                                    overflow: 'hidden',
+                                  }}
+                                  dangerouslySetInnerHTML={{__html: product.description2}}
+                                  className={styles.description2}
+                                />
+                                <Button type='link' onClick={() => setExpand(!expand)}>
+                                  {expand ? 'Thu gọn' : 'Xem thêm'}
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <div
+                                  dangerouslySetInnerHTML={{__html: product.description2}}
+                                  className={styles.description2}
+                                />
+                              </>
+                            )}
+                          </>
+                        ),
                       },
                       {
                         key: '2',
@@ -307,8 +372,8 @@ const ProductDetail: React.FC = () => {
           <Col xs={24} style={{marginTop: 40}}>
             <Title level={3}>Sản phẩm liên quan</Title>
             <Row gutter={[16, 16]}>
-              {relatedProducts.length > 0 ? (
-                relatedProducts.map((relatedProduct: Product) => (
+              {pagedRelatedProducts.length > 0 ? (
+                pagedRelatedProducts.map((relatedProduct: Product) => (
                   <Col key={relatedProduct.id} xs={24} sm={12} md={8} lg={6}>
                     <ProductCard product={relatedProduct} />
                   </Col>
@@ -317,6 +382,19 @@ const ProductDetail: React.FC = () => {
                 <Text>Không tìm thấy sản phẩm liên quan.</Text>
               )}
             </Row>
+
+            {/* Pagination */}
+            {relatedProducts.length > pageSize && (
+              <Row justify='center' style={{marginTop: 20}}>
+                <Pagination
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={relatedProducts.length}
+                  onChange={(page) => setCurrentPage(page)}
+                  responsive
+                />
+              </Row>
+            )}
           </Col>
         </Row>
       ) : (

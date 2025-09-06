@@ -1,30 +1,55 @@
 import {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
-import {Menu, AutoComplete, Input, Image, Typography, Drawer, Button} from 'antd'
-import {MenuUnfoldOutlined, MenuOutlined, CloseOutlined} from '@ant-design/icons'
+import {Menu, AutoComplete, Input, Image, Typography, Drawer, Button, Card, Flex} from 'antd'
+import {
+  MenuUnfoldOutlined,
+  MenuOutlined,
+  CloseOutlined,
+  LockOutlined,
+  SearchOutlined,
+  PhoneOutlined,
+} from '@ant-design/icons'
 import type {MenuProps} from 'antd'
 import Link from 'next/link'
 import handleAPI from '@/apis/handleAPI'
-import styles from '../../styles/common/Navbar.module.scss'
+import styles from '../../styles/common/SearchHeader.module.scss'
 import formatCurrency from '@/utils/formatCurrency'
 import Category from '@/models/Category'
 import Product from '@/models/Product'
+import {fail} from 'assert'
 
 const {Search} = Input
 const {Text} = Typography
 
 type MenuItem = Required<MenuProps>['items'][number]
 
-const Navbar = () => {
+const SearchHeader = () => {
   const router = useRouter()
   const [current, setCurrent] = useState<string>('category')
   const [items, setItems] = useState<MenuItem[]>([])
   const [options, setOptions] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [openKeys, setOpenKeys] = useState<string[]>([])
 
   // 🔹 Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    if (drawerOpen) {
+      const groupKeys: string[] = []
+      const collectKeys = (items: any[]) => {
+        items.forEach((item) => {
+          if (item.children && item.key) {
+            groupKeys.push(item.key as string)
+            collectKeys(item.children)
+          }
+        })
+      }
+      collectKeys(items)
+      setOpenKeys(groupKeys)
+    }
+  }, [drawerOpen, items])
 
   // 🔹 Find parent key for child navigation
   const findParentKey = (items: any[], slug: string): string | undefined => {
@@ -139,7 +164,7 @@ const Navbar = () => {
                 <div className={styles.suggest_name}>{p.name}</div>
                 <div className={styles.suggest_price}>{formatCurrency(p.price)}</div>
                 <Text delete type='secondary' style={{fontSize: 13}}>
-                  {formatCurrency(p.old_price)}
+                  {p.old_price > 0 ? formatCurrency(p.old_price) : formatCurrency(p.price)}
                 </Text>
               </div>
             </Link>
@@ -170,22 +195,111 @@ const Navbar = () => {
 
   return (
     <>
-      <div className={isMobile ? `${styles.navbar_sticky_mobile}` : `${styles.navbar_sticky}`}>
+      {isMobile && (
+        <div className={styles.logo_mobile}>
+          <Image src='/assets/logo.png' alt='Gas quan 7' width={84} height={84} preview={false} />
+        </div>
+      )}
+      <div className={isMobile ? `${styles.header_sticky_mobile}` : `${styles.header_sticky}`}>
         <div className={styles.wrapper}>
           {/* Desktop Menu */}
           {!isMobile && (
-            <Menu
-              onClick={onClick}
-              selectedKeys={[current]}
-              mode='horizontal'
-              items={items}
-              triggerSubMenuAction='hover'
-            />
+            <>
+              {/* Logo */}
+              <div className={styles.logo}>
+                <Link href='/'>
+                  <Image
+                    src='/assets/logo.png'
+                    alt='Gas quan 7'
+                    width={124}
+                    height={124}
+                    preview={false}
+                  />
+                </Link>
+              </div>
+              <div className={styles.search_wrap}>
+                <AutoComplete
+                  options={options}
+                  onSelect={onSelect}
+                  onSearch={handleSearch}
+                  notFoundContent={loading ? 'Đang tìm...' : 'Không tìm thấy'}
+                  className={styles.search_box}
+                >
+                  <Input placeholder='Tìm sản phẩm...' prefix={<SearchOutlined />} />
+                </AutoComplete>
+              </div>
+              <Button
+                type='primary'
+                icon={<PhoneOutlined />}
+                className={styles.contact_btn}
+                href='tel:09393910202'
+              >
+                <Flex vertical>
+                  <span>09393910202</span>
+                  <span>Gọi ngay</span>
+                </Flex>
+              </Button>
+            </>
+          )}
+
+          {/* Mobile Menu Button */}
+          {isMobile && (
+            <div className={styles.mobile_header}>
+              {/* Drawer Button */}
+              <Button
+                type='text'
+                icon={<MenuOutlined />}
+                onClick={() => setDrawerOpen(true)}
+                className={styles.mobileMenuBtn}
+              />
+              {/* Search in center */}
+              <div className={styles.search_wrap_mobile}>
+                <AutoComplete
+                  options={options}
+                  onSelect={onSelect}
+                  onSearch={handleSearch}
+                  notFoundContent={loading ? 'Đang tìm...' : 'Không tìm thấy'}
+                  className={styles.search_box_mobile}
+                >
+                  <Input placeholder='Tìm sản phẩm...' prefix={<SearchOutlined />} />
+                </AutoComplete>
+              </div>
+            </div>
           )}
         </div>
+
+        {/* Drawer for Mobile */}
+        <Drawer
+          title='Menu'
+          placement='left'
+          closable
+          onClose={() => setDrawerOpen(false)}
+          open={drawerOpen}
+          closeIcon={<CloseOutlined />}
+        >
+          <div className={styles.logo}>
+            <Link href='/'>
+              <Image
+                src='/assets/logo.png'
+                alt='Gas quan 7'
+                preview={false}
+                width={84}
+                height={84}
+              />
+            </Link>
+          </div>
+          <Menu
+            onClick={onClick}
+            selectedKeys={[current]}
+            mode='inline'
+            items={items}
+            openKeys={openKeys}
+            onOpenChange={(keys) => setOpenKeys(keys as string[])}
+          />
+        </Drawer>
       </div>
     </>
   )
 }
 
-export default Navbar
+export default SearchHeader

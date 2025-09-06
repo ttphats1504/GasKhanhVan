@@ -5,6 +5,7 @@ import HeadTag from '@/components/home/HeadTag'
 
 import styles from '../styles/layouts/CategoryLayout.module.scss'
 import Footer from '@/components/common/Footer'
+import SearchHeader from '@/components/common/SearchHeader'
 
 const {Content} = Layout
 
@@ -27,6 +28,7 @@ export default function CategoryLayout({children}: CategoryLayoutProps) {
   return (
     <Layout>
       <HeadTag />
+      <SearchHeader />
       <Navbar />
       <Content className={isMobile ? `${styles.container_mobile}` : styles.container}>
         <main>{children}</main>

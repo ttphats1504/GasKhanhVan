@@ -1,0 +1,29 @@
+.description2 {
+  max-width: 100%;
+  overflow-wrap: break-word; /* Cho text dài xuống dòng */
+  word-break: break-word;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+/* Responsive cho ảnh trong content */
+.description2 img {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block;
+  margin: 10px auto;
+}
+
+/* Responsive cho bảng */
+.description2 table {
+  width: 100% !important;
+  border-collapse: collapse;
+  overflow-x: auto;
+  display: block; /* Cho phép scroll ngang */
+}
+
+.description2 td,
+.description2 th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
