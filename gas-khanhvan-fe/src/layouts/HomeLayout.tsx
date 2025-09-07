@@ -29,7 +29,7 @@ export default function HomeLayout({children}: HomeLayoutProps) {
       <HeadTag />
       <SearchHeader />
       <Navbar />
-      <Content className={isMobile ? `${styles.container_home_mobile}` : styles.container}>
+      <Content className={isMobile ? `${styles.container_home_mobile}` : styles.container_home}>
         <main>{children}</main>
       </Content>
       <Footer />

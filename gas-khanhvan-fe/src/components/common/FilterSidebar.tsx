@@ -1,6 +1,6 @@
 import {Typography, Menu} from 'antd'
 import type {MenuProps} from 'antd'
-import {FilterOutlined, FireOutlined} from '@ant-design/icons'
+import {AppstoreOutlined, FilterOutlined, FireOutlined} from '@ant-design/icons'
 import styles from '@/styles/common/FilterSideBar.module.scss'
 import {useEffect, useState} from 'react'
 import handleAPI from '@/apis/handleAPI'
@@ -84,9 +84,11 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
       .map((cat: any) => ({
         key: cat.slug,
         label: cat.name,
+        icon: <AppstoreOutlined />,
         children: cat.children?.map((subCat: any) => ({
           key: subCat.slug,
           label: subCat.name,
+          icon: <FireOutlined />,
         })),
         onTitleClick: () => {
           router.push(`/${cat.slug}`)

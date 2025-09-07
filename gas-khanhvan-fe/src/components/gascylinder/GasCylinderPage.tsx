@@ -8,6 +8,8 @@ import {useEffect, useState} from 'react'
 import Spinner from '../common/Spinner'
 import Category from '@/models/Category'
 import Brand from '@/models/Brand'
+import Slider from 'react-slick'
+import {LeftOutlined, RightOutlined} from '@ant-design/icons'
 
 interface Props {
   cate: Category
@@ -66,6 +68,16 @@ const GasCylinderPage = ({cate}: Props) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [brands, setBrands] = useState<Brand[]>([])
 
+  const NextArrow = (props: any) => {
+    const {className, onClick} = props
+    return <div className={className} onClick={onClick}></div>
+  }
+
+  const PrevArrow = (props: any) => {
+    const {className, onClick} = props
+    return <div className={className} onClick={onClick}></div>
+  }
+
   useEffect(() => {
     const fetchBrands = async () => {
       try {
@@ -117,33 +129,52 @@ const GasCylinderPage = ({cate}: Props) => {
         ))}
       </Carousel>
 
-      <div>
-        <Row gutter={[16, 16]} justify='center' className={styles.partners}>
+      <div className={styles.partner_slider}>
+        <Slider
+          autoplay
+          autoplaySpeed={2000}
+          infinite
+          slidesToShow={6}
+          slidesToScroll={1}
+          arrows={true} // bật arrow
+          nextArrow={<NextArrow />} // arrow next
+          prevArrow={<PrevArrow />} // arrow prev
+          dots={false}
+          responsive={[
+            {breakpoint: 1200, settings: {slidesToShow: 5}},
+            {breakpoint: 992, settings: {slidesToShow: 4}},
+            {breakpoint: 768, settings: {slidesToShow: 3}},
+            {breakpoint: 480, settings: {slidesToShow: 2}},
+          ]}
+        >
           {brands.map((brand) => (
-            <Col key={brand.id} xs={12} sm={8} md={4} lg={4}>
+            <div key={brand.id}>
               <Image
-                className={styles.partner_image}
                 src={brand.image}
                 alt={brand.name}
                 preview={false}
+                className={styles.partner_image}
               />
-            </Col>
+            </div>
           ))}
-        </Row>
+        </Slider>
       </div>
 
       <div>
         <Row gutter={32}>
-          <Col sm={24} md={6}>
+          {/* Sidebar */}
+          <Col xs={24} md={6}>
             <FilterSideBar title='Danh mục sản phẩm' />
           </Col>
-          <Col sm={24} md={18}>
+
+          {/* Content */}
+          <Col xs={24} md={18}>
             <Flex vertical>
               {category && <Title level={3}>{category.name}</Title>}
               <Row gutter={[16, 16]}>
                 {products.length > 0 ? (
                   products.map((cylinder: any) => (
-                    <Col key={cylinder.id} xs={12} sm={12} md={8} xxl={6}>
+                    <Col key={cylinder.id} xs={12} sm={12} md={8} lg={8} xl={8} xxl={6}>
                       <ProductCard product={cylinder} />
                     </Col>
                   ))

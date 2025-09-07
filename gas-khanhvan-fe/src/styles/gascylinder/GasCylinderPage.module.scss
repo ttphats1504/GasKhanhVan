@@ -31,3 +31,98 @@
     }
   }
 }
+
+.wrapper {
+  padding: 16px;
+
+  @media (min-width: 768px) {
+    padding: 24px;
+  }
+
+  @media (min-width: 1200px) {
+    padding: 32px;
+  }
+}
+
+.carousel {
+  margin-bottom: 16px;
+
+  .carousel_image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+
+    @media (min-width: 768px) {
+      height: 300px;
+    }
+
+    @media (min-width: 1200px) {
+      height: 400px;
+    }
+  }
+}
+
+.partner_slider {
+  position: relative;
+  margin: 24px 0;
+
+  :global(.slick-slide) {
+    display: flex !important;
+    justify-content: center; // căn giữa ngang
+    align-items: center; // căn giữa dọc
+  }
+
+  .partner_image {
+    max-height: 84px; // chiều cao đồng nhất
+    object-fit: contain; // giữ tỷ lệ
+    padding: 8px;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  :global(.slick-arrow) {
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+    background-color: var(--primary-yellow-700);
+    color: #fff;
+    border-radius: 50%;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    // &:hover {
+    //   background-color: var(--primary-yellow-800);
+    //   transform: scale(1.1);
+    // }
+  }
+
+  :global(.slick-prev) {
+    left: -10px;
+
+    @media (max-width: 768px) {
+      left: -5px; // thu nhỏ khoảng cách trên mobile
+    }
+  }
+
+  :global(.slick-next) {
+    right: -10px;
+
+    @media (max-width: 768px) {
+      right: -5px; // thu nhỏ khoảng cách trên mobile
+    }
+  }
+
+  :global(.slick-slide) {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+  }
+}
