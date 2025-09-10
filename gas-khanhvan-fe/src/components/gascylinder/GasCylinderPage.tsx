@@ -8,13 +8,14 @@ import {useEffect, useState} from 'react'
 import Spinner from '../common/Spinner'
 import Category from '@/models/Category'
 import Brand from '@/models/Brand'
-import Slider from 'react-slick'
+import dynamic from 'next/dynamic'
 import {LeftOutlined, RightOutlined} from '@ant-design/icons'
 
 interface Props {
   cate: Category
 }
 
+const Slider = dynamic(() => import('react-slick'), {ssr: false})
 const {Title} = Typography
 
 const fetchProductDatas = async () => {
@@ -68,15 +69,17 @@ const GasCylinderPage = ({cate}: Props) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [brands, setBrands] = useState<Brand[]>([])
 
-  const NextArrow = (props: any) => {
-    const {className, onClick} = props
-    return <div className={className} onClick={onClick}></div>
-  }
+  const NextArrow = ({onClick}: any) => (
+    <div className='custom-arrow next' onClick={onClick}>
+      <RightOutlined />
+    </div>
+  )
 
-  const PrevArrow = (props: any) => {
-    const {className, onClick} = props
-    return <div className={className} onClick={onClick}></div>
-  }
+  const PrevArrow = ({onClick}: any) => (
+    <div className='custom-arrow prev' onClick={onClick}>
+      <LeftOutlined />
+    </div>
+  )
 
   useEffect(() => {
     const fetchBrands = async () => {
@@ -128,37 +131,38 @@ const GasCylinderPage = ({cate}: Props) => {
           </div>
         ))}
       </Carousel>
-
-      <div className={styles.partner_slider}>
-        <Slider
-          autoplay
-          autoplaySpeed={2000}
-          infinite
-          slidesToShow={6}
-          slidesToScroll={1}
-          arrows={true} // bật arrow
-          nextArrow={<NextArrow />} // arrow next
-          prevArrow={<PrevArrow />} // arrow prev
-          dots={false}
-          responsive={[
-            {breakpoint: 1200, settings: {slidesToShow: 5}},
-            {breakpoint: 992, settings: {slidesToShow: 4}},
-            {breakpoint: 768, settings: {slidesToShow: 3}},
-            {breakpoint: 480, settings: {slidesToShow: 2}},
-          ]}
-        >
-          {brands.map((brand) => (
-            <div key={brand.id}>
-              <Image
-                src={brand.image}
-                alt={brand.name}
-                preview={false}
-                className={styles.partner_image}
-              />
-            </div>
-          ))}
-        </Slider>
-      </div>
+      {brands.length > 0 && (
+        <div className={styles.partner_slider}>
+          <Slider
+            autoplay
+            autoplaySpeed={2000}
+            infinite
+            slidesToShow={6}
+            slidesToScroll={1}
+            arrows={true} // bật arrow
+            nextArrow={<NextArrow />} // arrow next
+            prevArrow={<PrevArrow />} // arrow prev
+            dots={false}
+            responsive={[
+              {breakpoint: 1200, settings: {slidesToShow: 5}},
+              {breakpoint: 992, settings: {slidesToShow: 4}},
+              {breakpoint: 768, settings: {slidesToShow: 3}},
+              {breakpoint: 480, settings: {slidesToShow: 2}},
+            ]}
+          >
+            {brands.map((brand) => (
+              <div key={brand.id}>
+                <Image
+                  src={brand.image}
+                  alt={brand.name}
+                  preview={false}
+                  className={styles.partner_image}
+                />
+              </div>
+            ))}
+          </Slider>
+        </div>
+      )}
 
       <div>
         <Row gutter={32}>

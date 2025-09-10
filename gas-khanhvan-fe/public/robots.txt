@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://gaskhanhvanquan7.vercel.app/
+Host: https://gaskhanhvan.com/
 
 # Sitemaps
-Sitemap: https://gaskhanhvanquan7.vercel.app/sitemap.xml
+Sitemap: https://gaskhanhvan.com/sitemap.xml
