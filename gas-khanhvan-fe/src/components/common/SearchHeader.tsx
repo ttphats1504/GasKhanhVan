@@ -237,10 +237,10 @@ const SearchHeader = () => {
                 type='primary'
                 icon={<PhoneOutlined />}
                 className={styles.contact_btn}
-                href='tel:09393910202'
+                onClick={() => (window.location.href = 'tel:02837731612')}
               >
                 <Flex vertical>
-                  <span>09393910202</span>
+                  <span>028 3773 1612</span>
                   <span>Gọi ngay</span>
                 </Flex>
               </Button>
