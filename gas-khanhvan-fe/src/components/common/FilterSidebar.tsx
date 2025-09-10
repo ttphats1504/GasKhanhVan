@@ -79,6 +79,9 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
           label: subCat.name,
           icon: <FireOutlined />,
         })),
+        onTitleClick: () => {
+          router.push(`/${cat.slug}`)
+        },
       }))
   }
 
