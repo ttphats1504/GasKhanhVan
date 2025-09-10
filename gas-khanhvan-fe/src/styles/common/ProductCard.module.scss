@@ -49,21 +49,24 @@
 }
 
 /* trigger khi hover vào card */
-.cardWrapper:hover {
-  border: 1px solid var(--primary-yellow-800) !important;
-}
+/* hiệu ứng hover chỉ chạy khi >= 1024px (desktop) */
+@media (min-width: 1024px) {
+  .cardWrapper:hover {
+    border: 1px solid var(--primary-yellow-800) !important;
+  }
 
-.cardWrapper:hover .product_name {
-  color: var(--primary-yellow-800);
-}
+  .cardWrapper:hover .product_name {
+    color: var(--primary-yellow-800);
+  }
 
-.cardWrapper:hover .productImage {
-  transform: scale(1.05);
-  border: none;
-}
+  .cardWrapper:hover .productImage {
+    transform: scale(1.05);
+    border: none;
+  }
 
-.cardWrapper:hover .shinyEffect {
-  animation: shine 1s forwards;
+  .cardWrapper:hover .shinyEffect {
+    animation: shine 1s forwards;
+  }
 }
 
 @keyframes shine {

@@ -246,8 +246,17 @@ const ProductDetail: React.FC = () => {
                             type='primary'
                             size='large'
                             block
-                            icon={<MessageOutlined />}
+                            icon={
+                              <Image
+                                src='/assets/zalo.png'
+                                width={24}
+                                height={24}
+                                alt='zalo'
+                                preview={false}
+                              />
+                            }
                             style={{height: 'auto', padding: '12px'}}
+                            onClick={() => window.open('https://zalo.me/0937762979', '_blank')}
                           >
                             <Flex vertical align='center' gap={4}>
                               <Flex align='center' gap={8}>
@@ -267,13 +276,14 @@ const ProductDetail: React.FC = () => {
                             size='large'
                             block
                             style={{height: 'auto', padding: '12px'}}
+                            onClick={() => (window.location.href = 'tel:02837731612')}
                           >
                             <Flex vertical align='center' gap={4}>
                               <Flex align='center' gap={8}>
                                 <PhoneOutlined />
                                 <span>Gọi Đặt Ngay</span>
                               </Flex>
-                              <Text style={{fontSize: 14, color: '#000'}}>(0839 160 160)</Text>
+                              <Text style={{fontSize: 14, color: '#000'}}>(028 3773 1612)</Text>
                             </Flex>
                           </Button>
                         </Col>

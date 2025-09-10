@@ -6,6 +6,7 @@ import HeadTag from '@/components/home/HeadTag'
 import styles from '../styles/layouts/CategoryLayout.module.scss'
 import Footer from '@/components/common/Footer'
 import SearchHeader from '@/components/common/SearchHeader'
+import ContactSection from '@/components/common/ContactSection'
 
 const {Content} = Layout
 
@@ -33,6 +34,7 @@ export default function CategoryLayout({children}: CategoryLayoutProps) {
       <Content className={isMobile ? `${styles.container_mobile}` : styles.container}>
         <main>{children}</main>
       </Content>
+      <ContactSection />
       <Footer />
     </Layout>
   )

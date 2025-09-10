@@ -5,6 +5,8 @@ import HeadTag from '@/components/home/HeadTag'
 import styles from '../styles/home/Home.module.scss'
 import {Layout} from 'antd'
 import Footer from '@/components/common/Footer'
+import ContactSection from '@/components/common/ContactSection'
+import SearchHeader from '@/components/common/SearchHeader'
 
 type MainLayoutProps = {
   children: ReactNode
@@ -26,10 +28,12 @@ export default function MainLayout({children}: MainLayoutProps) {
   return (
     <Layout>
       <HeadTag />
+      <SearchHeader />
       <Navbar />
       <Content className={isMobile ? `${styles.container_home_mobile}` : styles.container}>
         <main>{children}</main>
       </Content>
+      <ContactSection />
       <Footer />
     </Layout>
   )

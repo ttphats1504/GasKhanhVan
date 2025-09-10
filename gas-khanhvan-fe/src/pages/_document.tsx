@@ -1,4 +1,4 @@
-import {BackTop} from 'antd'
+import {BackTop, FloatButton} from 'antd'
 import {Html, Head, Main, NextScript} from 'next/document'
 
 export default function Document() {

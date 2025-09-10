@@ -6,6 +6,7 @@ import styles from '../styles/home/Home.module.scss'
 import {Layout} from 'antd'
 import Footer from '@/components/common/Footer'
 import SearchHeader from '@/components/common/SearchHeader'
+import ContactSection from '@/components/common/ContactSection'
 
 type HomeLayoutProps = {
   children: ReactNode
@@ -32,6 +33,7 @@ export default function HomeLayout({children}: HomeLayoutProps) {
       <Content className={isMobile ? `${styles.container_home_mobile}` : styles.container_home}>
         <main>{children}</main>
       </Content>
+      <ContactSection />
       <Footer />
     </Layout>
   )

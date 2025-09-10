@@ -13,7 +13,14 @@ export default function ContactSection() {
           <Title level={2}>Liên hệ với Gas Khánh Vân</Title>
           <Space direction='vertical' size='middle'>
             <Text>
-              <PhoneOutlined /> Hotline: <b style={{color: '#d4380d'}}>0909 123 456</b>
+              <PhoneOutlined /> Hotline:{' '}
+              <a href='tel:02837731612' style={{color: '#d4380d', fontWeight: 'bold'}}>
+                028 3773 1612
+              </a>
+              <b style={{margin: '0 6px', color: '#d4380d'}}>-</b>
+              <a href='tel:02837731966' style={{color: '#d4380d', fontWeight: 'bold'}}>
+                028 3773 1966
+              </a>
             </Text>
             <Text>
               <MailOutlined /> Email: gaskhanhvan@gmail.com
@@ -25,7 +32,7 @@ export default function ContactSection() {
             <Button
               type='primary'
               size='large'
-              href='tel:0909123456'
+              href='tel:028 3773 1612'
               style={{background: '#ff4d4f', border: 'none'}}
             >
               Gọi ngay

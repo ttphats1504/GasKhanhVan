@@ -9,10 +9,9 @@ import SaleBanner from '@/components/common/SaleBanner'
 import HomeLayout from '@/layouts/HomeLayout'
 import handleAPI from '@/apis/handleAPI'
 import Category from '@/models/Category'
-import {Flex, Typography, Spin} from 'antd'
+import {Flex, Typography} from 'antd'
 import Brand from '@/models/Brand'
 import LoadingOverlay from '@/components/common/LoadingOverlay'
-import ContactSection from '@/components/common/ContactSection'
 
 const {Title} = Typography
 
@@ -101,7 +100,6 @@ export default function Home() {
               ))}
 
               <SaleBanner />
-              <ContactSection />
             </div>
           </>
         )}

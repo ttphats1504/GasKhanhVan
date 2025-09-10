@@ -8,7 +8,12 @@ import {DefaultSeo} from 'next-seo'
 import {ConfigProvider, Image} from 'antd'
 import {StyleProvider} from '@ant-design/cssinjs'
 import {BackTop, FloatButton} from 'antd'
-import {PhoneOutlined, MessageOutlined, CustomerServiceOutlined} from '@ant-design/icons'
+import {
+  PhoneOutlined,
+  MessageOutlined,
+  CustomerServiceOutlined,
+  ArrowUpOutlined,
+} from '@ant-design/icons'
 import styles from '../styles/home/Home.module.scss'
 
 const roboto = Roboto({
@@ -42,11 +47,11 @@ export default function App({Component, pageProps}: AppProps) {
               {/* Call */}
               <FloatButton
                 icon={<PhoneOutlined />}
-                onClick={() => (window.location.href = 'tel:0938183330')}
+                onClick={() => (window.location.href = 'tel:02837731612')}
                 tooltip='Gọi ngay'
                 className={styles.callBtn}
               >
-                <span className={styles.callNumber}>0938 183 330</span>
+                <span className={styles.callNumber}>028 3773 1612</span>
               </FloatButton>
 
               {/* Zalo with PNG logo */}
@@ -61,7 +66,7 @@ export default function App({Component, pageProps}: AppProps) {
                     className={styles.iconFix}
                   />
                 }
-                onClick={() => window.open('https://zalo.me/0938183330', '_blank')}
+                onClick={() => window.open('https://zalo.me/0937762979', '_blank')}
                 tooltip='Chat Zalo'
                 className={styles.zaloBtn}
               />
@@ -82,9 +87,17 @@ export default function App({Component, pageProps}: AppProps) {
                 tooltip='Messenger'
                 className={styles.messBtn}
               />
-
-              <FloatButton.BackTop visibilityHeight={200} />
             </FloatButton.Group>
+            <FloatButton.BackTop
+              visibilityHeight={200}
+              target={() => document.body}
+              className={styles.backTopBtn}
+              style={{right: 24, bottom: 80}}
+            >
+              <div className={styles.backTopInner}>
+                <ArrowUpOutlined />
+              </div>
+            </FloatButton.BackTop>
             <Component {...pageProps} />
           </main>
         </ConfigProvider>
