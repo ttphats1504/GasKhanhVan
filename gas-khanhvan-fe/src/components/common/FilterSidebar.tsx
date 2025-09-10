@@ -1,11 +1,12 @@
 import {Typography, Menu} from 'antd'
 import type {MenuProps} from 'antd'
-import {AppstoreOutlined, FilterOutlined, FireOutlined} from '@ant-design/icons'
+import {AppstoreOutlined, FireOutlined} from '@ant-design/icons'
 import styles from '@/styles/common/FilterSideBar.module.scss'
 import {useEffect, useState} from 'react'
 import handleAPI from '@/apis/handleAPI'
 import {useRouter} from 'next/router'
 import Category from '@/models/Category'
+import LoadingOverlay from './LoadingOverlay'
 
 const {Title} = Typography
 
@@ -24,12 +25,8 @@ const getLevelKeys = (items1: LevelKeysProps[]) => {
   const key: Record<string, number> = {}
   const func = (items2: LevelKeysProps[], level = 1) => {
     items2.forEach((item) => {
-      if (item.key) {
-        key[item.key] = level
-      }
-      if (item.children) {
-        func(item.children, level + 1)
-      }
+      if (item.key) key[item.key] = level
+      if (item.children) func(item.children, level + 1)
     })
   }
   func(items1)
@@ -42,14 +39,13 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
   const [stateOpenKeys, setStateOpenKeys] = useState<string[]>([])
   const [selectedSlug, setSelectedSlug] = useState<string | undefined>(undefined)
   const [items, setItems] = useState<MenuItem[]>([])
+  const [loading, setLoading] = useState<boolean>(true) // ✅ loading state
+  const [navigating, setNavigating] = useState<boolean>(false) // ✅ loading khi chuyển trang
 
-  // find key to open menu when slug is children key
+  // find parent key
   const findParentKey = (items: any[], slug: string): string | undefined => {
     for (const item of items) {
-      if (item.children?.some((child: any) => child.key === slug)) {
-        return item.key as string
-      }
-      // 🔁 đệ quy để tìm trong children sâu hơn
+      if (item.children?.some((child: any) => child.key === slug)) return item.key as string
       if (item.children) {
         const found = findParentKey(item.children, slug)
         if (found) return found
@@ -60,16 +56,10 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
 
   useEffect(() => {
     if (!slug || !items.length) return
-
     const lastSlug = slug[slug.length - 1]
-
     const parentKey = findParentKey(items, String(lastSlug))
-    if (parentKey) {
-      setStateOpenKeys([parentKey])
-    } else {
-      setStateOpenKeys([String(lastSlug)])
-    }
-
+    if (parentKey) setStateOpenKeys([parentKey])
+    else setStateOpenKeys([String(lastSlug)])
     setSelectedSlug(String(lastSlug))
   }, [slug, items])
 
@@ -78,8 +68,7 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
   }, [router.query.slug])
 
   const buildMenuItems = (categories: Category[]): MenuItem[] => {
-    // Individual categories as top-level items
-    const individualCategoryItems: MenuItem[] = categories
+    return categories
       .filter((cat) => cat.slug !== 'tin-tuc')
       .map((cat: any) => ({
         key: cat.slug,
@@ -90,13 +79,7 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
           label: subCat.name,
           icon: <FireOutlined />,
         })),
-        onTitleClick: () => {
-          router.push(`/${cat.slug}`)
-        },
       }))
-
-    // Final combined menu
-    return [...individualCategoryItems]
   }
 
   const levelKeys = getLevelKeys(items as LevelKeysProps[])
@@ -104,31 +87,28 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        setLoading(true)
         const res: any = await handleAPI('/api/categories', 'get')
         const filtered = res.filter((cat: any) => cat.slug !== 'san-pham')
         const menuItems = buildMenuItems(filtered)
         setItems(menuItems)
+
+        // Prefetch
+        filtered.forEach((cat: any) => {
+          router.prefetch(`/${cat.slug}`)
+          cat.children?.forEach((subCat: any) => router.prefetch(`/${subCat.slug}`))
+        })
       } catch (error) {
         console.error('Failed to load categories:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchCategories()
   }, [])
 
-  const buildFullPath = (key: string, items: any[]): string => {
-    for (const item of items) {
-      if (item.key === key) return `/${key}`
-      if (item.children) {
-        const found = buildFullPath(key, item.children)
-        if (found) return `/${item.key}${found}`
-      }
-    }
-    return ''
-  }
-
-  const onClick: MenuProps['onClick'] = (e) => {
-    // tìm item được click
+  const onClick: MenuProps['onClick'] = async (e) => {
     const findItem = (items: any[], key: string): any | undefined => {
       for (const item of items) {
         if (item.key === key) return item
@@ -141,16 +121,12 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
     }
 
     const clickedItem = findItem(items, e.key as string)
-
-    console.log(clickedItem)
-
-    // Nếu là parent có children → vẫn route về /slug cha
     if (clickedItem) {
-      const path = `/${clickedItem.key}`
-      router.push(path)
+      setNavigating(true) // ✅ show loading khi chuyển trang
+      await router.push(`/${clickedItem.key}`)
+      setNavigating(false)
     }
 
-    // Giữ state open
     const parentKey: any = items.find((item: any) =>
       item.children?.some((child: any) => child.key === e.key)
     )?.key
@@ -158,45 +134,42 @@ const FilterSideBar = ({title}: FilterSideBarProps) => {
     setStateOpenKeys((prev: any) => {
       const newKeys: any = new Set(prev)
       if (parentKey) newKeys.add(parentKey)
-      newKeys.add(e.key) // ✅ giữ item được click mở
+      newKeys.add(e.key)
       return [...newKeys]
     })
   }
 
   const onOpenChange: MenuProps['onOpenChange'] = (openKeys) => {
     const currentOpenKey = openKeys.find((key) => stateOpenKeys.indexOf(key) === -1)
-
-    // open
     if (currentOpenKey !== undefined) {
       const repeatIndex = openKeys
         .filter((key) => key !== currentOpenKey)
         .findIndex((key) => levelKeys[key] === levelKeys[currentOpenKey])
-
       const currentLevelKey = levelKeys[currentOpenKey]
 
       const currentItem: any = items.filter((item) => item?.key === currentOpenKey)
-
       if (currentItem && currentItem?.length > 0 && currentItem[0].children.length > 0) {
         openKeys.push(currentItem[0].children[0].key)
       }
 
       setStateOpenKeys(
         openKeys
-          // remove repeat key
           .filter((_, index) => index !== repeatIndex)
-          // remove current level all child
           .filter((key) => levelKeys[key] <= currentLevelKey)
       )
     } else {
-      // close
       setStateOpenKeys(openKeys)
     }
   }
+
   return (
     <div className={styles.filter_bar}>
+      <LoadingOverlay spinning={loading || navigating} />
+
       <Title level={4} style={{display: 'flex', alignItems: 'center', gap: 8}}>
         {title}
       </Title>
+
       <Menu
         mode='inline'
         selectedKeys={selectedSlug ? [selectedSlug] : []}

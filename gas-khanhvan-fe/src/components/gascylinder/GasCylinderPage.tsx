@@ -5,11 +5,11 @@ import ProductCard from '../common/ProductCard'
 import handleAPI from '@/apis/handleAPI'
 import Product from '../../../../gkv-admin/src/models/Product'
 import {useEffect, useState} from 'react'
-import Spinner from '../common/Spinner'
 import Category from '@/models/Category'
 import Brand from '@/models/Brand'
 import dynamic from 'next/dynamic'
 import {LeftOutlined, RightOutlined} from '@ant-design/icons'
+import LoadingOverlay from '../common/LoadingOverlay'
 
 interface Props {
   cate: Category
@@ -121,9 +121,9 @@ const GasCylinderPage = ({cate}: Props) => {
     fetchData()
   }, [cate.id])
 
-  if (loading) return <Spinner />
   return (
     <div className={styles.wrapper}>
+      <LoadingOverlay spinning={loading} />
       <Carousel autoplay className={styles.carousel}>
         {banners.map((url, index) => (
           <div key={index}>

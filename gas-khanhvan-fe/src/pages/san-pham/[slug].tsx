@@ -10,15 +10,13 @@ import {
   Tabs,
   Badge,
   Space,
-  Divider,
   Breadcrumb,
-  Spin,
   Tag,
   Rate,
   Flex,
   Pagination,
 } from 'antd'
-import {CheckCircleOutlined, GiftOutlined, MessageOutlined, PhoneOutlined} from '@ant-design/icons'
+import {GiftOutlined, MessageOutlined, PhoneOutlined} from '@ant-design/icons'
 import MainLayout from '@/layouts/MainLayout'
 import ProductCard from '@/components/common/ProductCard'
 import handleAPI from '@/apis/handleAPI'
@@ -28,6 +26,7 @@ import styles from '@/styles/gascylinder/ProductDetailsPage.module.scss'
 import {Modal} from 'antd'
 import {RobotOutlined, LoadingOutlined} from '@ant-design/icons'
 import DOMPurify from 'dompurify'
+import LoadingOverlay from '@/components/common/LoadingOverlay'
 
 const {Title, Text, Paragraph} = Typography
 
@@ -151,17 +150,9 @@ const ProductDetail: React.FC = () => {
     currentPage * pageSize
   )
 
-  if (loading) {
-    return (
-      <MainLayout>
-        <Row justify='center' align='middle' style={{minHeight: '50vh'}}>
-          <Spin size='large' />
-        </Row>
-      </MainLayout>
-    )
-  }
   return (
     <MainLayout>
+      <LoadingOverlay spinning={loading} />
       <Breadcrumb style={{margin: '16px 0'}}>
         <Breadcrumb.Item href='/'>Trang chủ</Breadcrumb.Item>
         <Breadcrumb.Item href='/san-pham'>Sản phẩm</Breadcrumb.Item>

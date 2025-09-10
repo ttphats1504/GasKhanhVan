@@ -1,31 +1,74 @@
-.wrapper {
-  padding: 24px;
-  background: #fff;
-}
-
 .thumbnail {
-  margin: 16px 0;
-  border-radius: 8px;
-  max-height: 400px;
+  width: 100%;
+  height: auto;
+  max-height: 400px; // tùy theo thiết kế
   object-fit: cover;
+  border-radius: 8px;
+  margin: 16px 0;
 }
 
 .content {
-  margin-top: 16px;
-  line-height: 1.7;
+  width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
   font-size: 16px;
-}
+  line-height: 1.6;
+  margin-top: 16px;
 
-.related_item {
-  margin-bottom: 12px;
-  cursor: pointer;
-
+  // ✅ làm cho ảnh trong nội dung responsive
   img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    margin: 12px auto;
     border-radius: 6px;
-    margin-bottom: 6px;
   }
 
-  &:hover {
-    color: #1677ff;
+  // ✅ video / iframe responsive
+  iframe {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16/9;
+    display: block;
+    margin: 12px 0;
+  }
+
+  // ✅ bảng responsive
+  table {
+    width: 100% !important;
+    border-collapse: collapse;
+    display: block;
+    overflow-x: auto; // scroll ngang nếu bảng rộng
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // ✅ tiêu đề trong nội dung
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 600;
+    margin: 16px 0 8px;
+    line-height: 1.4;
+  }
+
+  p {
+    margin: 8px 0;
+  }
+
+  ul,
+  ol {
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+
+  blockquote {
+    border-left: 4px solid #fabc3f; // theo theme vàng-cam
+    padding-left: 12px;
+    color: #555;
+    margin: 12px 0;
   }
 }

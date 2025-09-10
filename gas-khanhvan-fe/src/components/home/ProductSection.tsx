@@ -1,20 +1,18 @@
-import {Col, Flex, Grid, Pagination, Row, Typography} from 'antd'
+import {Col, Flex, Grid, Pagination, Row, Typography, Spin} from 'antd'
 import Container from '../common/Container'
 import styles from '../../styles/home/ProductSection.module.scss'
 import ProductCard from '../common/ProductCard'
 import handleAPI from '@/apis/handleAPI'
 import {useEffect, useState} from 'react'
 import Product from '@/models/Product'
-import Spinner from '../common/Spinner'
 
 const {useBreakpoint} = Grid
-
 const {Title} = Typography
 
 type ProductSectionProps = {
   title: string
   categoryId?: number
-  brandId?: number // ✅ thêm brandId
+  brandId?: number
   isFeatured?: boolean
 }
 
@@ -27,7 +25,7 @@ const fetchProductDatas = async (
 ) => {
   let api = `/api/products?page=${page}&limit=${limit}`
   if (categoryId) api += `&typeId=${categoryId}`
-  if (brandId) api += `&brandId=${brandId}` // ✅ filter by brand
+  if (brandId) api += `&brandId=${brandId}`
   if (isFeatured) api += `&featured=true`
 
   try {
@@ -54,39 +52,32 @@ export default function ProductSection({
 
   const fetchData = async (page: number) => {
     setLoading(true)
-
     const res: any = await fetchProductDatas(page, limit, categoryId, brandId, isFeatured)
     if (res) {
       setProducts(res.data)
       setTotalItems(res.totalItems)
     }
-
     setLoading(false)
   }
 
   useEffect(() => {
     if (screens.xs) setLimit(2)
-    // Mobile
     else if (screens.sm) setLimit(4)
-    // Tablet nhỏ
     else if (screens.md) setLimit(6)
-    // Tablet vừa
     else if (screens.lg) setLimit(8)
-    // Desktop
-    else setLimit(12) // Desktop lớn
+    else setLimit(12)
   }, [screens])
 
   useEffect(() => {
     fetchData(page)
-  }, [page, limit, categoryId, brandId, isFeatured]) // ✅ theo dõi brandId
+  }, [page, limit, categoryId, brandId, isFeatured])
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage)
   }
 
-  if (loading) return <Spinner />
-  if (products.length <= 0) return <></>
-  console.log(products)
+  if (!loading && products.length <= 0) return <></>
+
   return (
     <Container>
       <Flex vertical>

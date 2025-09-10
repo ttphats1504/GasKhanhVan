@@ -1,6 +1,6 @@
 import handleAPI from '@/apis/handleAPI'
 import CustomBreadcrumbs, {CustomBreadcrumbItem} from '@/components/common/CustomBreadcrumbs'
-import Spinner from '@/components/common/Spinner'
+import LoadingOverlay from '@/components/common/LoadingOverlay'
 import GasCylinderPage from '@/components/gascylinder/GasCylinderPage'
 import CategoryLayout from '@/layouts/CategoryLayout'
 import Category from '@/models/Category'
@@ -56,11 +56,11 @@ export default function CategoryPagePage() {
     loadCategory()
   }, [router.query.slug])
 
-  if (loading) return <Spinner />
   if (!category) return <>Category not found.</>
 
   return (
     <CategoryLayout>
+      <LoadingOverlay spinning={loading} />
       <CustomBreadcrumbs items={breadcrumbs} />
       <GasCylinderPage cate={category} />
     </CategoryLayout>

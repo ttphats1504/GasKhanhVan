@@ -133,7 +133,7 @@ const Navbar = () => {
         products.map((p) => ({
           value: p.slug,
           label: (
-            <Link href={`/san-pham/${p.slug}`} className={styles.suggest_item}>
+            <Link href={`/san-pham/${p.slug}`} className={styles.suggest_item} prefetch>
               <Image src={p.image} alt={p.name} className={styles.suggest_img} preview={false} />
               <div>
                 <div className={styles.suggest_name}>{p.name}</div>

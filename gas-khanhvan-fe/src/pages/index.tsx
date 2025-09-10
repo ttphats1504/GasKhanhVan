@@ -1,27 +1,29 @@
 import React, {useEffect, useState} from 'react'
 import PromotionCarousel from '@/components/common/PromotionCarousel'
 import Incentives from '@/components/common/IncentivesSection'
-import Footer from '@/components/common/Footer'
 
-import styles from '../styles/home/Home.module.scss'
+import styles from '@/styles/home/Home.module.scss'
 import ProductSection from '@/components/home/ProductSection'
 import Head from 'next/head'
 import SaleBanner from '@/components/common/SaleBanner'
 import HomeLayout from '@/layouts/HomeLayout'
 import handleAPI from '@/apis/handleAPI'
 import Category from '@/models/Category'
-import {Flex, Typography} from 'antd'
+import {Flex, Typography, Spin} from 'antd'
 import Brand from '@/models/Brand'
+import LoadingOverlay from '@/components/common/LoadingOverlay'
 
 const {Title} = Typography
 
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([])
   const [brands, setBrands] = useState<Brand[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true)
         // fetch categories
         const categoryRes: any = await handleAPI('/api/categories', 'get')
         const filteredCategory = categoryRes.filter((cat: any) => cat.slug !== 'san-pham')
@@ -32,10 +34,13 @@ export default function Home() {
         setBrands(brandRes.data || [])
       } catch (err) {
         console.error(err)
+      } finally {
+        setLoading(false)
       }
     }
     fetchData()
   }, [])
+
   return (
     <>
       <Head>
@@ -58,63 +63,46 @@ export default function Home() {
           property='og:image'
           content='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV6JUe_TejYzBFTSUEVdiHsHzVqWOLE1fGXg&s'
         />
-        <script
-          type='application/ld+json'
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'WebSite',
-              url: 'https://gaskhanhvanquan7.vercel.app/',
-              name: 'Cửa Hàng Gas Gas Quận 7 - Gas Khánh Vân',
-              potentialAction: {
-                '@type': 'SearchAction',
-                target: 'https://gaskhanhvanquan7.vercel.app/search?q={search_term_string}',
-                'query-input': 'required name=search_term_string',
-              },
-            }),
-          }}
-        />
       </Head>
       <HomeLayout>
-        <PromotionCarousel />
-        <div>
-          <div className={styles.top_bg}>
-            <Incentives />
-            <Flex justify='center' align='center'>
-              <Title level={2} className={styles.title}>
-                SẢN PHẨM
-              </Title>
-              <div className={styles.border}></div>
-            </Flex>
+        <LoadingOverlay spinning={loading} />
+        {!loading && (
+          <>
+            <PromotionCarousel />
+            <div className={styles.top_bg}>
+              <Incentives />
 
-            {/* Featured Products */}
-            <ProductSection isFeatured title='Khuyến mãi hôm nay' />
+              <Flex justify='center' align='center'>
+                <Title level={2} className={styles.title}>
+                  SẢN PHẨM
+                </Title>
+                <div className={styles.border}></div>
+              </Flex>
 
-            {/* Products by Category */}
-            {categories.map((cat: any) =>
-              cat.children && cat.children.length > 0 ? (
-                // Render children categories
-                cat.children.map((child: Category) => (
-                  <ProductSection
-                    key={`cat-${child.id}`}
-                    title={child.name}
-                    categoryId={child.id}
-                  />
-                ))
-              ) : (
-                // Render parent if no children
-                <ProductSection key={`cat-${cat.id}`} title={cat.name} categoryId={cat.id} />
-              )
-            )}
+              <ProductSection isFeatured title='Khuyến mãi hôm nay' />
 
-            {/* Products by Brand */}
-            {brands.map((brand: any) => (
-              <ProductSection key={`brand-${brand.id}`} title={brand.name} brandId={brand.id} />
-            ))}
+              {categories.map((cat: any) =>
+                cat.children && cat.children.length > 0 ? (
+                  cat.children.map((child: Category) => (
+                    <ProductSection
+                      key={`cat-${child.id}`}
+                      title={child.name}
+                      categoryId={child.id}
+                    />
+                  ))
+                ) : (
+                  <ProductSection key={`cat-${cat.id}`} title={cat.name} categoryId={cat.id} />
+                )
+              )}
 
-            <SaleBanner />
-          </div>
-        </div>
+              {brands.map((brand: any) => (
+                <ProductSection key={`brand-${brand.id}`} title={brand.name} brandId={brand.id} />
+              ))}
+
+              <SaleBanner />
+            </div>
+          </>
+        )}
       </HomeLayout>
     </>
   )
