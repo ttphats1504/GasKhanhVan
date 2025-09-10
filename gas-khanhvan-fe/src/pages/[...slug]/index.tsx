@@ -56,7 +56,7 @@ export default function CategoryPagePage() {
     loadCategory()
   }, [router.query.slug])
 
-  if (!category) return <>Category not found.</>
+  if (!category || loading) return <></>
 
   return (
     <CategoryLayout>
