@@ -35,6 +35,11 @@ const SearchHeader = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
+  // 🔹 Khi click gợi ý
+  const handleSuggestionClick = (keyword: string) => {
+    handleSearch(keyword) // gọi lại search API
+  }
+
   useEffect(() => {
     if (drawerOpen) {
       const groupKeys: string[] = []

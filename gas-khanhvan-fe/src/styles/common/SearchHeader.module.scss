@@ -21,9 +21,9 @@
 }
 
 .header_sticky {
-  // background: linear-gradient(180deg, rgba(255, 218, 73, 1) 0%, rgba(255, 184, 31, 1) 100%);
-  background-image: url('/assets/header.png');
-  padding: 15px 48px;
+  background: linear-gradient(180deg, rgba(255, 218, 73, 1) 0%, rgba(255, 184, 31, 1) 100%);
+  // background-image: url('/assets/gas.png');
+  padding: 0 48px;
   position: relative;
   top: 0;
   z-index: 1000;

@@ -14,9 +14,9 @@
     .ant-image {
       width: 100% !important;
     }
-    .ant-image-img {
-      object-fit: contain !important;
-    }
+    // .ant-image-img {
+    //   object-fit: contain !important;
+    // }
   }
 }
 
@@ -28,7 +28,7 @@
 .productImage {
   width: 100%;
   height: 220px !important;
-  border: 5px solid var(--primary-yellow-800);
+  // border: 5px solid var(--primary-yellow-800);
   display: block;
   transition: transform 0.4s ease;
 }

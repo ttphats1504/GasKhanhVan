@@ -12,6 +12,7 @@ import Category from '@/models/Category'
 import {Flex, Typography, Spin} from 'antd'
 import Brand from '@/models/Brand'
 import LoadingOverlay from '@/components/common/LoadingOverlay'
+import ContactSection from '@/components/common/ContactSection'
 
 const {Title} = Typography
 
@@ -100,6 +101,7 @@ export default function Home() {
               ))}
 
               <SaleBanner />
+              <ContactSection />
             </div>
           </>
         )}
