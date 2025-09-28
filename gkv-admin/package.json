@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@botom/quill-resize-module": "^2.0.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -13,6 +14,8 @@
     "antd": "^5.22.2",
     "axios": "^1.7.9",
     "query-string": "^9.1.1",
+    "quill-image-resize-module-react": "^3.0.0",
+    "quill-image-resize-module-v2": "github:henriqueformiga/quill-image-resize-module-v2",
     "react": "^18.3.1",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.3.1",

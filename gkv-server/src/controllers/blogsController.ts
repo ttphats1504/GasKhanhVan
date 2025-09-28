@@ -139,14 +139,14 @@ export const updateBlog = async (req: Request, res: Response) => {
         })
 
         thumbnailUrl = (result as any).secure_url
-
-        await existing.update({
-          ...req.body,
-          thumbnail: thumbnailUrl,
-          ...(slug && {slug}),
-          published: published ?? existing.published,
-        })
       }
+
+      await existing.update({
+        ...req.body,
+        thumbnail: thumbnailUrl,
+        ...(slug && {slug}),
+        published: published ?? existing.published,
+      })
     }
 
     res.json(existing)

@@ -1,5 +1,5 @@
 import {useRouter} from 'next/router'
-import {useEffect, useState} from 'react'
+import {useEffect, useLayoutEffect, useState} from 'react'
 import {
   Card,
   Typography,
@@ -16,7 +16,7 @@ import {
   Flex,
   Pagination,
 } from 'antd'
-import {GiftOutlined, MessageOutlined, PhoneOutlined} from '@ant-design/icons'
+import {GiftOutlined, PhoneOutlined} from '@ant-design/icons'
 import MainLayout from '@/layouts/MainLayout'
 import ProductCard from '@/components/common/ProductCard'
 import handleAPI from '@/apis/handleAPI'
@@ -27,6 +27,7 @@ import {Modal} from 'antd'
 import {RobotOutlined, LoadingOutlined} from '@ant-design/icons'
 import DOMPurify from 'dompurify'
 import LoadingOverlay from '@/components/common/LoadingOverlay'
+import ViewedProducts from '@/components/common/ViewedProducts'
 
 const {Title, Text, Paragraph} = Typography
 
@@ -145,6 +146,14 @@ const ProductDetail: React.FC = () => {
     return () => window.removeEventListener('resize', updatePageSize)
   }, [])
 
+  useEffect(() => {
+    if (!product) return
+    const stored = JSON.parse(localStorage.getItem('viewedProducts') || '[]') as Product[]
+    const filtered = stored.filter((p) => p.id !== product.id)
+    const updated = [product, ...filtered].slice(0, 50)
+    localStorage.setItem('viewedProducts', JSON.stringify(updated))
+  }, [product])
+
   const pagedRelatedProducts = relatedProducts.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
@@ -178,7 +187,6 @@ const ProductDetail: React.FC = () => {
                           src={product.image}
                           alt={product.name}
                           style={{
-                            border: '5px solid #fabc3f',
                             borderRadius: '3px',
                             padding: '4px',
                             objectFit: 'cover',
@@ -190,7 +198,7 @@ const ProductDetail: React.FC = () => {
                     {/* Info */}
                     <Col xs={24} md={14}>
                       <Title level={3}>{product.name}</Title>
-                      <Button
+                      {/* <Button
                         type='primary'
                         shape='round'
                         icon={aiLoading ? <LoadingOutlined spin /> : <RobotOutlined />}
@@ -208,7 +216,7 @@ const ProductDetail: React.FC = () => {
                         }}
                       >
                         {aiLoading ? 'Đang tư vấn...' : 'AI tư vấn'}
-                      </Button>
+                      </Button> */}
 
                       <Flex gap='middle' align='center'>
                         <Rate allowHalf disabled defaultValue={4.5} style={{fontSize: '16px'}} />
@@ -450,6 +458,9 @@ const ProductDetail: React.FC = () => {
                 />
               </Row>
             )}
+          </Col>
+          <Col xs={24} style={{marginTop: 40}}>
+            <ViewedProducts excludeProductId={parseInt(product?.id)} />
           </Col>
         </Row>
       ) : (

@@ -50,37 +50,39 @@ export default function BlogPage() {
           </Title>
 
           <Row gutter={[24, 24]}>
-            {blogs.map((blog) => (
-              <Col key={blog.id} xs={24} sm={12} lg={8}>
-                <Link href={`/tin-tuc/${blog.slug}`} style={{textDecoration: 'none'}}>
-                  <Card
-                    hoverable
-                    cover={
-                      blog.thumbnail && (
-                        <Image
-                          src={blog.thumbnail}
-                          alt={blog.title}
-                          style={{height: 200, objectFit: 'cover'}}
-                          preview={false}
-                        />
-                      )
-                    }
-                    style={{borderRadius: 12, overflow: 'hidden'}}
-                  >
-                    <Title level={4} ellipsis>
-                      {blog.title}
-                    </Title>
-                    <Paragraph ellipsis={{rows: 2}}>
-                      {blog.content.replace(/<[^>]+>/g, '').slice(0, 100)}...
-                    </Paragraph>
-                    <Text type='secondary' style={{fontSize: 12}}>
-                      {blog.author || 'Admin'} ·{' '}
-                      {new Date(blog.createdAt).toLocaleDateString('vi-VN')}
-                    </Text>
-                  </Card>
-                </Link>
-              </Col>
-            ))}
+            {blogs
+              .filter((blog) => blog.published)
+              .map((blog) => (
+                <Col key={blog.id} xs={24} sm={12} lg={8}>
+                  <Link href={`/tin-tuc/${blog.slug}`} style={{textDecoration: 'none'}}>
+                    <Card
+                      hoverable
+                      cover={
+                        blog.thumbnail && (
+                          <Image
+                            src={blog.thumbnail}
+                            alt={blog.title}
+                            style={{height: 200, objectFit: 'cover'}}
+                            preview={false}
+                          />
+                        )
+                      }
+                      style={{borderRadius: 12, overflow: 'hidden'}}
+                    >
+                      <Title level={4} ellipsis>
+                        {blog.title}
+                      </Title>
+                      <Paragraph ellipsis={{rows: 2}}>
+                        {blog.content.replace(/<[^>]+>/g, '').slice(0, 100)}...
+                      </Paragraph>
+                      <Text type='secondary' style={{fontSize: 12}}>
+                        {blog.author || 'Admin'} ·{' '}
+                        {new Date(blog.createdAt).toLocaleDateString('vi-VN')}
+                      </Text>
+                    </Card>
+                  </Link>
+                </Col>
+              ))}
           </Row>
         </Col>
       </Row>

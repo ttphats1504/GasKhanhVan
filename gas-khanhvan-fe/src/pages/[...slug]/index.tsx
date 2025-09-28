@@ -4,16 +4,28 @@ import LoadingOverlay from '@/components/common/LoadingOverlay'
 import GasCylinderPage from '@/components/gascylinder/GasCylinderPage'
 import CategoryLayout from '@/layouts/CategoryLayout'
 import Category from '@/models/Category'
+import Brand from '@/models/Brand'
 import {useRouter} from 'next/router'
 import {useEffect, useState} from 'react'
+import {Col} from 'antd'
+import ViewedProducts from '@/components/common/ViewedProducts'
 
-export const fetchCategoryBySlug = async (slugPath: string) => {
+export const fetchCategoryBySlug = async (slug: string) => {
   try {
-    const api = `/api/categories/slug/${slugPath}`
-    const res: any = await handleAPI(api, 'get')
+    const res: any = await handleAPI(`/api/categories/slug/${slug}`, 'get')
     return res
-  } catch (error) {
-    console.error('Failed to fetch category:', error)
+  } catch (err) {
+    console.error('Failed to fetch category:', err)
+    return null
+  }
+}
+
+export const fetchBrandBySlug = async (slug: string) => {
+  try {
+    const res: any = await handleAPI(`/api/brands/slug/${slug}`, 'get')
+    return res
+  } catch (err) {
+    console.error('Failed to fetch brand:', err)
     return null
   }
 }
@@ -21,48 +33,56 @@ export const fetchCategoryBySlug = async (slugPath: string) => {
 export default function CategoryPagePage() {
   const router = useRouter()
   const [breadcrumbs, setBreadcrumbs] = useState<CustomBreadcrumbItem[]>([])
-  const [category, setCategory] = useState<Category>()
+  const [category, setCategory] = useState<Category | null>(null)
+  const [brand, setBrand] = useState<Brand | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const loadCategory = async () => {
+    const loadData = async () => {
       let slugParam = router.query.slug
       if (!slugParam) return
 
-      // normalize slug
       const slugArray = Array.isArray(slugParam) ? slugParam : [slugParam]
+      const lastSlug = slugArray[slugArray.length - 1]
 
-      const lastSlug = slugParam[slugParam.length - 1]
-
-      const category = await fetchCategoryBySlug(lastSlug)
-      if (category) {
-        setCategory(category)
+      // Thử tìm category trước
+      const cat = await fetchCategoryBySlug(lastSlug)
+      if (cat) {
+        setCategory(cat)
+      } else {
+        const b = await fetchBrandBySlug(lastSlug)
+        if (b) setBrand(b)
       }
+
+      // Tạo breadcrumbs
       const breadcrumbItems: CustomBreadcrumbItem[] = await Promise.all(
         slugArray.map(async (s, i) => {
-          const cat = await fetchCategoryBySlug(s) // gọi API cho từng slug
+          const catItem = await fetchCategoryBySlug(s)
+          const brandItem = !catItem ? await fetchBrandBySlug(s) : null
           return {
-            label: cat?.name || decodeURIComponent(s.replace(/-/g, ' ')),
+            label: catItem?.name || brandItem?.name || decodeURIComponent(s.replace(/-/g, ' ')),
             href: '/' + slugArray.slice(0, i + 1).join('/'),
           }
         })
       )
 
       setBreadcrumbs([{label: 'Trang chủ', href: '/'}, ...breadcrumbItems])
-
       setLoading(false)
     }
 
-    loadCategory()
+    loadData()
   }, [router.query.slug])
 
-  if (!category || loading) return <></>
+  if (loading) return <LoadingOverlay spinning={true} />
 
+  // Hiển thị GasCylinderPage với category nếu có, hoặc chỉ brand nếu không có category
   return (
     <CategoryLayout>
-      <LoadingOverlay spinning={loading} />
-      <CustomBreadcrumbs items={breadcrumbs} />
-      <GasCylinderPage cate={category} />
+      <CustomBreadcrumbs items={breadcrumbs} style={{margin: '20px 0'}} />
+      <GasCylinderPage cate={category || undefined} selectedBrand={brand?.id || null} />
+      <Col xs={24} style={{marginTop: 40}}>
+        <ViewedProducts />
+      </Col>
     </CategoryLayout>
   )
 }

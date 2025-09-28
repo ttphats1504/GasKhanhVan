@@ -15,7 +15,6 @@ type CustomBreadcrumbsProps = {
 }
 
 const CustomBreadcrumbs: React.FC<CustomBreadcrumbsProps> = ({items, style}) => {
-  console.log(items)
   return (
     <Breadcrumb style={{...style}}>
       {items.map((item, index) =>

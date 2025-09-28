@@ -23,21 +23,21 @@ const CategoryList: React.FC = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
 
-  // Fetch data from the backend
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
+  const fetchData = async () => {
+    setLoading(true)
 
-      const res: any = await fetchCategoryDatas() // Call the function
+    const res: any = await fetchCategoryDatas() // Call the function
 
-      if (res && res.length > 0) {
-        setCategories(res)
-      }
-
-      setLoading(false)
+    if (res && res.length > 0) {
+      setCategories(res)
     }
 
-    fetchData() // Call the async function inside useEffect
+    setLoading(false)
+  }
+
+  // Fetch data from the backend
+  useEffect(() => {
+    fetchData()
   }, [])
 
   // Handle delete action
@@ -49,6 +49,7 @@ const CategoryList: React.FC = () => {
       setCategories((prevCategories) => prevCategories.filter((category) => category.id !== id))
 
       message.success('Category deleted successfully!')
+      fetchData()
     } catch (error) {
       message.error('Error deleting category')
     }
@@ -61,6 +62,7 @@ const CategoryList: React.FC = () => {
         : [...prev, newCategory]
     )
     setEditingCategory(null)
+    fetchData()
   }
 
   // Table columns
@@ -118,29 +120,29 @@ const CategoryList: React.FC = () => {
     },
   ]
 
-  const buildTree = (list: Category[]) => {
-    const map: {[key: number]: any} = {}
-    const roots: Category[] = []
+  // const buildTree = (list: Category[]) => {
+  //   const map: {[key: number]: any} = {}
+  //   const roots: Category[] = []
 
-    list.forEach((item: any) => (map[item.id] = {...item, children: []}))
+  //   list.forEach((item: any) => (map[item.id] = {...item, children: []}))
 
-    list.forEach((item: any) => {
-      if (item.parentId) {
-        map[item.parentId]?.children.push(map[item.id])
-      } else {
-        roots.push(map[item.id])
-      }
-    })
+  //   list.forEach((item: any) => {
+  //     if (item.parentId) {
+  //       map[item.parentId]?.children.push(map[item.id])
+  //     } else {
+  //       roots.push(map[item.id])
+  //     }
+  //   })
 
-    return roots
-  }
+  //   return roots
+  // }
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
       const res: any = await fetchCategoryDatas()
       if (res && res.length > 0) {
-        setCategories(buildTree(res)) // 👈 transform flat → tree
+        setCategories(res) // 👈 transform flat → tree
       }
       setLoading(false)
     }
@@ -167,7 +169,7 @@ const CategoryList: React.FC = () => {
       <Row gutter={[16, 16]}>
         <Col span={24}>
           <Input.Search
-            placeholder='Search products...'
+            placeholder='Search category...'
             style={{marginBottom: '20px', width: '300px'}}
           />
         </Col>

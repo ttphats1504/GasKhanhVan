@@ -7,38 +7,15 @@ import Product from '../../../../gkv-admin/src/models/Product'
 import {useEffect, useState} from 'react'
 import Category from '@/models/Category'
 import Brand from '@/models/Brand'
-import dynamic from 'next/dynamic'
-import {LeftOutlined, RightOutlined} from '@ant-design/icons'
 import LoadingOverlay from '../common/LoadingOverlay'
+import BrandsCarousel from '../common/BrandsCarousel'
 
 interface Props {
-  cate: Category
+  cate: Category | undefined
+  selectedBrand?: number | null // <- nhận từ ngoài
 }
 
-const Slider = dynamic(() => import('react-slick'), {ssr: false})
 const {Title} = Typography
-
-const fetchProductDatas = async () => {
-  const api = `/api/products`
-  try {
-    const res = await handleAPI(api, 'get')
-    return res
-  } catch (error) {
-    console.error('Error fetching Products:', error)
-    return []
-  }
-}
-
-const fetchProductDatasByCateId = async (categoryId: number) => {
-  const api = `/api/products?typeId=${categoryId}`
-  try {
-    const res = await handleAPI(api, 'get')
-    return res
-  } catch (error) {
-    console.error('Error fetching Products:', error)
-    return []
-  }
-}
 
 const fetchCategoryById = async (categoryId: number) => {
   const api = `/api/categories/${categoryId}`
@@ -62,24 +39,18 @@ const fetchBannerImages = async () => {
   }
 }
 
-const GasCylinderPage = ({cate}: Props) => {
+const GasCylinderPage = ({cate, selectedBrand: selectedBrandProp}: Props) => {
   const [products, setProducts] = useState<Product[]>([])
   const [category, setCategory] = useState<Category | null>()
   const [banners, setBanners] = useState<string[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [brands, setBrands] = useState<Brand[]>([])
+  const [selectedBrand, setSelectedBrand] = useState<number | null>(selectedBrandProp || null)
 
-  const NextArrow = ({onClick}: any) => (
-    <div className='custom-arrow next' onClick={onClick}>
-      <RightOutlined />
-    </div>
-  )
-
-  const PrevArrow = ({onClick}: any) => (
-    <div className='custom-arrow prev' onClick={onClick}>
-      <LeftOutlined />
-    </div>
-  )
+  // Cập nhật selectedBrand nếu prop thay đổi từ ngoài
+  useEffect(() => {
+    setSelectedBrand(selectedBrandProp || null)
+  }, [selectedBrandProp])
 
   useEffect(() => {
     const fetchBrands = async () => {
@@ -98,28 +69,46 @@ const GasCylinderPage = ({cate}: Props) => {
     setProducts([])
     setBanners([])
     setCategory(null)
+
     const fetchData = async () => {
       setLoading(true)
 
+      let typeIds: number[] = []
       if (cate) {
-        const isSanPham = cate.slug === 'san-pham'
-
-        const [productRes, bannerRes, cateRes]: any = await Promise.all([
-          isSanPham ? fetchProductDatas() : fetchProductDatasByCateId(cate.id),
-          fetchBannerImages(),
-          fetchCategoryById(cate.id),
-        ])
-
-        if (productRes?.totalItems) setProducts(productRes.data)
-        if (cateRes) setCategory(cateRes)
-        if (bannerRes?.length) setBanners(bannerRes.map((b: any) => b.image))
+        typeIds.push(cate.id)
+        // Nếu category có children, lấy id của children
+        if (cate.children && cate.children.length > 0) {
+          typeIds.push(...cate.children.map((c) => c.id))
+        }
       }
+
+      let productApi = '/api/products?'
+      if (selectedBrand) {
+        productApi += `brandId=${selectedBrand}`
+        if (typeIds.length) productApi += `&typeId=${typeIds.join(',')}`
+      } else if (typeIds.length) {
+        productApi += `typeId=${typeIds.join(',')}`
+      }
+
+      const [productRes, bannerRes, cateRes]: any = await Promise.all([
+        handleAPI(productApi, 'get'),
+        fetchBannerImages(),
+        cate ? fetchCategoryById(cate.id) : Promise.resolve(null),
+      ])
+
+      if (productRes?.totalItems) setProducts(productRes.data)
+      if (cateRes) setCategory(cateRes)
+      if (bannerRes?.length) setBanners(bannerRes.map((b: any) => b.image))
 
       setLoading(false)
     }
 
     fetchData()
-  }, [cate.id])
+  }, [cate?.id, selectedBrand])
+
+  const titleText = selectedBrand
+    ? brands.find((b) => b.id === selectedBrand)?.name
+    : category?.name
 
   return (
     <div className={styles.wrapper}>
@@ -131,50 +120,25 @@ const GasCylinderPage = ({cate}: Props) => {
           </div>
         ))}
       </Carousel>
+
       {brands.length > 0 && (
-        <div className={styles.partner_slider}>
-          <Slider
-            autoplay
-            autoplaySpeed={2000}
-            infinite
-            slidesToShow={6}
-            slidesToScroll={1}
-            arrows={true} // bật arrow
-            nextArrow={<NextArrow />} // arrow next
-            prevArrow={<PrevArrow />} // arrow prev
-            dots={false}
-            responsive={[
-              {breakpoint: 1200, settings: {slidesToShow: 5}},
-              {breakpoint: 992, settings: {slidesToShow: 4}},
-              {breakpoint: 768, settings: {slidesToShow: 3}},
-              {breakpoint: 480, settings: {slidesToShow: 2}},
-            ]}
-          >
-            {brands.map((brand) => (
-              <div key={brand.id}>
-                <Image
-                  src={brand.image}
-                  alt={brand.name}
-                  preview={false}
-                  className={styles.partner_image}
-                />
-              </div>
-            ))}
-          </Slider>
-        </div>
+        <BrandsCarousel
+          brands={brands}
+          onSelect={(brandId) => setSelectedBrand(brandId)}
+          selectedBrand={selectedBrand}
+        />
       )}
 
       <div>
         <Row gutter={32}>
-          {/* Sidebar */}
           <Col xs={24} md={6}>
             <FilterSideBar title='Danh mục sản phẩm' />
           </Col>
 
-          {/* Content */}
           <Col xs={24} md={18}>
             <Flex vertical>
-              {category && <Title level={3}>{category.name}</Title>}
+              {titleText && <Title level={3}>{titleText}</Title>}
+
               <Row gutter={[16, 16]}>
                 {products.length > 0 ? (
                   products.map((cylinder: any) => (

@@ -44,7 +44,7 @@ Blog.init(
     slug: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: 'unique_blog_slug',
     },
     content: {
       type: DataTypes.TEXT('long'), // lưu HTML hoặc Markdown

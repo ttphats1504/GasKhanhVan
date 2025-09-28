@@ -45,7 +45,7 @@ Brand.init(
     slug: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: 'unique_brand_slug',
     },
     order: {
       type: DataTypes.INTEGER.UNSIGNED,

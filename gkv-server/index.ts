@@ -11,6 +11,7 @@ import incentiveRoutes from './src/routers/incentiveRoutes'
 import bannerRoutes from './src/routers/bannerRoutes'
 import brandsRoutes from './src/routers/brandsRoutes'
 import blogRoutes from './src/routers/blogRoutes'
+import uploadRoutes from './src/routers/uploadRoutes'
 
 import {mysqlDB} from './src/database/mysql'
 import Product from './src/models/ProductModel'
@@ -83,6 +84,7 @@ app.use('/api/incentives', incentiveRoutes)
 app.use('/api/banners', bannerRoutes)
 app.use('/api/brands', brandsRoutes)
 app.use('/api/blogs', blogRoutes)
+app.use('/api', uploadRoutes)
 
 // Start server
 const startServer = async () => {

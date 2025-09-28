@@ -81,17 +81,19 @@ const BlogDetailPage = () => {
         {/* Sidebar tin tức khác */}
         <Col sm={24} md={6}>
           <Card title='Bài viết mới nhất' size='small'>
-            {relatedBlogs.map((b: any) => (
-              <div
-                key={b.id}
-                className={styles.related_item}
-                onClick={() => router.push(`/tin-tuc/${b.slug}`)}
-              >
-                <Image src={b.thumbnail} alt={b.title} preview={false} width='100%' />
-                <Text strong>{b.title}</Text>
-                <Divider />
-              </div>
-            ))}
+            {relatedBlogs
+              .filter((blog) => blog.published)
+              .map((b: any) => (
+                <div
+                  key={b.id}
+                  className={styles.related_item}
+                  onClick={() => router.push(`/tin-tuc/${b.slug}`)}
+                >
+                  <Image src={b.thumbnail} alt={b.title} preview={false} width='100%' />
+                  <Text strong>{b.title}</Text>
+                  <Divider />
+                </div>
+              ))}
           </Card>
         </Col>
       </Row>

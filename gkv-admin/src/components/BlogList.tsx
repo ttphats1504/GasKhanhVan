@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {Card, Table, Button, Space, Popconfirm, Input, message, Switch} from 'antd'
-import {PlusOutlined, EditOutlined, DeleteOutlined} from '@ant-design/icons'
+import {PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined} from '@ant-design/icons'
 import handleAPI from '../apis/handleAPI'
 import Blog from '../models/Blog'
 import BlogForm from './BlogForm'
@@ -15,7 +15,7 @@ const BlogList: React.FC = () => {
   const [total, setTotal] = useState(0)
   const [editing, setEditing] = useState<Blog | null>(null)
   const [formVisible, setFormVisible] = useState(false)
-  const [mode, setMode] = useState<'add' | 'edit'>('add') // 👈 thêm mode
+  const [mode, setMode] = useState<'add' | 'edit' | 'duplicate'>('add') // 👈 thêm mode
   const [search, setSearch] = useState('')
 
   const fetchData = async () => {
@@ -73,6 +73,19 @@ const BlogList: React.FC = () => {
       message.error('Update failed')
     }
   }
+  const handleDuplicate = (blog: Blog) => {
+    // Tạo bản copy để truyền xuống form
+    const copy: Blog = {
+      ...blog,
+      id: 0 as any, // bỏ id (hoặc undefined nếu model cho phép)
+      title: blog.title + ' (copy)',
+      slug: blog.slug + '-copy',
+    }
+
+    setEditing(copy)
+    setMode('duplicate') // 👈 duplicate thì vẫn là tạo mới
+    setFormVisible(true)
+  }
 
   const columns = [
     {title: 'ID', dataIndex: 'id', key: 'id', width: 80},
@@ -99,6 +112,7 @@ const BlogList: React.FC = () => {
       render: (_: any, record: Blog) => (
         <Space>
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+          <Button icon={<CopyOutlined />} onClick={() => handleDuplicate(record)} />
           <Popconfirm title='Delete blog?' onConfirm={() => handleDelete(record.id)}>
             <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>

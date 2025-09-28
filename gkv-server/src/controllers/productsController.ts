@@ -65,7 +65,8 @@ export const getAllProducts = async (req: Request, res: Response) => {
 
     const whereClause: any = {}
     if (typeId) {
-      whereClause.typeId = typeId // lọc theo typeId
+      const typeIds = (typeId as string).split(',').map((id) => Number(id))
+      whereClause.typeId = {[Op.in]: typeIds}
     }
 
     if (brandId) {
