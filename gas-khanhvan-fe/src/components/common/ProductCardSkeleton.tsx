@@ -8,7 +8,7 @@ interface ProductCardSkeletonProps {
     sm?: number;
     md?: number;
     lg?: number;
-    xl?: number;
+    xl?: number; // Added xl breakpoint support
   };
 }
 
