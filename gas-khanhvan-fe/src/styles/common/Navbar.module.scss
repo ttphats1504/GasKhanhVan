@@ -1,20 +1,125 @@
 .wrapper {
   display: flex;
   justify-content: space-between;
-  padding: 5px 0;
+  padding: 0;
   align-items: center;
-  position: sticky !important;
-  z-index: 9999;
+  max-width: 1440px;
+  margin: 0 auto;
+
   :global {
     .ant-menu {
       display: flex;
       justify-content: center;
       width: 100%;
       border-bottom: none !important;
+      background: transparent !important;
+      gap: 8px;
     }
-    .ant-menu-title-content {
-      font-size: 1rem;
+
+    .ant-menu-item,
+    .ant-menu-submenu {
+      color: #ffffff !important;
       font-weight: 700;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      padding: 10px 20px !important;
+      margin: 0 2px !important;
+      border-radius: 0 !important;
+      position: relative;
+      height: auto !important;
+      line-height: 1.5 !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+      // Xóa tất cả pseudo elements của Ant Design
+      &::before,
+      &::after {
+        display: none !important;
+        content: none !important;
+      }
+
+      // Dùng border-bottom có sẵn của Ant Design
+      border-left: none !important;
+      border-right: none !important;
+      border-top: none !important;
+      border-bottom: 4px solid transparent !important;
+
+      &:hover {
+        color: #ffffff !important;
+        background: rgba(255, 107, 0, 0.3) !important;
+        border-bottom-color: #ffffff !important;
+
+        &::before,
+        &::after {
+          display: none !important;
+        }
+      }
+
+      &.ant-menu-item-selected,
+      &.ant-menu-submenu-selected {
+        color: #ffffff !important;
+        background: rgba(255, 107, 0, 0.4) !important;
+        font-weight: 800;
+        border-bottom: 5px solid #ffffff !important;
+
+        &::before,
+        &::after {
+          display: none !important;
+        }
+      }
+    }
+
+    // Override cho active state
+    .ant-menu-item-active,
+    .ant-menu-submenu-active {
+      &::before,
+      &::after {
+        display: none !important;
+      }
+    }
+
+    // Submenu title (chữ trắng)
+    .ant-menu-submenu-title {
+      color: #ffffff !important;
+
+      .ant-menu-submenu-arrow {
+        color: #ffffff !important;
+      }
+    }
+
+    .ant-menu-title-content {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      line-height: 1.5;
+    }
+
+    // Submenu dropdown
+    .ant-menu-submenu-popup {
+      .ant-menu {
+        background: #fff !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        border: 2px solid var(--primary-yellow-500);
+        padding: 8px;
+      }
+
+      .ant-menu-item {
+        border: none !important;
+        border-radius: 8px;
+        margin: 4px 0 !important;
+        height: auto !important;
+        line-height: 1.5 !important;
+        padding: 10px 16px !important;
+        color: #1a1a1a !important;
+
+        &:hover {
+          background: linear-gradient(135deg, #fff8e6 0%, #ffe6b3 100%) !important;
+          color: #ff6b00 !important;
+          transform: translateX(4px);
+          border: none !important;
+        }
+      }
     }
   }
 }
@@ -24,10 +129,38 @@
   position: -webkit-sticky;
   position: sticky;
   top: 0;
-  z-index: 1000;
-  background-color: #fff;
-  border-bottom: 1px solid #cacaca;
-  box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.2);
+  z-index: 998;
+  background: linear-gradient(135deg, #ff6b00 0%, #ff8c00 50%, #ffb81f 100%);
+  border-bottom: 4px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.6) 50%,
+      transparent 100%
+    );
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff6b00 0%, #ff8c00 100%);
+  }
+
+  @media (max-width: 1024px) {
+    padding: 0 24px;
+  }
 }
 
 .navbar_sticky_mobile {
