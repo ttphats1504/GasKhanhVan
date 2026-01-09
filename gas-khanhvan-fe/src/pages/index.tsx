@@ -9,9 +9,9 @@ import SaleBanner from "@/components/common/SaleBanner";
 import HomeLayout from "@/layouts/HomeLayout";
 import handleAPI from "@/apis/handleAPI";
 import Category from "@/models/Category";
-import { Flex, Typography } from "antd";
+import { Flex, Typography, Skeleton } from "antd";
 import Brand from "@/models/Brand";
-import LoadingOverlay from "@/components/common/LoadingOverlay";
+import ProductCardSkeleton from "@/components/common/ProductCardSkeleton";
 
 const { Title } = Typography;
 
@@ -69,54 +69,63 @@ export default function Home() {
           content="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV6JUe_TejYzBFTSUEVdiHsHzVqWOLE1fGXg&s"
         />
       </Head>
-      <LoadingOverlay spinning={loading} />
-      {!loading && (
-        <HomeLayout>
-          <>
-            <PromotionCarousel />
-            <div className={styles.top_bg}>
-              <Incentives />
-
-              <Flex justify="center" align="center">
-                <Title level={2} className={styles.title}>
-                  SẢN PHẨM
-                </Title>
-                <div className={styles.border}></div>
-              </Flex>
-
-              <ProductSection isFeatured title="Khuyến mãi hôm nay" />
-
-              {categories.map((cat: any) =>
-                cat.children && cat.children.length > 0 ? (
-                  cat.children.map((child: Category) => (
-                    <ProductSection
-                      key={`cat-${child.id}`}
-                      title={child.name}
-                      categoryId={child.id}
-                    />
-                  ))
-                ) : (
-                  <ProductSection
-                    key={`cat-${cat.id}`}
-                    title={cat.name}
-                    categoryId={cat.id}
-                  />
-                )
-              )}
-
-              {brands.map((brand: any) => (
-                <ProductSection
-                  key={`brand-${brand.id}`}
-                  title={brand.name}
-                  brandId={brand.id}
-                />
-              ))}
-
-              <SaleBanner />
+      <HomeLayout>
+        <>
+          {loading ? (
+            <div style={{ padding: "20px 0" }}>
+              <Skeleton.Image
+                active
+                style={{ width: "100%", height: 400, marginBottom: 20 }}
+              />
+              <ProductCardSkeleton count={12} />
             </div>
-          </>
-        </HomeLayout>
-      )}
+          ) : (
+            <>
+              <PromotionCarousel />
+              <div className={styles.top_bg}>
+                <Incentives />
+
+                <Flex justify="center" align="center">
+                  <Title level={2} className={styles.title}>
+                    SẢN PHẨM
+                  </Title>
+                  <div className={styles.border}></div>
+                </Flex>
+
+                <ProductSection isFeatured title="Khuyến mãi hôm nay" />
+
+                {categories.map((cat: any) =>
+                  cat.children && cat.children.length > 0 ? (
+                    cat.children.map((child: Category) => (
+                      <ProductSection
+                        key={`cat-${child.id}`}
+                        title={child.name}
+                        categoryId={child.id}
+                      />
+                    ))
+                  ) : (
+                    <ProductSection
+                      key={`cat-${cat.id}`}
+                      title={cat.name}
+                      categoryId={cat.id}
+                    />
+                  )
+                )}
+
+                {brands.map((brand: any) => (
+                  <ProductSection
+                    key={`brand-${brand.id}`}
+                    title={brand.name}
+                    brandId={brand.id}
+                  />
+                ))}
+
+                <SaleBanner />
+              </div>
+            </>
+          )}
+        </>
+      </HomeLayout>
     </>
   );
 }

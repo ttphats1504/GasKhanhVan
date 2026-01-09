@@ -1,5 +1,5 @@
-import {useRouter} from 'next/router'
-import {useEffect, useLayoutEffect, useState} from 'react'
+import { useRouter } from "next/router";
+import { useEffect, useLayoutEffect, useState } from "react";
 import {
   Card,
   Typography,
@@ -15,101 +15,104 @@ import {
   Rate,
   Flex,
   Pagination,
-} from 'antd'
-import {GiftOutlined, PhoneOutlined} from '@ant-design/icons'
-import MainLayout from '@/layouts/MainLayout'
-import ProductCard from '@/components/common/ProductCard'
-import handleAPI from '@/apis/handleAPI'
-import Product from '@/models/Product'
-import formatCurrency from '@/utils/formatCurrency'
-import styles from '@/styles/gascylinder/ProductDetailsPage.module.scss'
-import {Modal} from 'antd'
-import {RobotOutlined, LoadingOutlined} from '@ant-design/icons'
-import DOMPurify from 'dompurify'
-import LoadingOverlay from '@/components/common/LoadingOverlay'
-import ViewedProducts from '@/components/common/ViewedProducts'
+  Skeleton,
+} from "antd";
+import { GiftOutlined, PhoneOutlined } from "@ant-design/icons";
+import MainLayout from "@/layouts/MainLayout";
+import ProductCard from "@/components/common/ProductCard";
+import handleAPI from "@/apis/handleAPI";
+import Product from "@/models/Product";
+import formatCurrency from "@/utils/formatCurrency";
+import styles from "@/styles/gascylinder/ProductDetailsPage.module.scss";
+import { Modal } from "antd";
+import { RobotOutlined, LoadingOutlined } from "@ant-design/icons";
+import DOMPurify from "dompurify";
+import ViewedProducts from "@/components/common/ViewedProducts";
+import ProductCardSkeleton from "@/components/common/ProductCardSkeleton";
 
-const {Title, Text, Paragraph} = Typography
+const { Title, Text, Paragraph } = Typography;
 
 const fetchProductDatas = async () => {
   try {
-    return await handleAPI('/api/products', 'get')
+    return await handleAPI("/api/products", "get");
   } catch (error) {
-    console.error('Error fetching Products:', error)
-    return []
+    console.error("Error fetching Products:", error);
+    return [];
   }
-}
+};
 
 const ProductDetail: React.FC = () => {
-  const router = useRouter()
-  const {slug} = router.query
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
-  const [outstandingProducts, setOutstandingProducts] = useState<Product[]>([])
-  const [product, setProduct] = useState<Product>()
-  const [loading, setLoading] = useState(true)
-  const [savePrice, setSavePrice] = useState(0)
-  const [expand, setExpand] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(4)
-  const [aiVisible, setAiVisible] = useState(false)
-  const [aiAnswer, setAiAnswer] = useState('')
-  const [aiLoading, setAiLoading] = useState(false)
+  const router = useRouter();
+  const { slug } = router.query;
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [outstandingProducts, setOutstandingProducts] = useState<Product[]>([]);
+  const [product, setProduct] = useState<Product>();
+  const [loading, setLoading] = useState(true);
+  const [savePrice, setSavePrice] = useState(0);
+  const [expand, setExpand] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(4);
+  const [aiVisible, setAiVisible] = useState(false);
+  const [aiAnswer, setAiAnswer] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   const handleAskAI = async (question: string) => {
-    if (!product) return
+    if (!product) return;
     try {
-      setAiLoading(true)
-      setAiAnswer('')
+      setAiLoading(true);
+      setAiAnswer("");
 
       const response: any = await handleAPI(
-        '/api/products/ask-ai',
-        'post',
+        "/api/products/ask-ai",
+        "post",
         {
           Id: product.id,
           question,
         },
         {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         }
-      )
-      const cleanHtml = DOMPurify.sanitize(response.html)
-      const stripMarkdown = cleanHtml.replace(/```[html]*|```/g, '')
-      setAiAnswer(stripMarkdown)
+      );
+      const cleanHtml = DOMPurify.sanitize(response.html);
+      const stripMarkdown = cleanHtml.replace(/```[html]*|```/g, "");
+      setAiAnswer(stripMarkdown);
     } catch (err) {
-      console.error('Ask AI error:', err)
-      setAiAnswer('Xin lỗi, AI hiện không phản hồi được. Vui lòng thử lại sau.')
+      console.error("Ask AI error:", err);
+      setAiAnswer(
+        "Xin lỗi, AI hiện không phản hồi được. Vui lòng thử lại sau."
+      );
     } finally {
-      setAiLoading(false)
+      setAiLoading(false);
     }
-  }
+  };
 
   // 🔹 Detect screen size
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         if (slug) {
-          const res: any = await handleAPI(`/api/products/slug/${slug}`, 'get')
-          setProduct(res)
+          const res: any = await handleAPI(`/api/products/slug/${slug}`, "get");
+          setProduct(res);
         }
       } catch (error) {
-        console.error(error)
+        console.error(error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchProduct()
-  }, [slug])
+    fetchProduct();
+  }, [slug]);
 
   // Fetch list
   useEffect(() => {
@@ -117,54 +120,93 @@ const ProductDetail: React.FC = () => {
       fetchProductDatas().then((res: any) => {
         const relatedProducts: Product[] = res?.data
           .filter((c: any) => parseInt(c.typeId) == product?.typeId)
-          .slice(0, 5)
+          .slice(0, 5);
         const outstandingProducts: Product[] = res?.data
           .filter((c: any) => c.id != product?.id)
-          .slice(0, 5)
-        setRelatedProducts(relatedProducts)
-        setOutstandingProducts(outstandingProducts)
-      })
+          .slice(0, 5);
+        setRelatedProducts(relatedProducts);
+        setOutstandingProducts(outstandingProducts);
+      });
 
-      const saved: any = product.old_price - product.price
-      setSavePrice(saved)
+      const saved: any = product.old_price - product.price;
+      setSavePrice(saved);
     }
-  }, [slug, product])
+  }, [slug, product]);
 
   const updatePageSize = () => {
     if (window.innerWidth < 576) {
-      setPageSize(2) // mobile
+      setPageSize(2); // mobile
     } else if (window.innerWidth < 992) {
-      setPageSize(3) // tablet
+      setPageSize(3); // tablet
     } else {
-      setPageSize(4) // desktop
+      setPageSize(4); // desktop
     }
-  }
+  };
 
   useEffect(() => {
-    updatePageSize()
-    window.addEventListener('resize', updatePageSize)
-    return () => window.removeEventListener('resize', updatePageSize)
-  }, [])
+    updatePageSize();
+    window.addEventListener("resize", updatePageSize);
+    return () => window.removeEventListener("resize", updatePageSize);
+  }, []);
 
   useEffect(() => {
-    if (!product) return
-    const stored = JSON.parse(localStorage.getItem('viewedProducts') || '[]') as Product[]
-    const filtered = stored.filter((p) => p.id !== product.id)
-    const updated = [product, ...filtered].slice(0, 50)
-    localStorage.setItem('viewedProducts', JSON.stringify(updated))
-  }, [product])
+    if (!product) return;
+    const stored = JSON.parse(
+      localStorage.getItem("viewedProducts") || "[]"
+    ) as Product[];
+    const filtered = stored.filter((p) => p.id !== product.id);
+    const updated = [product, ...filtered].slice(0, 50);
+    localStorage.setItem("viewedProducts", JSON.stringify(updated));
+  }, [product]);
 
   const pagedRelatedProducts = relatedProducts.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
-  )
+  );
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <Breadcrumb style={{ margin: "16px 0" }}>
+          <Breadcrumb.Item href="/">Trang chủ</Breadcrumb.Item>
+          <Breadcrumb.Item href="/san-pham">Sản phẩm</Breadcrumb.Item>
+          <Breadcrumb.Item>...</Breadcrumb.Item>
+        </Breadcrumb>
+        <Row gutter={[32, 32]}>
+          <Col xs={24} md={18}>
+            <Card>
+              <Row gutter={24}>
+                <Col xs={24} md={10}>
+                  <Skeleton.Image
+                    active
+                    style={{ width: "100%", height: 300 }}
+                  />
+                </Col>
+                <Col xs={24} md={14}>
+                  <Skeleton active paragraph={{ rows: 8 }} />
+                </Col>
+              </Row>
+            </Card>
+            <Card style={{ marginTop: 20 }}>
+              <Skeleton active paragraph={{ rows: 10 }} />
+            </Card>
+          </Col>
+          <Col xs={24} md={6}>
+            <Card>
+              <Skeleton active paragraph={{ rows: 5 }} />
+            </Card>
+          </Col>
+        </Row>
+        <ProductCardSkeleton count={4} />
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
-      <LoadingOverlay spinning={loading} />
-      <Breadcrumb style={{margin: '16px 0'}}>
-        <Breadcrumb.Item href='/'>Trang chủ</Breadcrumb.Item>
-        <Breadcrumb.Item href='/san-pham'>Sản phẩm</Breadcrumb.Item>
+      <Breadcrumb style={{ margin: "16px 0" }}>
+        <Breadcrumb.Item href="/">Trang chủ</Breadcrumb.Item>
+        <Breadcrumb.Item href="/san-pham">Sản phẩm</Breadcrumb.Item>
         <Breadcrumb.Item>{product?.name}</Breadcrumb.Item>
       </Breadcrumb>
 
@@ -174,22 +216,22 @@ const ProductDetail: React.FC = () => {
             <Row gutter={[24, 24]}>
               {/* Main product card */}
               <Col xs={24}>
-                <Card bordered={false} style={{borderRadius: '10px'}}>
-                  <Row gutter={24} align='top'>
+                <Card bordered={false} style={{ borderRadius: "10px" }}>
+                  <Row gutter={24} align="top">
                     {/* Image */}
                     <Col xs={24} md={10}>
                       <Badge.Ribbon
-                        text={product.stock > 0 ? 'Còn hàng' : 'Hết hàng'}
-                        color={product.stock > 0 ? 'green' : 'red'}
+                        text={product.stock > 0 ? "Còn hàng" : "Hết hàng"}
+                        color={product.stock > 0 ? "green" : "red"}
                       >
                         <Image
-                          width='100%'
+                          width="100%"
                           src={product.image}
                           alt={product.name}
                           style={{
-                            borderRadius: '3px',
-                            padding: '4px',
-                            objectFit: 'cover',
+                            borderRadius: "3px",
+                            padding: "4px",
+                            objectFit: "cover",
                           }}
                         />
                       </Badge.Ribbon>
@@ -218,9 +260,14 @@ const ProductDetail: React.FC = () => {
                         {aiLoading ? 'Đang tư vấn...' : 'AI tư vấn'}
                       </Button> */}
 
-                      <Flex gap='middle' align='center'>
-                        <Rate allowHalf disabled defaultValue={4.5} style={{fontSize: '16px'}} />
-                        <Text type='secondary'>
+                      <Flex gap="middle" align="center">
+                        <Rate
+                          allowHalf
+                          disabled
+                          defaultValue={4.5}
+                          style={{ fontSize: "16px" }}
+                        />
+                        <Text type="secondary">
                           10 lượt đánh giá (<a>Xem Ngay</a>)
                         </Text>
                       </Flex>
@@ -228,49 +275,62 @@ const ProductDetail: React.FC = () => {
                       {/* Price */}
                       <Title
                         level={3}
-                        style={{color: '#E53935', fontWeight: 'bold', marginBottom: 0}}
+                        style={{
+                          color: "#E53935",
+                          fontWeight: "bold",
+                          marginBottom: 0,
+                        }}
                       >
-                        {product?.price ? formatCurrency(product.price) : 'LIÊN HỆ'}{' '}
-                        <Text style={{fontSize: 14}}>(Đã bao gồm VAT)</Text>
+                        {product?.price
+                          ? formatCurrency(product.price)
+                          : "LIÊN HỆ"}{" "}
+                        <Text style={{ fontSize: 14 }}>(Đã bao gồm VAT)</Text>
                       </Title>
-                      <Text delete type='secondary'>
-                        Giá Thị Trường:{' '}
+                      <Text delete type="secondary">
+                        Giá Thị Trường:{" "}
                         {product.old_price > 0
                           ? formatCurrency(product.old_price)
                           : formatCurrency(product.price)}
                       </Text>
                       <br />
                       {savePrice > 0 ? (
-                        <Tag color='red'>Tiết Kiệm {formatCurrency(savePrice)}</Tag>
+                        <Tag color="red">
+                          Tiết Kiệm {formatCurrency(savePrice)}
+                        </Tag>
                       ) : (
-                        <Tag color='green'>Giá tốt</Tag>
+                        <Tag color="green">Giá tốt</Tag>
                       )}
 
                       {/* CTA Buttons */}
-                      <Row gutter={[16, 16]} style={{margin: '14px 0px'}}>
+                      <Row gutter={[16, 16]} style={{ margin: "14px 0px" }}>
                         {/* Chat Zalo */}
-                        <Col xs={24} sm={12} style={{paddingLeft: 0}}>
+                        <Col xs={24} sm={12} style={{ paddingLeft: 0 }}>
                           <Button
-                            type='primary'
-                            size='large'
+                            type="primary"
+                            size="large"
                             block
                             icon={
                               <Image
-                                src='/assets/zalo.png'
+                                src="/assets/zalo.png"
                                 width={24}
                                 height={24}
-                                alt='zalo'
+                                alt="zalo"
                                 preview={false}
                               />
                             }
-                            style={{height: 'auto', padding: '12px'}}
-                            onClick={() => window.open('https://zalo.me/0937762979', '_blank')}
+                            style={{ height: "auto", padding: "12px" }}
+                            onClick={() =>
+                              window.open(
+                                "https://zalo.me/0937762979",
+                                "_blank"
+                              )
+                            }
                           >
-                            <Flex vertical align='center' gap={4}>
-                              <Flex align='center' gap={8}>
+                            <Flex vertical align="center" gap={4}>
+                              <Flex align="center" gap={8}>
                                 <span>Liên hệ qua Zalo</span>
                               </Flex>
-                              <Text style={{fontSize: 12, color: '#fff'}}>
+                              <Text style={{ fontSize: 12, color: "#fff" }}>
                                 (Giải Pháp Hỗ Trợ Tức Thì)
                               </Text>
                             </Flex>
@@ -279,19 +339,23 @@ const ProductDetail: React.FC = () => {
                         {/* Gọi ngay */}
                         <Col xs={24} sm={12}>
                           <Button
-                            type='default'
+                            type="default"
                             danger
-                            size='large'
+                            size="large"
                             block
-                            style={{height: 'auto', padding: '12px'}}
-                            onClick={() => (window.location.href = 'tel:02837731612')}
+                            style={{ height: "auto", padding: "12px" }}
+                            onClick={() =>
+                              (window.location.href = "tel:02837731612")
+                            }
                           >
-                            <Flex vertical align='center' gap={4}>
-                              <Flex align='center' gap={8}>
+                            <Flex vertical align="center" gap={4}>
+                              <Flex align="center" gap={8}>
                                 <PhoneOutlined />
                                 <span>Gọi Đặt Ngay</span>
                               </Flex>
-                              <Text style={{fontSize: 14, color: '#000'}}>(028 3773 1612)</Text>
+                              <Text style={{ fontSize: 14, color: "#000" }}>
+                                (028 3773 1612)
+                              </Text>
                             </Flex>
                           </Button>
                         </Col>
@@ -301,21 +365,28 @@ const ProductDetail: React.FC = () => {
                         <Card
                           bordered
                           style={{
-                            borderColor: '#f5222d',
+                            borderColor: "#f5222d",
                             borderRadius: 12,
-                            background: '#fffbe6',
+                            background: "#fffbe6",
                           }}
                         >
-                          <Space align='center' style={{marginBottom: 12}}>
-                            <GiftOutlined style={{fontSize: 20, color: '#faad14'}} />
-                            <Title level={4} style={{margin: 0, color: '#d4380d'}}>
+                          <Space align="center" style={{ marginBottom: 12 }}>
+                            <GiftOutlined
+                              style={{ fontSize: 20, color: "#faad14" }}
+                            />
+                            <Title
+                              level={4}
+                              style={{ margin: 0, color: "#d4380d" }}
+                            >
                               ƯU ĐÃI THÊM
                             </Title>
                           </Space>
 
                           <div
-                            dangerouslySetInnerHTML={{__html: product.description}}
-                            style={{lineHeight: 1.6}}
+                            dangerouslySetInnerHTML={{
+                              __html: product.description,
+                            }}
+                            style={{ lineHeight: 1.6 }}
                           />
                         </Card>
                       )}
@@ -327,32 +398,39 @@ const ProductDetail: React.FC = () => {
               <Col xs={24}>
                 <Card>
                   <Tabs
-                    defaultActiveKey='1'
-                    style={{marginTop: 20}}
+                    defaultActiveKey="1"
+                    style={{ marginTop: 20 }}
                     items={[
                       {
-                        key: '1',
-                        label: 'Thông tin sản phẩm',
+                        key: "1",
+                        label: "Thông tin sản phẩm",
                         children: (
                           <>
                             {isMobile ? (
                               <>
                                 <div
                                   style={{
-                                    maxHeight: expand ? 'none' : 300,
-                                    overflow: 'hidden',
+                                    maxHeight: expand ? "none" : 300,
+                                    overflow: "hidden",
                                   }}
-                                  dangerouslySetInnerHTML={{__html: product.description2}}
+                                  dangerouslySetInnerHTML={{
+                                    __html: product.description2,
+                                  }}
                                   className={styles.description2}
                                 />
-                                <Button type='link' onClick={() => setExpand(!expand)}>
-                                  {expand ? 'Thu gọn' : 'Xem thêm'}
+                                <Button
+                                  type="link"
+                                  onClick={() => setExpand(!expand)}
+                                >
+                                  {expand ? "Thu gọn" : "Xem thêm"}
                                 </Button>
                               </>
                             ) : (
                               <>
                                 <div
-                                  dangerouslySetInnerHTML={{__html: product.description2}}
+                                  dangerouslySetInnerHTML={{
+                                    __html: product.description2,
+                                  }}
                                   className={styles.description2}
                                 />
                               </>
@@ -361,9 +439,11 @@ const ProductDetail: React.FC = () => {
                         ),
                       },
                       {
-                        key: '2',
-                        label: 'Đánh giá',
-                        children: <Text>Chưa có đánh giá nào! Đánh giá ngay.</Text>,
+                        key: "2",
+                        label: "Đánh giá",
+                        children: (
+                          <Text>Chưa có đánh giá nào! Đánh giá ngay.</Text>
+                        ),
                       },
                     ]}
                   />
@@ -378,28 +458,28 @@ const ProductDetail: React.FC = () => {
               <Card
                 bordered={false}
                 style={{
-                  borderRadius: '10px',
-                  background: '#fafafa',
+                  borderRadius: "10px",
+                  background: "#fafafa",
                 }}
               >
-                <Title level={4} style={{color: '#f66b34'}}>
+                <Title level={4} style={{ color: "#f66b34" }}>
                   Chính sách Gas Khánh Vân
                 </Title>
                 <Row gutter={[16, 16]}>
                   <Col span={24}>
-                    <Space direction='vertical'>
+                    <Space direction="vertical">
                       <Title level={5}>🚚 Giao hàng nhanh</Title>
                       <Text>Miễn phí giao hàng trong bán kính 5km.</Text>
                     </Space>
                   </Col>
                   <Col span={24}>
-                    <Space direction='vertical'>
+                    <Space direction="vertical">
                       <Title level={5}>🛡️ Bảo hành chính hãng</Title>
                       <Text>Sản phẩm chính hãng, bảo hành đầy đủ.</Text>
                     </Space>
                   </Col>
                   <Col span={24}>
-                    <Space direction='vertical'>
+                    <Space direction="vertical">
                       <Title level={5}>📞 Hỗ trợ 24/7</Title>
                       <Text>Hotline: 001230012 luôn sẵn sàng hỗ trợ bạn.</Text>
                     </Space>
@@ -409,11 +489,11 @@ const ProductDetail: React.FC = () => {
               <Card
                 bordered={false}
                 style={{
-                  borderRadius: '10px',
-                  background: '#fafafa',
+                  borderRadius: "10px",
+                  background: "#fafafa",
                 }}
               >
-                <Title level={4} style={{color: '#f66b34'}}>
+                <Title level={4} style={{ color: "#f66b34" }}>
                   Sản phẩm nổi bật
                 </Title>
                 <Row gutter={[16, 16]}>
@@ -432,7 +512,7 @@ const ProductDetail: React.FC = () => {
           </Col>
 
           {/* Related Products */}
-          <Col xs={24} style={{marginTop: 40}}>
+          <Col xs={24} style={{ marginTop: 40 }}>
             <Title level={3}>Sản phẩm liên quan</Title>
             <Row gutter={[16, 16]}>
               {pagedRelatedProducts.length > 0 ? (
@@ -448,7 +528,7 @@ const ProductDetail: React.FC = () => {
 
             {/* Pagination */}
             {relatedProducts.length > pageSize && (
-              <Row justify='center' style={{marginTop: 20}}>
+              <Row justify="center" style={{ marginTop: 20 }}>
                 <Pagination
                   current={currentPage}
                   pageSize={pageSize}
@@ -459,7 +539,7 @@ const ProductDetail: React.FC = () => {
               </Row>
             )}
           </Col>
-          <Col xs={24} style={{marginTop: 40}}>
+          <Col xs={24} style={{ marginTop: 40 }}>
             <ViewedProducts excludeProductId={parseInt(product?.id)} />
           </Col>
         </Row>
@@ -468,8 +548,8 @@ const ProductDetail: React.FC = () => {
       )}
       <Modal
         title={
-          <Flex align='center' gap={8}>
-            <RobotOutlined style={{color: '#764ba2'}} />
+          <Flex align="center" gap={8}>
+            <RobotOutlined style={{ color: "#764ba2" }} />
             <span>AI Tư Vấn Sản Phẩm</span>
           </Flex>
         }
@@ -479,31 +559,34 @@ const ProductDetail: React.FC = () => {
         centered
       >
         {aiLoading ? (
-          <Flex align='center' justify='center' style={{minHeight: 120}}>
-            <LoadingOutlined style={{fontSize: 28, color: '#764ba2'}} spin />
+          <Flex align="center" justify="center" style={{ minHeight: 120 }}>
+            <LoadingOutlined style={{ fontSize: 28, color: "#764ba2" }} spin />
           </Flex>
         ) : (
           <Card
             bordered={false}
             style={{
-              background: '#fafafa',
+              background: "#fafafa",
               borderRadius: 12,
               padding: 16,
-              boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-              maxHeight: '60vh',
-              overflowY: 'auto',
+              boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+              maxHeight: "60vh",
+              overflowY: "auto",
             }}
           >
             {aiAnswer ? (
-              <div className={styles.ai_answer} dangerouslySetInnerHTML={{__html: aiAnswer}} />
+              <div
+                className={styles.ai_answer}
+                dangerouslySetInnerHTML={{ __html: aiAnswer }}
+              />
             ) : (
-              <Paragraph type='secondary'>AI chưa có câu trả lời.</Paragraph>
+              <Paragraph type="secondary">AI chưa có câu trả lời.</Paragraph>
             )}
           </Card>
         )}
       </Modal>
     </MainLayout>
-  )
-}
+  );
+};
 
-export default ProductDetail
+export default ProductDetail;
