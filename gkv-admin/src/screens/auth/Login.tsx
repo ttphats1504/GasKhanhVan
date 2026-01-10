@@ -36,12 +36,8 @@ const Login = () => {
       if (res.data) {
         dispatch(addAuth(res.data));
 
-        if (isRemember) {
-          localStorage.setItem(
-            localDataNames.authData,
-            JSON.stringify(res.data)
-          );
-        }
+        // Always save to localStorage to persist auth state on reload
+        localStorage.setItem(localDataNames.authData, JSON.stringify(res.data));
       }
     } catch (error: any) {
       message.error(error.message || "Login failed!");

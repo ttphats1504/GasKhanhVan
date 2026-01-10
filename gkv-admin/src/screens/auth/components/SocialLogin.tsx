@@ -40,34 +40,24 @@ const SocialLogin = (props: Props) => {
             const res: any = await handleAPI(api, "post", data);
             message.success(res.message || "Login successful!");
 
-            // Save auth data to Redux
-            dispatch(
-              addAuth({
-                token,
-                user: {
-                  uid: user.uid,
-                  email: user.email,
-                  displayName: user.displayName,
-                  photoURL: user.photoURL,
-                },
-              })
-            );
+            const authData = {
+              token,
+              user: {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+              },
+            };
 
-            // Save to localStorage if remember is checked
-            if (isRemember) {
-              localStorage.setItem(
-                localDataNames.authData,
-                JSON.stringify({
-                  token,
-                  user: {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL,
-                  },
-                })
-              );
-            }
+            // Save auth data to Redux
+            dispatch(addAuth(authData));
+
+            // Always save to localStorage to persist auth state on reload
+            localStorage.setItem(
+              localDataNames.authData,
+              JSON.stringify(authData)
+            );
           } catch (error: any) {
             console.log(error);
             message.error(error.message || "Login failed!");
