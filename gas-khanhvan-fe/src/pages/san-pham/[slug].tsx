@@ -16,6 +16,7 @@ import {
   Flex,
   Pagination,
   Skeleton,
+  Empty,
 } from "antd";
 import { GiftOutlined, PhoneOutlined } from "@ant-design/icons";
 import MainLayout from "@/layouts/MainLayout";
@@ -544,7 +545,44 @@ const ProductDetail: React.FC = () => {
           </Col>
         </Row>
       ) : (
-        <Text>Không tìm thấy sản phẩm.</Text>
+        <Flex
+          vertical
+          align="center"
+          justify="center"
+          style={{
+            minHeight: 500,
+            background: "#fafafa",
+            borderRadius: 12,
+            padding: "60px 20px",
+          }}
+        >
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={
+              <Flex vertical gap={8} align="center">
+                <Typography.Title level={3} style={{ margin: 0 }}>
+                  Không tìm thấy sản phẩm
+                </Typography.Title>
+                <Typography.Text type="secondary" style={{ fontSize: 16 }}>
+                  Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
+                </Typography.Text>
+              </Flex>
+            }
+          >
+            <Space size="middle" style={{ marginTop: 24 }}>
+              <Button
+                type="primary"
+                size="large"
+                onClick={() => router.push("/")}
+              >
+                Về trang chủ
+              </Button>
+              <Button size="large" onClick={() => router.back()}>
+                Quay lại
+              </Button>
+            </Space>
+          </Empty>
+        </Flex>
       )}
       <Modal
         title={

@@ -4,6 +4,7 @@ import Incentives from "@/components/common/IncentivesSection";
 
 import styles from "@/styles/home/Home.module.scss";
 import ProductSection from "@/components/home/ProductSection";
+import FeaturedSection from "@/components/home/FeaturedSection";
 import Head from "next/head";
 import SaleBanner from "@/components/common/SaleBanner";
 import HomeLayout from "@/layouts/HomeLayout";
@@ -41,6 +42,14 @@ export default function Home() {
       }
     };
     fetchData();
+  }, []);
+
+  // Smooth scroll behavior
+  useEffect(() => {
+    document.documentElement.style.scrollBehavior = "smooth";
+    return () => {
+      document.documentElement.style.scrollBehavior = "auto";
+    };
   }, []);
 
   return (
@@ -81,18 +90,28 @@ export default function Home() {
             </div>
           ) : (
             <>
-              <PromotionCarousel />
-              <div className={styles.top_bg}>
-                <Incentives />
+              <div className={styles.hero_wrapper}>
+                <PromotionCarousel />
+              </div>
 
-                <Flex justify="center" align="center">
+              <div className={styles.content_flow}>
+                <div className={styles.top_bg}>
+                  <Incentives />
+                </div>
+
+                {/* Featured/Hot Sale Section - Nổi bật */}
+                <FeaturedSection />
+
+                <Flex
+                  justify="center"
+                  align="center"
+                  className={styles.section_header}
+                >
                   <Title level={2} className={styles.title}>
                     SẢN PHẨM
                   </Title>
                   <div className={styles.border}></div>
                 </Flex>
-
-                <ProductSection isFeatured title="Khuyến mãi hôm nay" />
 
                 {categories.map((cat: any) =>
                   cat.children && cat.children.length > 0 ? (

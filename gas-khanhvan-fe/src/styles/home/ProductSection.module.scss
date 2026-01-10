@@ -1,3 +1,29 @@
+.section_wrapper {
+  padding: 40px 0 20px;
+  position: relative;
+  background: linear-gradient(to bottom, transparent 0%, rgba(255, 247, 230, 0.1) 50%, transparent 100%);
+
+  &:first-of-type {
+    padding-top: 20px;
+  }
+
+  // Subtle separator line
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(250, 140, 22, 0.2), transparent);
+  }
+
+  &:first-of-type::before {
+    display: none;
+  }
+}
+
 .title {
   color: var(--primary-orange-700) !important;
   font-size: 2.5rem !important;
@@ -9,26 +35,105 @@
   color: var(--primary-orange-700) !important;
   font-size: 2em !important;
   font-weight: 700;
+  position: relative;
+  display: inline-block;
+  padding-left: 20px;
+
+  // Decorative flame icon
+  &::before {
+    content: '🔥';
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+    opacity: 0.7;
+    animation: pulse-flame 2s ease-in-out infinite;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.5em !important;
+    padding-left: 15px;
+
+    &::before {
+      font-size: 0.7em;
+      left: -5px;
+    }
+  }
+}
+
+@keyframes pulse-flame {
+  0%, 100% {
+    opacity: 0.7;
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
+  }
 }
 
 .line_break {
   height: 2px;
-  background-color: #ccc;
+  background: linear-gradient(to right, #ccc 0%, transparent 100%);
   position: relative;
+  margin-bottom: 10px;
+
   &::before {
     width: 150px;
-    background: var(--primary-orange-700);
+    background: linear-gradient(90deg, var(--primary-orange-700), #faad14);
     content: '';
     display: block;
     height: 3px;
     left: 0;
     position: absolute;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(250, 140, 22, 0.3);
+    animation: expand-line 0.6s ease-out;
+  }
+
+  // Decorative dots
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: var(--primary-orange-700);
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+}
+
+@keyframes expand-line {
+  from {
+    width: 0;
+  }
+  to {
+    width: 150px;
   }
 }
 
 .card_wrap {
   margin: 30px auto;
+  position: relative;
+
+  // Subtle background pattern
+  &::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(250, 140, 22, 0.03) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
 }
+
 .carousel_wrap {
   display: block !important;
   :global {

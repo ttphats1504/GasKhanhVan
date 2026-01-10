@@ -1,27 +1,38 @@
-import {Carousel, Image} from 'antd'
-import {useEffect, useState} from 'react'
-import handleAPI from '@/apis/handleAPI'
-import styles from '../../styles/common/PromotionCarousel.module.scss'
-import Banner from '@/models/Banner'
+import { Carousel, Image } from "antd";
+import { useEffect, useState } from "react";
+import handleAPI from "@/apis/handleAPI";
+import styles from "../../styles/common/PromotionCarousel.module.scss";
+import Banner from "@/models/Banner";
 
 const PromotionCarousel = () => {
-  const [banners, setBanners] = useState<Banner[]>([])
+  const [banners, setBanners] = useState<Banner[]>([]);
 
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res: any = await handleAPI('/api/banners', 'get')
+        const res: any = await handleAPI("/api/banners", "get");
         if (res?.length) {
-          // Sort banners by `order` before displaying (optional but likely desired)
-          setBanners(res.sort((a: any, b: any) => a.order - b.order))
+          // Filter banners for homepage (categoryId is null or undefined)
+          const homepageBanners = res.filter(
+            (banner: Banner) => !banner.categoryId
+          );
+          // Sort banners by `order` before displaying
+          setBanners(
+            homepageBanners.sort((a: any, b: any) => a.order - b.order)
+          );
         }
       } catch (error) {
-        console.error('Error fetching banners:', error)
+        console.error("Error fetching banners:", error);
       }
-    }
+    };
 
-    fetchBanners()
-  }, [])
+    fetchBanners();
+  }, []);
+
+  // Don't render if no banners
+  if (banners.length === 0) {
+    return null;
+  }
 
   return (
     <div className={styles.content}>
@@ -33,14 +44,14 @@ const PromotionCarousel = () => {
               alt={`Banner ${banner.id}`}
               preview={false}
               className={styles.image_content}
-              width='100%'
-              height='auto'
+              width="100%"
+              height="auto"
             />
           </div>
         ))}
       </Carousel>
     </div>
-  )
-}
+  );
+};
 
-export default PromotionCarousel
+export default PromotionCarousel;

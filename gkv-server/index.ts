@@ -88,6 +88,7 @@ app.use('/api', uploadRoutes)
 
 // Start server
 const startServer = async () => {
+  // Sync models (alter: true will update existing tables)
   await Product.sync({alter: true})
   await Category.sync({alter: true})
   await Incentive.sync({alter: true})

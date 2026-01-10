@@ -38,6 +38,7 @@ export default function CategoryPagePage() {
   const [category, setCategory] = useState<Category | null>(null);
   const [brand, setBrand] = useState<Brand | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isFeatured, setIsFeatured] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -46,6 +47,17 @@ export default function CategoryPagePage() {
 
       const slugArray = Array.isArray(slugParam) ? slugParam : [slugParam];
       const lastSlug = slugArray[slugArray.length - 1];
+
+      // Kiểm tra nếu là trang khuyến mãi
+      if (lastSlug === "khuyen-mai") {
+        setIsFeatured(true);
+        setBreadcrumbs([
+          { label: "Trang chủ", href: "/" },
+          { label: "Khuyến mãi", href: "/khuyen-mai" },
+        ]);
+        setLoading(false);
+        return;
+      }
 
       // Thử tìm category trước
       const cat = await fetchCategoryBySlug(lastSlug);
@@ -72,6 +84,7 @@ export default function CategoryPagePage() {
       );
 
       setBreadcrumbs([{ label: "Trang chủ", href: "/" }, ...breadcrumbItems]);
+      setIsFeatured(false);
       setLoading(false);
     };
 
@@ -98,6 +111,7 @@ export default function CategoryPagePage() {
       <GasCylinderPage
         cate={category || undefined}
         selectedBrand={brand?.id || null}
+        isFeatured={isFeatured}
       />
       <Col xs={24} style={{ marginTop: 40 }}>
         <ViewedProducts />

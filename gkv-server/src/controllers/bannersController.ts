@@ -6,7 +6,7 @@ import streamifier from 'streamifier'
 // Create
 export const addBanner = async (req: Request, res: Response) => {
   try {
-    const {order} = req.body
+    const {order, categoryId} = req.body
     const file = req.file
     let imageUrl = ''
 
@@ -32,6 +32,7 @@ export const addBanner = async (req: Request, res: Response) => {
     const newBanner = await Banner.create({
       order,
       image: imageUrl,
+      categoryId: categoryId || null,
     })
 
     res.status(201).json(newBanner)
@@ -40,10 +41,20 @@ export const addBanner = async (req: Request, res: Response) => {
   }
 }
 
-// Read All
-export const getAllBanners = async (_req: Request, res: Response) => {
+// Read All (with optional categoryId filter)
+export const getAllBanners = async (req: Request, res: Response) => {
   try {
-    const banners = await Banner.findAll()
+    const {categoryId} = req.query
+    const whereClause: any = {}
+
+    if (categoryId) {
+      whereClause.categoryId = categoryId
+    }
+
+    const banners = await Banner.findAll({
+      where: whereClause,
+      order: [['order', 'ASC']],
+    })
     res.status(200).json(banners)
   } catch (err) {
     res.status(500).json({error: (err as Error).message})

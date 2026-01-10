@@ -8,7 +8,9 @@ import {
   Row,
   Typography,
   Skeleton,
+  Button,
 } from "antd";
+import { FireOutlined } from "@ant-design/icons";
 import styles from "@/styles/gascylinder/GasCylinderPage.module.scss";
 import FilterSideBar from "../common/FilterSidebar";
 import ProductCard from "../common/ProductCard";
@@ -23,6 +25,7 @@ import ProductCardSkeleton from "../common/ProductCardSkeleton";
 interface Props {
   cate: Category | undefined;
   selectedBrand?: number | null; // <- nhận từ ngoài
+  isFeatured?: boolean; // <- hiển thị sản phẩm khuyến mãi
 }
 
 const { Title } = Typography;
@@ -49,7 +52,11 @@ const fetchBannerImages = async () => {
   }
 };
 
-const GasCylinderPage = ({ cate, selectedBrand: selectedBrandProp }: Props) => {
+const GasCylinderPage = ({
+  cate,
+  selectedBrand: selectedBrandProp,
+  isFeatured,
+}: Props) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category | null>();
   const [banners, setBanners] = useState<string[]>([]);
@@ -95,11 +102,17 @@ const GasCylinderPage = ({ cate, selectedBrand: selectedBrandProp }: Props) => {
       }
 
       let productApi = "/api/products?";
-      if (selectedBrand) {
-        productApi += `brandId=${selectedBrand}`;
-        if (typeIds.length) productApi += `&typeId=${typeIds.join(",")}`;
-      } else if (typeIds.length) {
-        productApi += `typeId=${typeIds.join(",")}`;
+
+      // Nếu là trang khuyến mãi, chỉ lấy sản phẩm featured
+      if (isFeatured) {
+        productApi += `featured=true`;
+      } else {
+        if (selectedBrand) {
+          productApi += `brandId=${selectedBrand}`;
+          if (typeIds.length) productApi += `&typeId=${typeIds.join(",")}`;
+        } else if (typeIds.length) {
+          productApi += `typeId=${typeIds.join(",")}`;
+        }
       }
 
       const [productRes, bannerRes, cateRes]: any = await Promise.all([
@@ -110,13 +123,22 @@ const GasCylinderPage = ({ cate, selectedBrand: selectedBrandProp }: Props) => {
 
       if (productRes?.totalItems) setProducts(productRes.data);
       if (cateRes) setCategory(cateRes);
-      if (bannerRes?.length) setBanners(bannerRes.map((b: any) => b.image));
+
+      // Filter banners by categoryId
+      if (bannerRes?.length && cate) {
+        const categoryBanners = bannerRes.filter(
+          (b: any) => Number(b.categoryId) === Number(cate.id)
+        );
+        setBanners(categoryBanners.map((b: any) => b.image));
+      } else {
+        setBanners([]);
+      }
 
       setLoading(false);
     };
 
     fetchData();
-  }, [cate?.id, selectedBrand]);
+  }, [cate?.id, selectedBrand, isFeatured]);
 
   const titleText = selectedBrand
     ? brands.find((b) => b.id === selectedBrand)?.name
@@ -124,31 +146,52 @@ const GasCylinderPage = ({ cate, selectedBrand: selectedBrandProp }: Props) => {
 
   return (
     <div className={styles.wrapper}>
-      {loading ? (
-        <Skeleton.Image
-          active
-          style={{ width: "100%", height: 300, marginBottom: 20 }}
-        />
-      ) : (
-        <Carousel autoplay className={styles.carousel}>
-          {banners.map((url, index) => (
-            <div key={index}>
-              <Image
-                src={url}
-                alt={`Banner ${index}`}
-                className={styles.carousel_image}
-              />
-            </div>
-          ))}
-        </Carousel>
+      {/* Header cho trang khuyến mãi */}
+      {isFeatured && (
+        <div className={styles.featured_header}>
+          <div className={styles.icon_wrapper}>
+            <FireOutlined className={styles.fire_icon} />
+          </div>
+          <div>
+            <Title level={2} className={styles.featured_title}>
+              SẢN PHẨM KHUYẾN MÃI
+            </Title>
+          </div>
+        </div>
       )}
 
-      {brands.length > 0 && (
-        <BrandsCarousel
-          brands={brands}
-          onSelect={(brandId) => setSelectedBrand(brandId)}
-          selectedBrand={selectedBrand}
-        />
+      {!isFeatured && (
+        <>
+          {loading ? (
+            <Skeleton.Image
+              active
+              style={{ width: "100%", height: 300, marginBottom: 20 }}
+            />
+          ) : (
+            banners.length > 0 && (
+              <Carousel autoplay className={styles.carousel}>
+                {banners.map((url, index) => (
+                  <div key={index}>
+                    <Image
+                      src={url}
+                      alt={`Banner ${index}`}
+                      preview={false}
+                      className={styles.carousel_image}
+                    />
+                  </div>
+                ))}
+              </Carousel>
+            )
+          )}
+
+          {brands.length > 0 && (
+            <BrandsCarousel
+              brands={brands}
+              onSelect={(brandId) => setSelectedBrand(brandId)}
+              selectedBrand={selectedBrand}
+            />
+          )}
+        </>
       )}
 
       <div>
@@ -183,7 +226,43 @@ const GasCylinderPage = ({ cate, selectedBrand: selectedBrandProp }: Props) => {
                       </Col>
                     ))
                   ) : (
-                    <Empty description={<>Chưa có sản phẩm nào</>} />
+                    <Col xs={24}>
+                      <Flex
+                        vertical
+                        align="center"
+                        justify="center"
+                        style={{
+                          minHeight: 400,
+                          background: "#fafafa",
+                          borderRadius: 12,
+                          padding: "40px 20px",
+                        }}
+                      >
+                        <Empty
+                          image={Empty.PRESENTED_IMAGE_SIMPLE}
+                          description={
+                            <Flex vertical gap={8} align="center">
+                              <Typography.Title level={4} style={{ margin: 0 }}>
+                                Chưa có sản phẩm nào
+                              </Typography.Title>
+                              <Typography.Text type="secondary">
+                                Danh mục này hiện chưa có sản phẩm. Vui lòng
+                                quay lại sau hoặc khám phá các danh mục khác.
+                              </Typography.Text>
+                            </Flex>
+                          }
+                        >
+                          <Button
+                            type="primary"
+                            size="large"
+                            onClick={() => (window.location.href = "/")}
+                            style={{ marginTop: 16 }}
+                          >
+                            Về trang chủ
+                          </Button>
+                        </Empty>
+                      </Flex>
+                    </Col>
                   )}
                 </Row>
               )}

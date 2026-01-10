@@ -1,29 +1,189 @@
 .content {
-  overflow: hidden;
-  :global {
-    .ant-carousel .ant-image {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      display: block;
-    }
-  }
-}
-.content {
   width: 100%;
   overflow: hidden;
+  border-radius: 16px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 0;
+  transition: all 0.3s ease;
+  background: #fff;
+
+  &:hover {
+    box-shadow:
+      0 15px 50px rgba(0, 0, 0, 0.12),
+      0 4px 12px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+  }
+
+  :global {
+    .ant-carousel {
+      .slick-slide {
+        > div {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      .ant-image {
+        width: 100% !important;
+        height: auto !important;
+        display: block;
+      }
+
+      img {
+        width: 100% !important;
+        height: auto !important;
+        object-fit: contain !important;
+        display: block;
+        border-radius: 16px;
+      }
+
+      // Carousel dots styling
+      .slick-dots {
+        bottom: 20px;
+        z-index: 10;
+
+        li {
+          margin: 0 6px;
+
+          button {
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+
+            &:hover {
+              background: rgba(255, 255, 255, 0.9);
+              transform: scale(1.2);
+            }
+          }
+
+          &.slick-active button {
+            background: var(--primary-orange-700);
+            border-color: var(--primary-orange-700);
+            width: 28px;
+            border-radius: 5px;
+          }
+        }
+      }
+
+      // Navigation arrows (if enabled)
+      .slick-prev,
+      .slick-next {
+        width: 44px;
+        height: 44px;
+        z-index: 10;
+
+        &:before {
+          font-size: 44px;
+          opacity: 0.6;
+        }
+
+        &:hover:before {
+          opacity: 1;
+        }
+      }
+
+      .slick-prev {
+        left: 20px;
+      }
+
+      .slick-next {
+        right: 20px;
+      }
+    }
+  }
 }
 
 .image_content {
   width: 100%;
   height: auto;
-  object-fit: cover; // ảnh vừa khung mà không méo
-  border-radius: 8px; // tuỳ thích
+  object-fit: contain;
+  border-radius: 16px;
+  display: block;
+}
+
+// Tablet responsive
+@media (max-width: 1024px) {
+  .content {
+    border-radius: 12px;
+
+    :global {
+      .ant-carousel {
+        img {
+          border-radius: 12px;
+        }
+
+        .slick-dots {
+          bottom: 15px;
+
+          li button {
+            width: 8px;
+            height: 8px;
+          }
+
+          li.slick-active button {
+            width: 24px;
+          }
+        }
+      }
+    }
+  }
+
+  .image_content {
+    border-radius: 12px;
+  }
 }
 
 // Mobile responsive
 @media (max-width: 768px) {
+  .content {
+    border-radius: 8px;
+    margin: 0 10px;
+    box-shadow:
+      0 6px 24px rgba(0, 0, 0, 0.06),
+      0 2px 6px rgba(0, 0, 0, 0.04);
+
+    &:hover {
+      transform: none;
+    }
+
+    :global {
+      .ant-carousel {
+        img {
+          border-radius: 8px;
+        }
+
+        .slick-dots {
+          bottom: 12px;
+
+          li {
+            margin: 0 4px;
+
+            button {
+              width: 6px;
+              height: 6px;
+            }
+          }
+
+          li.slick-active button {
+            width: 20px;
+          }
+        }
+
+        .slick-prev,
+        .slick-next {
+          display: none !important;
+        }
+      }
+    }
+  }
+
   .image_content {
-    border-radius: 0; // full screen trên mobile
+    border-radius: 8px;
   }
 }
