@@ -9,13 +9,12 @@ import {
   Typography,
 } from "antd";
 import { useState } from "react";
-// import { useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
-// import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
-// import { addAuth } from "../../redux/reducers/authReducer";
-// import { appInfo, localDataNames } from "../../constants/appInfos";
+import { addAuth } from "../../redux/reducers/authReducer";
+import { appInfo, localDataNames } from "../../constants/appInfos";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -24,21 +23,28 @@ const Login = () => {
   const [isRemember, setIsRemember] = useState(false);
 
   const [form] = Form.useForm();
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const handleLogin = async (values: { email: string; password: string }) => {
     console.log(values);
     setIsLoading(true);
     try {
-      const res: any = await handleAPI("/auth/register", "post", values);
+      const res: any = await handleAPI("/auth/login", "post", values);
       console.log(res);
-      // message.success(res.message);
-      // res.data && dispatch(addAuth(res.data));
-      // if (isRemember) {
-      //   localStorage.setItem(localDataNames.authData, JSON.stringify(res.data));
-      // }
+      message.success(res.message || "Login successful!");
+
+      if (res.data) {
+        dispatch(addAuth(res.data));
+
+        if (isRemember) {
+          localStorage.setItem(
+            localDataNames.authData,
+            JSON.stringify(res.data)
+          );
+        }
+      }
     } catch (error: any) {
-      message.error(error.message);
+      message.error(error.message || "Login failed!");
     } finally {
       setIsLoading(false);
     }
@@ -54,8 +60,8 @@ const Login = () => {
         <div className="text-center">
           <img
             className="mb-3"
-            // src={appInfo.logo}
-            alt=""
+            src={appInfo.logo}
+            alt="KhanhVanGas Logo"
             style={{
               width: 48,
               height: 48,

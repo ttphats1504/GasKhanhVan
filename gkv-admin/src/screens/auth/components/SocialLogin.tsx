@@ -1,17 +1,11 @@
 import { Button, message } from "antd";
-// import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { signInWithPopup } from "firebase/auth";
 import { useState } from "react";
-// import { useDispatch } from "react-redux";
-// import handleAPI from '../../../apis/handleAPI';
-// import { auth } from '../../../firebase/firebaseConfig';
-// import { addAuth } from '../../../redux/reducers/authReducer';
-// import { localDataNames } from '../../../constants/appInfos';
-
-// const provider = new GoogleAuthProvider();
-// provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-// provider.setCustomParameters({
-// 	login_hint: 'bsdaoquang@gmail.com',
-// });
+import { useDispatch } from "react-redux";
+import handleAPI from "../../../apis/handleAPI";
+import { auth, googleProvider } from "../../../firebase/firebaseConfig";
+import { addAuth } from "../../../redux/reducers/authReducer";
+import { localDataNames } from "../../../constants/appInfos";
 
 interface Props {
   isRemember?: boolean;
@@ -22,44 +16,73 @@ const SocialLogin = (props: Props) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  //   const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const handleLoginWithGoogle = async () => {
     setIsLoading(true);
     try {
-      // const result = await signInWithPopup(auth, provider);
-      // if (result) {
-      // 	const user = result.user;
-      // 	if (user) {
-      // 		const data = {
-      // 			name: user.displayName,
-      // 			email: user.email,
-      // 			photoUrl: user.photoURL,
-      // 		};
-      // 		const api = `/auth/google-login`;
-      // 		try {
-      // 			const res: any = await handleAPI(api, data, 'post');
-      // 			message.success(res.message);
-      // 			dispatch(addAuth(res.data));
-      // 			if (isRemember) {
-      // 				localStorage.setItem(
-      // 					localDataNames.authData,
-      // 					JSON.stringify(res.data)
-      // 				);
-      // 			}
-      // 		} catch (error: any) {
-      // 			console.log(error);
-      // 			message.error(error.message);
-      // 		} finally {
-      // 			setIsLoading(false);
-      // 		}
-      // 	}
-      // } else {
-      // 	console.log('Can not login with google');
-      // }
-    } catch (error) {
+      const result = await signInWithPopup(auth, googleProvider);
+      if (result) {
+        const user = result.user;
+        if (user) {
+          // Get Firebase ID token
+          const token = await user.getIdToken();
+
+          const data = {
+            name: user.displayName,
+            email: user.email,
+            photoUrl: user.photoURL,
+            uid: user.uid,
+          };
+
+          const api = `/auth/google-login`;
+          try {
+            const res: any = await handleAPI(api, "post", data);
+            message.success(res.message || "Login successful!");
+
+            // Save auth data to Redux
+            dispatch(
+              addAuth({
+                token,
+                user: {
+                  uid: user.uid,
+                  email: user.email,
+                  displayName: user.displayName,
+                  photoURL: user.photoURL,
+                },
+              })
+            );
+
+            // Save to localStorage if remember is checked
+            if (isRemember) {
+              localStorage.setItem(
+                localDataNames.authData,
+                JSON.stringify({
+                  token,
+                  user: {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL,
+                  },
+                })
+              );
+            }
+          } catch (error: any) {
+            console.log(error);
+            message.error(error.message || "Login failed!");
+          } finally {
+            setIsLoading(false);
+          }
+        }
+      } else {
+        console.log("Can not login with google");
+        message.error("Login failed!");
+        setIsLoading(false);
+      }
+    } catch (error: any) {
       console.log(error);
-    } finally {
+      message.error(error.message || "Login failed!");
       setIsLoading(false);
     }
   };

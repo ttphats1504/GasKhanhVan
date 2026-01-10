@@ -5,6 +5,8 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 
 import userRouter from './src/routers/user'
+import authRoutes from './src/routers/authRoutes'
+import adminUsersRoutes from './src/routers/adminUsersRoutes'
 import productRoutes from './src/routers/productRoutes'
 import categoryRoutes from './src/routers/categoryRoutes'
 import incentiveRoutes from './src/routers/incentiveRoutes'
@@ -77,7 +79,9 @@ const connectMySQL = async () => {
 }
 
 // Routes
-app.use('/auth', userRouter)
+app.use('/auth', authRoutes)
+app.use('/user', userRouter)
+app.use('/api/admin-users', adminUsersRoutes)
 app.use('/api/products', productRoutes)
 app.use('/api/categories', categoryRoutes)
 app.use('/api/incentives', incentiveRoutes)
