@@ -253,13 +253,20 @@ const MainRouter = () => {
           </Space>
 
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-            <Space style={{ cursor: "pointer" }} align="center">
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                cursor: "pointer",
+              }}
+            >
               <Avatar
                 src={user?.photoURL}
                 icon={!user?.photoURL && <UserOutlined />}
                 size="large"
               />
-              <div>
+              <div style={{ lineHeight: 1.4 }}>
                 <div>
                   <Text strong>{user?.displayName || "Admin"}</Text>
                 </div>
@@ -269,7 +276,7 @@ const MainRouter = () => {
                   </Text>
                 </div>
               </div>
-            </Space>
+            </div>
           </Dropdown>
         </Header>
         <Content
