@@ -33,7 +33,7 @@ const BannerForm: React.FC<BannerFormProps> = ({
   const [form] = Form.useForm();
   const [file, setFile] = useState<UploadFile | File | null>(null);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [croppedImage, setCroppedImage] = useState<File | null>(null);
+  const [, setCroppedImage] = useState<File | null>(null);
   const [cropModalVisible, setCropModalVisible] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -104,7 +104,7 @@ const BannerForm: React.FC<BannerFormProps> = ({
 
       if (response) {
         message.success(
-          `Banner ${isEditing ? "updated" : "added"} successfully!`
+          `Banner ${isEditing ? "updated" : "added"} successfully!`,
         );
         onSuccess(response);
         onClose();
@@ -127,7 +127,7 @@ const BannerForm: React.FC<BannerFormProps> = ({
 
   const getCroppedImg = async (
     imageSrc: string,
-    cropPixels: Area
+    cropPixels: Area,
   ): Promise<File> => {
     const image = await createImage(imageSrc);
     const canvas = document.createElement("canvas");
@@ -147,7 +147,7 @@ const BannerForm: React.FC<BannerFormProps> = ({
       0,
       0,
       cropPixels.width,
-      cropPixels.height
+      cropPixels.height,
     );
 
     return new Promise((resolve) => {

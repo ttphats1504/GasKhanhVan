@@ -1,141 +1,177 @@
-import React, {useEffect, useState} from 'react'
-import {Card, Table, Button, Space, Popconfirm, Input, message, Switch} from 'antd'
-import {PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined} from '@ant-design/icons'
-import handleAPI from '../apis/handleAPI'
-import Blog from '../models/Blog'
-import BlogForm from './BlogForm'
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Button,
+  Space,
+  Popconfirm,
+  Input,
+  message,
+  Switch,
+} from "antd";
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  CopyOutlined,
+} from "@ant-design/icons";
+import handleAPI from "../apis/handleAPI";
+import Blog from "../models/Blog";
+import BlogForm from "./BlogForm";
 
-const {Search} = Input
+const { Search } = Input;
 
 const BlogList: React.FC = () => {
-  const [blogs, setBlogs] = useState<Blog[]>([])
-  const [loading, setLoading] = useState(false)
-  const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(20)
-  const [total, setTotal] = useState(0)
-  const [editing, setEditing] = useState<Blog | null>(null)
-  const [formVisible, setFormVisible] = useState(false)
-  const [mode, setMode] = useState<'add' | 'edit' | 'duplicate'>('add') // 👈 thêm mode
-  const [search, setSearch] = useState('')
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const [total, setTotal] = useState(0);
+  const [editing, setEditing] = useState<Blog | null>(null);
+  const [formVisible, setFormVisible] = useState(false);
+  const [mode, setMode] = useState<"add" | "edit" | "duplicate">("add"); // 👈 thêm mode
+  const [search, setSearch] = useState("");
 
   const fetchData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const res: any = await handleAPI(
         `/api/blogs?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`,
-        'get'
-      )
-      setBlogs(res?.data || [])
-      setTotal(res?.totalItems || 0)
+        "get",
+      );
+      setBlogs(res?.data || []);
+      setTotal(res?.totalItems || 0);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchData()
-  }, [page, limit, search])
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, limit, search]);
 
   const handleDelete = async (id: number) => {
     try {
-      await handleAPI(`/api/blogs/${id}`, 'delete')
-      message.success('Deleted')
-      fetchData()
+      await handleAPI(`/api/blogs/${id}`, "delete");
+      message.success("Deleted");
+      fetchData();
     } catch (err) {
-      message.error('Delete failed')
+      message.error("Delete failed");
     }
-  }
+  };
 
   const handleOpenCreate = () => {
-    setEditing(null)
-    setMode('add') // 👈 set mode add
-    setFormVisible(true)
-  }
+    setEditing(null);
+    setMode("add"); // 👈 set mode add
+    setFormVisible(true);
+  };
 
   const handleEdit = (blog: Blog) => {
-    setEditing(blog)
-    setMode('edit') // 👈 set mode edit
-    setFormVisible(true)
-  }
+    setEditing(blog);
+    setMode("edit"); // 👈 set mode edit
+    setFormVisible(true);
+  };
 
   const handleSave = () => {
-    fetchData()
-  }
+    fetchData();
+  };
 
   const togglePublished = async (id: number, published: boolean) => {
     try {
-      await handleAPI(`/api/blogs/${id}`, 'put', {published})
-      message.success('Updated publish status')
-      fetchData()
+      await handleAPI(`/api/blogs/${id}`, "put", { published });
+      message.success("Updated publish status");
+      fetchData();
     } catch {
-      message.error('Update failed')
+      message.error("Update failed");
     }
-  }
+  };
   const handleDuplicate = (blog: Blog) => {
     // Tạo bản copy để truyền xuống form
     const copy: Blog = {
       ...blog,
       id: 0 as any, // bỏ id (hoặc undefined nếu model cho phép)
-      title: blog.title + ' (copy)',
-      slug: blog.slug + '-copy',
-    }
+      title: blog.title + " (copy)",
+      slug: blog.slug + "-copy",
+    };
 
-    setEditing(copy)
-    setMode('duplicate') // 👈 duplicate thì vẫn là tạo mới
-    setFormVisible(true)
-  }
+    setEditing(copy);
+    setMode("duplicate"); // 👈 duplicate thì vẫn là tạo mới
+    setFormVisible(true);
+  };
 
   const columns = [
-    {title: 'ID', dataIndex: 'id', key: 'id', width: 80},
+    { title: "ID", dataIndex: "id", key: "id", width: 80 },
     {
-      title: 'Thumbnail',
-      dataIndex: 'thumbnail',
-      key: 'thumbnail',
+      title: "Thumbnail",
+      dataIndex: "thumbnail",
+      key: "thumbnail",
       render: (src: string) =>
-        src ? <img src={src} style={{height: 48, objectFit: 'cover'}} /> : '—',
+        src ? (
+          <img
+            src={src}
+            alt="blog"
+            style={{ height: 48, objectFit: "cover" }}
+          />
+        ) : (
+          "—"
+        ),
     },
-    {title: 'Title', dataIndex: 'title', key: 'title'},
-    {title: 'Slug', dataIndex: 'slug', key: 'slug'},
+    { title: "Title", dataIndex: "title", key: "title" },
+    { title: "Slug", dataIndex: "slug", key: "slug" },
     {
-      title: 'Published',
-      dataIndex: 'published',
-      key: 'published',
+      title: "Published",
+      dataIndex: "published",
+      key: "published",
       render: (val: boolean, record: Blog) => (
-        <Switch checked={val} onChange={(checked) => togglePublished(record.id, checked)} />
+        <Switch
+          checked={val}
+          onChange={(checked) => togglePublished(record.id, checked)}
+        />
       ),
     },
     {
-      title: 'Actions',
-      key: 'actions',
+      title: "Actions",
+      key: "actions",
       render: (_: any, record: Blog) => (
         <Space>
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Button icon={<CopyOutlined />} onClick={() => handleDuplicate(record)} />
-          <Popconfirm title='Delete blog?' onConfirm={() => handleDelete(record.id)}>
+          <Button
+            icon={<CopyOutlined />}
+            onClick={() => handleDuplicate(record)}
+          />
+          <Popconfirm
+            title="Delete blog?"
+            onConfirm={() => handleDelete(record.id)}
+          >
             <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
       ),
     },
-  ]
+  ];
 
   return (
     <Card
-      title='Manage Blogs'
+      title="Manage Blogs"
       extra={
-        <Button type='primary' icon={<PlusOutlined />} onClick={handleOpenCreate}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleOpenCreate}
+        >
           Add Blog
         </Button>
       }
     >
-      <Space style={{marginBottom: 12}}>
+      <Space style={{ marginBottom: 12 }}>
         <Search
-          placeholder='Search blogs'
+          placeholder="Search blogs"
           onSearch={(v) => {
-            setSearch(v)
-            setPage(1)
+            setSearch(v);
+            setPage(1);
           }}
           enterButton
         />
@@ -144,15 +180,15 @@ const BlogList: React.FC = () => {
       <Table
         columns={columns}
         dataSource={blogs}
-        rowKey='id'
+        rowKey="id"
         loading={loading}
         pagination={{
           current: page,
           pageSize: limit,
           total,
           onChange: (p, ps) => {
-            setPage(p)
-            setLimit(ps || limit)
+            setPage(p);
+            setLimit(ps || limit);
           },
         }}
       />
@@ -165,7 +201,7 @@ const BlogList: React.FC = () => {
         mode={mode} // 👈 truyền xuống form
       />
     </Card>
-  )
-}
+  );
+};
 
-export default BlogList
+export default BlogList;

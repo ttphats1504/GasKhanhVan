@@ -1,5 +1,4 @@
 import axios from 'axios'
-import {config} from 'process'
 import queryString from 'query-string'
 
 const baseURL = process.env.REACT_APP_BASE_URL || `http://localhost:3002`
