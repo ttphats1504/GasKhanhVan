@@ -1,43 +1,48 @@
-import React, {useState, useEffect} from 'react'
-import {Form, Input, Button, Modal, Upload, message, Flex, Select} from 'antd'
-import {RedoOutlined, UploadOutlined} from '@ant-design/icons'
-import handleAPI from '../apis/handleAPI'
-import {UploadFile} from 'antd/es/upload/interface'
-import Category from '../models/Category'
+import React, { useState, useEffect } from "react";
+import { Form, Input, Button, Modal, message, Flex, Select } from "antd";
+import { RedoOutlined } from "@ant-design/icons";
+import handleAPI from "../apis/handleAPI";
+import { UploadFile } from "antd/es/upload/interface";
+import Category from "../models/Category";
 
 interface CategoryFormProps {
-  visible: boolean
-  onClose: () => void
-  onSuccess: (newCategory: Category) => void
-  category?: Category | null // If provided, form will be in edit mode
-  parentId: number | null
+  visible: boolean;
+  onClose: () => void;
+  onSuccess: (newCategory: Category) => void;
+  category?: Category | null; // If provided, form will be in edit mode
+  parentId: number | null;
 }
 
 interface CategoryOption {
-  id: number
-  name: string
+  id: number;
+  name: string;
 }
 
-const CategoryForm: React.FC<CategoryFormProps> = ({visible, onClose, onSuccess, category}) => {
-  const [form] = Form.useForm()
-  const [file, setFile] = useState<UploadFile | null>(null)
-  const isEditing = !!category
-  const [categories, setCategories] = useState<CategoryOption[]>([])
+const CategoryForm: React.FC<CategoryFormProps> = ({
+  visible,
+  onClose,
+  onSuccess,
+  category,
+}) => {
+  const [form] = Form.useForm();
+  const [file, setFile] = useState<UploadFile | null>(null);
+  const isEditing = !!category;
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
 
   useEffect(() => {
     // Fetch all categories for parent select
-    handleAPI('/api/categories', 'get').then((res: any) => {
-      setCategories(res)
-    })
-  }, [])
+    handleAPI("/api/categories", "get").then((res: any) => {
+      setCategories(res);
+    });
+  }, []);
 
   useEffect(() => {
     if (category) {
-      form.setFieldsValue(category)
+      form.setFieldsValue(category);
     } else {
-      form.resetFields()
+      form.resetFields();
     }
-  }, [category, form])
+  }, [category, form]);
 
   // Handle file change
   // const handleFileChange = ({file}: any) => {
@@ -45,67 +50,74 @@ const CategoryForm: React.FC<CategoryFormProps> = ({visible, onClose, onSuccess,
   // }
 
   // Handle form submission
-  const handleSubmit = async (values: Omit<Category, 'id'>) => {
+  const handleSubmit = async (values: Omit<Category, "id">) => {
     // if (!file && !isEditing) {
     //   message.error('Please upload an image!')
     //   return
     // }
 
-    const formData = new FormData()
-    formData.append('name', values.name)
-    formData.append('slug', values.slug)
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("slug", values.slug);
     if (values.parentId) {
-      formData.append('parentId', values.parentId.toString())
+      formData.append("parentId", values.parentId.toString());
     }
     // Cast file to Blob safely
-    const fileBlob = file as unknown as Blob
+    const fileBlob = file as unknown as Blob;
     // Append file as Blob
-    formData.append('image', fileBlob)
+    formData.append("image", fileBlob);
 
-    console.log('📝 FormData before sending:', Object.fromEntries(formData.entries()))
+    console.log(
+      "📝 FormData before sending:",
+      Object.fromEntries(formData.entries()),
+    );
 
     try {
       const response: any = isEditing
-        ? await handleAPI(`/api/categories/${category?.id}`, 'put', formData, {
-            'Content-Type': 'multipart/form-data',
+        ? await handleAPI(`/api/categories/${category?.id}`, "put", formData, {
+            "Content-Type": "multipart/form-data",
           })
-        : await handleAPI('/api/categories', 'post', formData, {
-            'Content-Type': 'multipart/form-data',
-          })
+        : await handleAPI("/api/categories", "post", formData, {
+            "Content-Type": "multipart/form-data",
+          });
 
       if (response) {
-        message.success(`Cylinder ${isEditing ? 'updated' : 'added'} successfully!`)
-        onSuccess(response) // Update the table
-        onClose()
-        form.resetFields()
-        setFile(null)
+        message.success(
+          `Cylinder ${isEditing ? "updated" : "added"} successfully!`,
+        );
+        onSuccess(response); // Update the table
+        onClose();
+        form.resetFields();
+        setFile(null);
       }
     } catch (error) {
-      message.error(`Error ${isEditing ? 'updating' : 'adding'} cylinder`)
+      message.error(`Error ${isEditing ? "updating" : "adding"} cylinder`);
     }
-  }
+  };
 
   return (
     <Modal
-      title={isEditing ? 'Edit Category' : 'Add Category'}
+      title={isEditing ? "Edit Category" : "Add Category"}
       open={visible}
       onCancel={onClose}
       footer={null}
     >
-      <Form form={form} onFinish={handleSubmit} layout='vertical'>
+      <Form form={form} onFinish={handleSubmit} layout="vertical">
         <Form.Item
-          label='Name'
-          name='name'
-          rules={[{required: true, message: 'Please enter the category name!'}]}
+          label="Name"
+          name="name"
+          rules={[
+            { required: true, message: "Please enter the category name!" },
+          ]}
         >
-          <Input placeholder='Enter category name' />
+          <Input placeholder="Enter category name" />
         </Form.Item>
         <Form.Item
-          label='Slug'
-          name='slug'
-          rules={[{required: true, message: 'Please enter the slug!'}]}
+          label="Slug"
+          name="slug"
+          rules={[{ required: true, message: "Please enter the slug!" }]}
         >
-          <Input placeholder='Enter slug' />
+          <Input placeholder="Enter slug" />
         </Form.Item>
         {/* <Form.Item label='Upload Image' name='image'>
           <Upload.Dragger
@@ -123,8 +135,8 @@ const CategoryForm: React.FC<CategoryFormProps> = ({visible, onClose, onSuccess,
             <p>Click or drag file to upload</p>
           </Upload.Dragger>
         </Form.Item> */}
-        <Form.Item label='Parent Category' name='parentId'>
-          <Select placeholder='Select parent category' allowClear>
+        <Form.Item label="Parent Category" name="parentId">
+          <Select placeholder="Select parent category" allowClear>
             {categories
               .filter((c: any) => !category || c.id !== category.id) // avoid setting itself as parent
               .map((c) => (
@@ -136,15 +148,19 @@ const CategoryForm: React.FC<CategoryFormProps> = ({visible, onClose, onSuccess,
         </Form.Item>
         <Form.Item>
           {isEditing ? (
-            <Button type='primary' htmlType='submit'>
+            <Button type="primary" htmlType="submit">
               Update Category
             </Button>
           ) : (
             <Flex gap={8}>
-              <Button type='primary' htmlType='submit'>
+              <Button type="primary" htmlType="submit">
                 Add Category
               </Button>
-              <Button type='dashed' icon={<RedoOutlined />} onClick={() => form.resetFields()}>
+              <Button
+                type="dashed"
+                icon={<RedoOutlined />}
+                onClick={() => form.resetFields()}
+              >
                 Clear
               </Button>
             </Flex>
@@ -152,7 +168,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({visible, onClose, onSuccess,
         </Form.Item>
       </Form>
     </Modal>
-  )
-}
+  );
+};
 
-export default CategoryForm
+export default CategoryForm;

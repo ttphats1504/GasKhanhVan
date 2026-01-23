@@ -11,9 +11,7 @@ interface Props {
   isRemember?: boolean;
 }
 
-const SocialLogin = (props: Props) => {
-  const {} = props;
-
+const SocialLogin = (_props: Props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
