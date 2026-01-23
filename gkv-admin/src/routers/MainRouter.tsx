@@ -253,18 +253,22 @@ const MainRouter = () => {
           </Space>
 
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-            <Space style={{ cursor: "pointer" }}>
+            <Space style={{ cursor: "pointer" }} align="center">
               <Avatar
                 src={user?.photoURL}
                 icon={!user?.photoURL && <UserOutlined />}
                 size="large"
               />
-              <Space direction="vertical" size={0}>
-                <Text strong>{user?.displayName || "Admin"}</Text>
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  {user?.email}
-                </Text>
-              </Space>
+              <div>
+                <div>
+                  <Text strong>{user?.displayName || "Admin"}</Text>
+                </div>
+                <div>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    {user?.email}
+                  </Text>
+                </div>
+              </div>
             </Space>
           </Dropdown>
         </Header>
