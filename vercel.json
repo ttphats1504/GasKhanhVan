@@ -1,0 +1,8 @@
+{
+  "buildCommand": "cd gas-khanhvan-fe && npm run build",
+  "outputDirectory": "gas-khanhvan-fe/.next",
+  "installCommand": "cd gas-khanhvan-fe && npm install",
+  "framework": "nextjs",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./gas-khanhvan-fe"
+}
+

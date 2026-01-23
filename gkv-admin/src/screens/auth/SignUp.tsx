@@ -18,7 +18,7 @@ const SignUp = () => {
   const [form] = Form.useForm();
 
   const handleLogin = async (values: { email: string; password: string }) => {
-    const api = `/auth/register`;
+    // const api = `/auth/register`;
 
     setIsLoading(true);
     try {
@@ -95,11 +95,11 @@ const SignUp = () => {
                 validator: (_, value) => {
                   if (!value) {
                     return Promise.reject(
-                      new Error("Please enter your password!!!")
+                      new Error("Please enter your password!!!"),
                     );
                   } else if (value.length < 6) {
                     return Promise.reject(
-                      new Error("Please enter your password!!!")
+                      new Error("Please enter your password!!!"),
                     );
                   } else {
                     return Promise.resolve();

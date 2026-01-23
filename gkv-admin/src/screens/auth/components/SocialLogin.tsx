@@ -12,7 +12,7 @@ interface Props {
 }
 
 const SocialLogin = (props: Props) => {
-  const { isRemember } = props;
+  const {} = props;
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,7 +56,7 @@ const SocialLogin = (props: Props) => {
             // Always save to localStorage to persist auth state on reload
             localStorage.setItem(
               localDataNames.authData,
-              JSON.stringify(authData)
+              JSON.stringify(authData),
             );
           } catch (error: any) {
             console.log(error);
