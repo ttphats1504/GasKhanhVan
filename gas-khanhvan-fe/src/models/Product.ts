@@ -2,6 +2,7 @@ interface Product {
   id: string
   name: string
   typeId: number
+  brandId: number
   price: number
   old_price: number
   stock: number
@@ -10,7 +11,7 @@ interface Product {
   createdAt: string
   slug: string
   description2: string
-  isFutured: number
+  isFeatured: number
 }
 
 export default Product

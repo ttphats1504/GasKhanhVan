@@ -12,15 +12,16 @@ import {
 } from "antd";
 import { FireOutlined } from "@ant-design/icons";
 import styles from "@/styles/gascylinder/GasCylinderPage.module.scss";
-import FilterSideBar from "../common/FilterSidebar";
+import FilterSideBar, { FilterOptions } from "../common/FilterSidebar";
 import ProductCard from "../common/ProductCard";
 import handleAPI from "@/apis/handleAPI";
 import Product from "../../../../gkv-admin/src/models/Product";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Category from "@/models/Category";
 import Brand from "@/models/Brand";
 import BrandsCarousel from "../common/BrandsCarousel";
 import ProductCardSkeleton from "../common/ProductCardSkeleton";
+import SortBar, { SortOption } from "../common/SortBar";
 
 interface Props {
   cate: Category | undefined;
@@ -63,8 +64,10 @@ const GasCylinderPage = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [selectedBrand, setSelectedBrand] = useState<number | null>(
-    selectedBrandProp || null
+    selectedBrandProp || null,
   );
+  const [sortOption, setSortOption] = useState<SortOption>("default");
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({});
 
   // Cập nhật selectedBrand nếu prop thay đổi từ ngoài
   useEffect(() => {
@@ -127,7 +130,7 @@ const GasCylinderPage = ({
       // Filter banners by categoryId
       if (bannerRes?.length && cate) {
         const categoryBanners = bannerRes.filter(
-          (b: any) => Number(b.categoryId) === Number(cate.id)
+          (b: any) => Number(b.categoryId) === Number(cate.id),
         );
         setBanners(categoryBanners.map((b: any) => b.image));
       } else {
@@ -143,6 +146,86 @@ const GasCylinderPage = ({
   const titleText = selectedBrand
     ? brands.find((b) => b.id === selectedBrand)?.name
     : category?.name;
+
+  // Lọc và sắp xếp sản phẩm
+  const filteredAndSortedProducts = useMemo(() => {
+    let filtered = [...products];
+
+    // Apply filters
+    if (filterOptions.priceRange) {
+      const [min, max] = filterOptions.priceRange;
+      filtered = filtered.filter(
+        (p) => Number(p.price) >= min && Number(p.price) <= max,
+      );
+    }
+
+    if (filterOptions.brands && filterOptions.brands.length > 0) {
+      filtered = filtered.filter((p) =>
+        filterOptions.brands!.includes(p.brandId),
+      );
+    }
+
+    if (filterOptions.featured) {
+      filtered = filtered.filter((p) => p.isFeatured === 1);
+    }
+
+    if (filterOptions.isNew) {
+      // Sản phẩm mới: tạo trong vòng 30 ngày
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      filtered = filtered.filter((p) => {
+        const createdDate = new Date(p.createdAt || 0);
+        return createdDate >= thirtyDaysAgo;
+      });
+    }
+
+    if (filterOptions.isBestSeller) {
+      // Giả sử có field sold_count hoặc dùng isFeatured làm best seller
+      filtered = filtered.filter((p) => p.isFeatured === 1);
+    }
+
+    // Apply sorting
+    switch (sortOption) {
+      case "price-asc":
+        return filtered.sort((a, b) => Number(a.price) - Number(b.price));
+
+      case "price-desc":
+        return filtered.sort((a, b) => Number(b.price) - Number(a.price));
+
+      case "name-asc":
+        return filtered.sort((a, b) => a.name.localeCompare(b.name, "vi"));
+
+      case "name-desc":
+        return filtered.sort((a, b) => b.name.localeCompare(a.name, "vi"));
+
+      case "newest":
+        return filtered.sort((a, b) => {
+          const dateA = new Date(a.createdAt || 0).getTime();
+          const dateB = new Date(b.createdAt || 0).getTime();
+          return dateB - dateA;
+        });
+
+      case "discount":
+        return filtered.sort((a, b) => {
+          const discountA =
+            a.old_price && a.old_price > a.price
+              ? ((Number(a.old_price) - Number(a.price)) /
+                  Number(a.old_price)) *
+                100
+              : 0;
+          const discountB =
+            b.old_price && b.old_price > b.price
+              ? ((Number(b.old_price) - Number(b.price)) /
+                  Number(b.old_price)) *
+                100
+              : 0;
+          return discountB - discountA;
+        });
+
+      default:
+        return filtered;
+    }
+  }, [products, sortOption, filterOptions]);
 
   return (
     <div className={styles.wrapper}>
@@ -197,12 +280,24 @@ const GasCylinderPage = ({
       <div>
         <Row gutter={32}>
           <Col xs={24} md={6}>
-            <FilterSideBar title="Danh mục sản phẩm" />
+            <FilterSideBar
+              title="Danh mục sản phẩm"
+              onFilterChange={setFilterOptions}
+            />
           </Col>
 
           <Col xs={24} md={18}>
             <Flex vertical>
               {titleText && <Title level={3}>{titleText}</Title>}
+
+              {/* Sort Bar */}
+              {!loading && products.length > 0 && (
+                <SortBar
+                  value={sortOption}
+                  onChange={setSortOption}
+                  totalItems={filteredAndSortedProducts.length}
+                />
+              )}
 
               {loading ? (
                 <ProductCardSkeleton
@@ -211,16 +306,15 @@ const GasCylinderPage = ({
                 />
               ) : (
                 <Row gutter={[16, 16]}>
-                  {products.length > 0 ? (
-                    products.map((cylinder: any) => (
+                  {filteredAndSortedProducts.length > 0 ? (
+                    filteredAndSortedProducts.map((cylinder: any) => (
                       <Col
                         key={cylinder.id}
                         xs={12}
-                        sm={12}
+                        sm={8}
                         md={8}
                         lg={8}
-                        xl={8}
-                        xxl={6}
+                        xl={6}
                       >
                         <ProductCard product={cylinder} />
                       </Col>

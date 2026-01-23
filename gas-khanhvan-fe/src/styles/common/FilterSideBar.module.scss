@@ -115,5 +115,98 @@
         }
       }
     }
+
+    // Collapse styling
+    .ant-collapse {
+      background: transparent;
+      border: none;
+
+      .ant-collapse-item {
+        border: none;
+        margin-bottom: 8px;
+        background: #fafafa;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #fff6e5;
+        }
+      }
+
+      .ant-collapse-header {
+        padding: 12px 16px !important;
+        font-weight: 600;
+        color: #333;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          color: var(--primary-orange-700);
+        }
+      }
+
+      .ant-collapse-content {
+        background: transparent;
+        border-top: 1px solid #f0f0f0;
+      }
+
+      .ant-collapse-content-box {
+        padding: 12px 16px;
+      }
+    }
+
+    // Slider styling
+    .ant-slider {
+      .ant-slider-track {
+        background: linear-gradient(90deg, var(--primary-orange-700), var(--primary-yellow-700));
+      }
+
+      .ant-slider-handle::after {
+        box-shadow: 0 0 0 2px var(--primary-orange-700);
+      }
+
+      &:hover {
+        .ant-slider-track {
+          background: linear-gradient(90deg, var(--primary-orange-800), var(--primary-yellow-800));
+        }
+      }
+    }
+
+    // Checkbox styling
+    .ant-checkbox-wrapper {
+      font-size: 14px;
+      color: #555;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: var(--primary-orange-700);
+
+        .ant-checkbox-inner {
+          border-color: var(--primary-orange-700);
+        }
+      }
+    }
+
+    .ant-checkbox-checked {
+      .ant-checkbox-inner {
+        background-color: var(--primary-orange-700);
+        border-color: var(--primary-orange-700);
+      }
+
+      &::after {
+        border-color: var(--primary-orange-700);
+      }
+    }
+
+    .ant-checkbox-wrapper:hover .ant-checkbox-inner,
+    .ant-checkbox:hover .ant-checkbox-inner,
+    .ant-checkbox-input:focus + .ant-checkbox-inner {
+      border-color: var(--primary-orange-700);
+    }
   }
+}
+
+.filter_collapse {
+  margin-top: 8px;
 }

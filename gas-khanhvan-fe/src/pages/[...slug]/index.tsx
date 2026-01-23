@@ -40,6 +40,13 @@ export default function CategoryPagePage() {
   const [loading, setLoading] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
 
+  // Force scroll to top when component mounts or route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [router.asPath]);
+
   useEffect(() => {
     const loadData = async () => {
       let slugParam = router.query.slug;
@@ -80,7 +87,7 @@ export default function CategoryPagePage() {
               decodeURIComponent(s.replace(/-/g, " ")),
             href: "/" + slugArray.slice(0, i + 1).join("/"),
           };
-        })
+        }),
       );
 
       setBreadcrumbs([{ label: "Trang chủ", href: "/" }, ...breadcrumbItems]);

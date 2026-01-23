@@ -123,7 +123,7 @@ export default function FeaturedSection() {
 
         <Row className={styles.card_wrap} gutter={[16, 16]}>
           {products.map((product: Product) => (
-            <Col key={product.id} sm={12} xs={12} md={8} lg={4}>
+            <Col key={product.id} xs={12} sm={8} md={6} lg={6} xl={4}>
               <ProductCard product={product} />
             </Col>
           ))}
@@ -136,7 +136,10 @@ export default function FeaturedSection() {
             size="large"
             className={styles.view_all_btn}
             icon={<ArrowRightOutlined />}
-            onClick={() => router.push("/khuyen-mai")}
+            onClick={() => {
+              window.scrollTo(0, 0);
+              setTimeout(() => router.push("/khuyen-mai"), 10);
+            }}
           >
             Xem tất cả sản phẩm khuyến mãi
           </Button>

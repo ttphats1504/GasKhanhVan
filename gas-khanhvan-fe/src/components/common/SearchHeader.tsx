@@ -98,7 +98,7 @@ const SearchHeader = () => {
     }
     router.push(path);
     setCurrent(e.key);
-    setDrawerOpen(false); // đóng drawer khi chọn
+    setDrawerOpen(false);
   };
 
   // 🔹 Build menu items
@@ -195,7 +195,7 @@ const SearchHeader = () => {
               </div>
             </Link>
           ),
-        }))
+        })),
       );
     } catch (err) {
       console.error(err);
@@ -241,13 +241,22 @@ const SearchHeader = () => {
       >
         {isMobile && (
           <div className={styles.logo_mobile}>
-            <Image
-              src="/assets/logo.png"
-              alt="Gas quan 7"
-              width={60}
-              height={60}
-              preview={false}
-            />
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                window.scrollTo(0, 0);
+                setTimeout(() => router.push("/"), 10);
+              }}
+            >
+              <Image
+                src="/assets/logo.png"
+                alt="Gas quan 7"
+                width={60}
+                height={60}
+                preview={false}
+              />
+            </a>
           </div>
         )}
         <div
@@ -267,13 +276,20 @@ const SearchHeader = () => {
                     !isScrolled ? styles.logo_large : styles.logo_small
                   }`}
                 >
-                  <Link href="/">
+                  <a
+                    href="/"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.scrollTo(0, 0);
+                      setTimeout(() => router.push("/"), 10);
+                    }}
+                  >
                     <img
                       src="/assets/logo.png"
                       alt="Gas Khánh Vân"
                       className={styles.logo_img}
                     />
-                  </Link>
+                  </a>
                 </div>
 
                 {/* Search Bar - Larger */}
@@ -394,7 +410,15 @@ const SearchHeader = () => {
             }}
           >
             <div className={styles.drawer_logo}>
-              <Link href="/" onClick={() => setDrawerOpen(false)}>
+              <a
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setDrawerOpen(false);
+                  window.scrollTo(0, 0);
+                  setTimeout(() => router.push("/"), 10);
+                }}
+              >
                 <Image
                   src="/assets/logo.png"
                   alt="Gas Khánh Vân"
@@ -402,7 +426,7 @@ const SearchHeader = () => {
                   width={70}
                   height={70}
                 />
-              </Link>
+              </a>
             </div>
             <Menu
               onClick={onClick}

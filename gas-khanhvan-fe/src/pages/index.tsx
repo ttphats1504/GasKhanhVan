@@ -13,13 +13,22 @@ import Category from "@/models/Category";
 import { Flex, Typography, Skeleton } from "antd";
 import Brand from "@/models/Brand";
 import ProductCardSkeleton from "@/components/common/ProductCardSkeleton";
+import { useRouter } from "next/router";
 
 const { Title } = Typography;
 
 export default function Home() {
+  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Force scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [router.asPath]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,7 +37,7 @@ export default function Home() {
         // fetch categories
         const categoryRes: any = await handleAPI("/api/categories", "get");
         const filteredCategory = categoryRes.filter(
-          (cat: any) => cat.slug !== "san-pham"
+          (cat: any) => cat.slug !== "san-pham",
         );
         setCategories(filteredCategory);
 
@@ -42,14 +51,6 @@ export default function Home() {
       }
     };
     fetchData();
-  }, []);
-
-  // Smooth scroll behavior
-  useEffect(() => {
-    document.documentElement.style.scrollBehavior = "smooth";
-    return () => {
-      document.documentElement.style.scrollBehavior = "auto";
-    };
   }, []);
 
   return (
@@ -128,7 +129,7 @@ export default function Home() {
                       title={cat.name}
                       categoryId={cat.id}
                     />
-                  )
+                  ),
                 )}
 
                 {brands.map((brand: any) => (

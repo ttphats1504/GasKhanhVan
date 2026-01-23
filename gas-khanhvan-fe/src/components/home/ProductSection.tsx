@@ -21,7 +21,7 @@ const fetchProductDatas = async (
   limit = 6,
   categoryId?: number,
   brandId?: number,
-  isFeatured?: boolean
+  isFeatured?: boolean,
 ) => {
   let api = `/api/products?page=${page}&limit=${limit}`;
   if (categoryId) api += `&typeId=${categoryId}`;
@@ -57,7 +57,7 @@ export default function ProductSection({
       limit,
       categoryId,
       brandId,
-      isFeatured
+      isFeatured,
     );
     if (res) {
       setProducts(res.data);
@@ -91,11 +91,12 @@ export default function ProductSection({
           <Title level={3} className={styles.product_title}>
             {title}
           </Title>
+          <div className={styles.line_break}></div>
         </Flex>
 
         <Row className={styles.card_wrap} gutter={[16, 16]}>
           {products.map((product: Product) => (
-            <Col key={product.id} sm={12} xs={12} md={8} lg={4}>
+            <Col key={product.id} xs={12} sm={8} md={6} lg={6} xl={4}>
               <ProductCard product={product} />
             </Col>
           ))}

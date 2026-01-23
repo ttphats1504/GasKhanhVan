@@ -8,6 +8,8 @@ import { DefaultSeo } from "next-seo";
 import { ConfigProvider } from "antd";
 import { StyleProvider } from "@ant-design/cssinjs";
 import FloatButtons from "@/components/common/FloatButtons";
+import { useRouter } from "next/router";
+import { useEffect, useLayoutEffect } from "react";
 
 const roboto = Roboto({
   weight: "400",
@@ -15,6 +17,32 @@ const roboto = Roboto({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+
+  // Disable browser scroll restoration
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  // Scroll to top IMMEDIATELY when route changes using useLayoutEffect
+  useLayoutEffect(() => {
+    // Force scroll multiple times to override any interference
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    // Also scroll after a tiny delay to catch late interference
+    const timer = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [router.asPath]);
+
   return (
     <>
       <DefaultSeo
