@@ -4,10 +4,15 @@ import {
   FireOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined,
   LogoutOutlined,
   UserOutlined,
   TeamOutlined,
+  GiftOutlined,
+  PictureOutlined,
+  StarOutlined,
+  TagsOutlined,
+  FileTextOutlined,
+  DashboardOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -18,6 +23,7 @@ import {
   Dropdown,
   Space,
   Typography,
+  Breadcrumb,
 } from "antd";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -48,24 +54,46 @@ const MainRouter = () => {
   } = theme.useToken();
 
   const [selectedKey, setSelectedKey] = useState("1");
+  const [breadcrumbItems, setBreadcrumbItems] = useState<any[]>([
+    { title: "Dashboard" },
+  ]);
+
+  const menuConfig: Record<string, { title: string; path: string }> = {
+    "1": { title: "Products", path: "/product" },
+    "2": { title: "Categories", path: "/category" },
+    "3": { title: "Incentives", path: "/incentive" },
+    "4": { title: "Banners", path: "/banner" },
+    "5": { title: "Featured Products", path: "/features-product" },
+    "6": { title: "Brands", path: "/brands" },
+    "7": { title: "Blogs", path: "/blogs" },
+    "8": { title: "Admin Users", path: "/admin-users" },
+  };
 
   useEffect(() => {
-    console.log(location.pathname);
+    let key = "1";
     if (location.pathname.includes("/product")) {
-      setSelectedKey("1");
+      key = "1";
     } else if (location.pathname.includes("/category")) {
-      setSelectedKey("2");
+      key = "2";
     } else if (location.pathname.includes("/incentive")) {
-      setSelectedKey("3");
+      key = "3";
     } else if (location.pathname.includes("/banner")) {
-      setSelectedKey("4");
+      key = "4";
     } else if (location.pathname.includes("/features-product")) {
-      setSelectedKey("5");
+      key = "5";
     } else if (location.pathname.includes("/brands")) {
-      setSelectedKey("6");
+      key = "6";
+    } else if (location.pathname.includes("/blogs")) {
+      key = "7";
     } else if (location.pathname.includes("/admin-users")) {
-      setSelectedKey("8");
+      key = "8";
     }
+    setSelectedKey(key);
+    setBreadcrumbItems([
+      { title: <DashboardOutlined /> },
+      { title: menuConfig[key]?.title || "Dashboard" },
+    ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   const handleMenuClick = (e: any) => {
@@ -104,9 +132,47 @@ const MainRouter = () => {
   ];
 
   return (
-    <Layout>
-      <Sider trigger={null} collapsible collapsed={collapsed}>
-        <div className="demo-logo-vertical" />
+    <Layout style={{ minHeight: "100vh" }}>
+      <Sider
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+        style={{
+          overflow: "auto",
+          height: "100vh",
+          position: "fixed",
+          left: 0,
+          top: 0,
+          bottom: 0,
+        }}
+      >
+        <div
+          style={{
+            height: 64,
+            margin: 16,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(255, 255, 255, 0.1)",
+            borderRadius: 8,
+          }}
+        >
+          {!collapsed ? (
+            <Typography.Title
+              level={4}
+              style={{ color: "#fff", margin: 0, fontWeight: 600 }}
+            >
+              🔥 GasKhanhVan
+            </Typography.Title>
+          ) : (
+            <Typography.Title
+              level={4}
+              style={{ color: "#fff", margin: 0, fontWeight: 600 }}
+            >
+              🔥
+            </Typography.Title>
+          )}
+        </div>
         <Menu
           theme="dark"
           mode="inline"
@@ -116,36 +182,36 @@ const MainRouter = () => {
             {
               key: "1",
               icon: <FireOutlined />,
-              label: "Product",
+              label: "Products",
             },
             {
               key: "2",
               icon: <AppstoreAddOutlined />,
-              label: "Menu Items",
+              label: "Categories",
             },
             {
               key: "3",
-              icon: <UploadOutlined />,
-              label: "Incentives Items",
+              icon: <GiftOutlined />,
+              label: "Incentives",
             },
             {
               key: "4",
-              icon: <UploadOutlined />,
+              icon: <PictureOutlined />,
               label: "Banners",
             },
             {
               key: "5",
-              icon: <UploadOutlined />,
-              label: "Features Product",
+              icon: <StarOutlined />,
+              label: "Featured Products",
             },
             {
               key: "6",
-              icon: <UploadOutlined />,
+              icon: <TagsOutlined />,
               label: "Brands",
             },
             {
               key: "7",
-              icon: <UploadOutlined />,
+              icon: <FileTextOutlined />,
               label: "Blogs",
             },
             {
@@ -156,7 +222,9 @@ const MainRouter = () => {
           ]}
         />
       </Sider>
-      <Layout>
+      <Layout
+        style={{ marginLeft: collapsed ? 80 : 200, transition: "all 0.2s" }}
+      >
         <Header
           style={{
             padding: "0 24px",
@@ -164,26 +232,39 @@ const MainRouter = () => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            position: "sticky",
+            top: 0,
+            zIndex: 1,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
           }}
         >
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: "16px",
-              width: 64,
-              height: 64,
-            }}
-          />
+          <Space>
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{
+                fontSize: "16px",
+                width: 64,
+                height: 64,
+              }}
+            />
+            <Breadcrumb items={breadcrumbItems} />
+          </Space>
 
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
             <Space style={{ cursor: "pointer" }}>
               <Avatar
                 src={user?.photoURL}
                 icon={!user?.photoURL && <UserOutlined />}
+                size="large"
               />
-              <Text>{user?.displayName || user?.email || "Admin"}</Text>
+              <Space direction="vertical" size={0}>
+                <Text strong>{user?.displayName || "Admin"}</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  {user?.email}
+                </Text>
+              </Space>
             </Space>
           </Dropdown>
         </Header>

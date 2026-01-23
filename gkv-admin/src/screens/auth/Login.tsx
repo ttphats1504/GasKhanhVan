@@ -10,11 +10,11 @@ import {
 } from "antd";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
 import { addAuth } from "../../redux/reducers/authReducer";
-import { appInfo, localDataNames } from "../../constants/appInfos";
+import { localDataNames } from "../../constants/appInfos";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -24,6 +24,7 @@ const Login = () => {
 
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleLogin = async (values: { email: string; password: string }) => {
     console.log(values);
@@ -38,6 +39,9 @@ const Login = () => {
 
         // Always save to localStorage to persist auth state on reload
         localStorage.setItem(localDataNames.authData, JSON.stringify(res.data));
+
+        // Redirect to main page
+        navigate("/");
       }
     } catch (error: any) {
       message.error(error.message || "Login failed!");
@@ -51,21 +55,32 @@ const Login = () => {
       <Card
         style={{
           width: "50%",
+          maxWidth: 480,
+          boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+          borderRadius: 16,
         }}
       >
         <div className="text-center">
-          <img
-            className="mb-3"
-            src={appInfo.logo}
-            alt="KhanhVanGas Logo"
+          <div
             style={{
-              width: 48,
-              height: 48,
+              width: 64,
+              height: 64,
+              margin: "0 auto 16px",
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              borderRadius: 16,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 32,
             }}
-          />
-          <Title level={2}>Log in to your account</Title>
-          <Paragraph type="secondary">
-            Welcome back! please enter your details
+          >
+            🔥
+          </div>
+          <Title level={2} style={{ marginBottom: 8 }}>
+            Welcome Back
+          </Title>
+          <Paragraph type="secondary" style={{ fontSize: 16 }}>
+            Sign in to GasKhanhVan Admin Panel
           </Paragraph>
         </div>
 
@@ -123,10 +138,13 @@ const Login = () => {
             type="primary"
             style={{
               width: "100%",
+              height: 48,
+              fontSize: 16,
+              fontWeight: 600,
+              borderRadius: 8,
             }}
-            size="large"
           >
-            Login
+            Sign In
           </Button>
         </div>
         <SocialLogin isRemember={isRemember} />

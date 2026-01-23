@@ -2,6 +2,7 @@ import { Button, message } from "antd";
 import { signInWithPopup } from "firebase/auth";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import handleAPI from "../../../apis/handleAPI";
 import { auth, googleProvider } from "../../../firebase/firebaseConfig";
 import { addAuth } from "../../../redux/reducers/authReducer";
@@ -15,6 +16,7 @@ const SocialLogin = (_props: Props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleLoginWithGoogle = async () => {
     setIsLoading(true);
@@ -56,6 +58,9 @@ const SocialLogin = (_props: Props) => {
               localDataNames.authData,
               JSON.stringify(authData),
             );
+
+            // Redirect to main page
+            navigate("/");
           } catch (error: any) {
             console.log(error);
             message.error(error.message || "Login failed!");

@@ -6,28 +6,59 @@ const { Title } = Typography;
 
 const AuthRouter = () => {
   return (
-    <div className="container-fluid">
-      <div className="row">
+    <div
+      className="container-fluid"
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <div className="row" style={{ width: "100%" }}>
         <div
-          className="col d-none d-lg-block text-center"
-          style={{ marginTop: "15%" }}
+          className="col d-none d-lg-flex text-center"
+          style={{
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            color: "#fff",
+          }}
         >
-          <div className="mb-4">
-            <img
-              style={{
-                width: 256,
-                objectFit: "cover",
-              }}
-              src="https://firebasestorage.googleapis.com/v0/b/kanban-c0323.appspot.com/o/kanban-logo.png?alt=media&token=a3e8c386-57da-49a3-b9a2-94b8fd93ff83"
-              alt=""
-            />
+          <div
+            style={{
+              fontSize: 120,
+              marginBottom: 24,
+            }}
+          >
+            🔥
           </div>
-          <div>
-            <Title className="text-primary">KhanhVanGas Manage</Title>
-          </div>
+          <Title style={{ color: "#fff", fontSize: 48, fontWeight: 700 }}>
+            GasKhanhVan
+          </Title>
+          <Title level={3} style={{ color: "rgba(255,255,255,0.9)" }}>
+            Admin Management System
+          </Title>
+          <p
+            style={{
+              fontSize: 18,
+              color: "rgba(255,255,255,0.8)",
+              maxWidth: 400,
+            }}
+          >
+            Manage your gas cylinder business with ease. Track products, orders,
+            and customers all in one place.
+          </p>
         </div>
 
-        <div className="col content-center">
+        <div
+          className="col"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
